@@ -1,0 +1,616 @@
+{
+  "version": 1,
+  "video": {
+    "src": "juste-leblanc.mp4",
+    "durationMs": 255699
+  },
+  "speakers": [
+    {
+      "id": "SPEAKER_00"
+    },
+    {
+      "id": "SPEAKER_01"
+    }
+  ],
+  "segments": [
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 1297,
+      "t1": 1817
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 2158,
+      "t1": 4779
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 4839,
+      "t1": 8422
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 8482,
+      "t1": 12845
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 12865,
+      "t1": 14606
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 14646,
+      "t1": 15367
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 15907,
+      "t1": 18429
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 18449,
+      "t1": 21031
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 21051,
+      "t1": 23272
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 23332,
+      "t1": 24413
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 24473,
+      "t1": 28035
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 28075,
+      "t1": 28816
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 30077,
+      "t1": 32478
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 32497,
+      "t1": 34219
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 34239,
+      "t1": 35140
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 35160,
+      "t1": 36681
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 36701,
+      "t1": 38122
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 38142,
+      "t1": 39382
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 39422,
+      "t1": 40463
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 40523,
+      "t1": 41003
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 41023,
+      "t1": 42584
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 42604,
+      "t1": 43585
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 43665,
+      "t1": 44765
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 44966,
+      "t1": 45646
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 45686,
+      "t1": 47287
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 47327,
+      "t1": 48027
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 48047,
+      "t1": 50009
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 50029,
+      "t1": 50929
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 50969,
+      "t1": 52410
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 52430,
+      "t1": 53911
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 53931,
+      "t1": 58754
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 58794,
+      "t1": 59394
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 60777,
+      "t1": 62738
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 62778,
+      "t1": 64617
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 64638,
+      "t1": 65158
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 65218,
+      "t1": 70400
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 70460,
+      "t1": 70940
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 70980,
+      "t1": 71921
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 71961,
+      "t1": 72801
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 73081,
+      "t1": 73661
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 73701,
+      "t1": 74561
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 74881,
+      "t1": 75322
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 75362,
+      "t1": 80383
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 80503,
+      "t1": 81984
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 82044,
+      "t1": 85165
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 85205,
+      "t1": 85865
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 85905,
+      "t1": 86125
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 86145,
+      "t1": 86865
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 90984,
+      "t1": 92565
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 92865,
+      "t1": 94766
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 94786,
+      "t1": 95626
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 95666,
+      "t1": 100289
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 100309,
+      "t1": 105892
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 105912,
+      "t1": 109874
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 110134,
+      "t1": 114176
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 114236,
+      "t1": 114917
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 116167,
+      "t1": 118809
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 118889,
+      "t1": 119450
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 119490,
+      "t1": 120571
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 121231,
+      "t1": 122673
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 122713,
+      "t1": 124194
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 124254,
+      "t1": 129598
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 129619,
+      "t1": 130979
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 131020,
+      "t1": 132381
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 132421,
+      "t1": 133082
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 133262,
+      "t1": 133402
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 135904,
+      "t1": 136985
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 137145,
+      "t1": 138727
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 138787,
+      "t1": 139827
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 139867,
+      "t1": 143230
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 143310,
+      "t1": 143551
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 144913,
+      "t1": 147115
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 147135,
+      "t1": 148636
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 148676,
+      "t1": 150538
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 150558,
+      "t1": 152479
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 152499,
+      "t1": 156663
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 156683,
+      "t1": 157363
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 157403,
+      "t1": 158624
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 158664,
+      "t1": 160226
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 160286,
+      "t1": 164910
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 164950,
+      "t1": 165770
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 167111,
+      "t1": 167752
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 167772,
+      "t1": 168893
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 169013,
+      "t1": 170614
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 170634,
+      "t1": 171475
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 171535,
+      "t1": 172596
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 172616,
+      "t1": 173056
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 176074,
+      "t1": 178135
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 178535,
+      "t1": 180976
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 180996,
+      "t1": 181536
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 182497,
+      "t1": 183877
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 183917,
+      "t1": 186158
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 186278,
+      "t1": 187699
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 187719,
+      "t1": 188479
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 188819,
+      "t1": 191801
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 191821,
+      "t1": 193321
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 193381,
+      "t1": 195482
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 195502,
+      "t1": 197903
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 197943,
+      "t1": 201364
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 201404,
+      "t1": 202385
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 203933,
+      "t1": 207235
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 207275,
+      "t1": 209356
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 209396,
+      "t1": 214299
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 214319,
+      "t1": 217881
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 217921,
+      "t1": 219983
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 220043,
+      "t1": 221183
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 221223,
+      "t1": 223465
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 223485,
+      "t1": 225946
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 225986,
+      "t1": 226567
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 226727,
+      "t1": 229168
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 229248,
+      "t1": 230829
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 234818,
+      "t1": 237581
+    },
+    {
+      "speaker": "SPEAKER_01",
+      "t0": 237641,
+      "t1": 239843
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 239903,
+      "t1": 241925
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 241965,
+      "t1": 244968
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 245049,
+      "t1": 247311
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 247371,
+      "t1": 250995
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 251015,
+      "t1": 253297
+    },
+    {
+      "speaker": "SPEAKER_00",
+      "t0": 253357,
+      "t1": 254999
+    }
+  ],
+  "laneMap": {
+    "SPEAKER_00": 0,
+    "SPEAKER_01": 1
+  }
+}
