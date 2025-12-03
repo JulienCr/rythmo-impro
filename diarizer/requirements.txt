@@ -1,0 +1,18 @@
+# Core dependencies for WhisperX with diarization
+whisperx==3.2.0
+transformers>=4.30.0
+
+# Diarization (pyannote) - version required by whisperx 3.2.0
+pyannote.audio==3.1.1
+onnxruntime>=1.15.0
+
+# PyTorch/torchaudio - pin to versions compatible with pyannote.audio 3.1.1
+torch>=2.0.0,<2.1.0
+torchaudio>=2.0.0,<2.1.0
+
+# Audio/video processing
+ffmpeg-python>=0.2.0
+
+# Utilities
+numpy>=1.24.0,<2.0.0
+tqdm>=4.65.0

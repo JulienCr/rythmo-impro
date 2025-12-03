@@ -1,0 +1,28 @@
+# Environment variables (contains secrets)
+.env
+*.env
+
+venv/
+
+# Input/output directories
+in/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Node.js
+node_modules/
+.next/
+.pnpm-store/
+
+# Cache
+cache/
+
+# OS
+.DS_Store
+Thumbs.db
