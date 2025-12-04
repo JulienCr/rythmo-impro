@@ -1,0 +1,823 @@
+1
+00:00:01,246 --> 00:00:04,669
+[SPEAKER_00] Monsieur Pignon (conf: 0.64)
+
+2
+00:00:04,690 --> 00:00:04,710
+[UNKNOWN] ? (conf: 0.00)
+
+3
+00:00:04,730 --> 00:00:04,830
+[SPEAKER_00] Oui ? (conf: 0.45)
+
+4
+00:00:04,849 --> 00:00:06,171
+[SPEAKER_00] Si je vous dis précisément
+
+5
+00:00:06,192 --> 00:00:06,932
+[SPEAKER_00] ce qu'il faut lui dire, (conf: 0.69)
+
+6
+00:00:06,972 --> 00:00:07,793
+[SPEAKER_00] vous pensez que vous pouvez
+
+7
+00:00:07,833 --> 00:00:08,494
+[SPEAKER_00] le faire ? (conf: 0.58)
+
+8
+00:00:08,515 --> 00:00:09,195
+[SPEAKER_00] Il y a des moments,
+
+9
+00:00:09,275 --> 00:00:10,297
+[SPEAKER_00] j'ai vraiment l'impression que vous (conf: 0.70)
+
+10
+00:00:10,317 --> 00:00:12,880
+[SPEAKER_00] me prenez pour un imbécile. (conf: 0.34)
+
+11
+00:00:12,900 --> 00:00:13,621
+[SPEAKER_00] Mais bien sûr que je (conf: 0.72)
+
+12
+00:00:13,660 --> 00:00:14,662
+[SPEAKER_00] peux le faire ! (conf: 0.77)
+
+13
+00:00:14,682 --> 00:00:15,882
+[SPEAKER_00] Qu'est-ce que je dois dire (conf: 0.71)
+
+14
+00:00:15,903 --> 00:00:15,923
+[SPEAKER_00] ? (conf: 0.00)
+
+15
+00:00:15,942 --> 00:00:16,564
+[SPEAKER_00] On pourrait se servir du (conf: 0.65)
+
+16
+00:00:16,583 --> 00:00:18,446
+[SPEAKER_00] bouquin qu'ils ont écrit ensemble. (conf: 0.70)
+
+17
+00:00:18,466 --> 00:00:19,266
+[SPEAKER_00] Vous appelez Leblanc et vous (conf: 0.74)
+
+18
+00:00:19,306 --> 00:00:19,788
+[SPEAKER_00] lui dites que vous êtes (conf: 0.73)
+
+19
+00:00:19,827 --> 00:00:21,070
+[SPEAKER_00] producteur de films.
+
+20
+00:00:21,089 --> 00:00:21,931
+[SPEAKER_00] Vous avez lu le roman (conf: 0.67)
+
+21
+00:00:21,971 --> 00:00:22,591
+[SPEAKER_00] et vous voulez acheter les
+
+22
+00:00:22,611 --> 00:00:23,512
+[SPEAKER_00] droits pour le cinéma. (conf: 0.56)
+
+23
+00:00:23,532 --> 00:00:24,434
+[SPEAKER_00] Ah oui, c'est bien ça (conf: 0.30)
+
+24
+00:00:24,454 --> 00:00:24,474
+[SPEAKER_00] ! (conf: 0.01)
+
+25
+00:00:24,493 --> 00:00:25,375
+[SPEAKER_00] Et en fin de conversation, (conf: 0.74)
+
+26
+00:00:25,394 --> 00:00:26,135
+[SPEAKER_00] vous lui demandez où vous (conf: 0.73)
+
+27
+00:00:26,175 --> 00:00:28,077
+[SPEAKER_00] pouvez joindre sa collaboratrice.
+
+28
+00:00:28,097 --> 00:00:29,059
+[SPEAKER_00] Quelle collaboratrice ? (conf: 0.76)
+
+29
+00:00:30,085 --> 00:00:30,905
+[SPEAKER_00] Ma femme, je vous ai (conf: 0.60)
+
+30
+00:00:30,925 --> 00:00:31,545
+[SPEAKER_00] dit qu'il avait écrit en (conf: 0.60)
+
+31
+00:00:31,565 --> 00:00:32,506
+[SPEAKER_00] bouquin avec elle. (conf: 0.48)
+
+32
+00:00:32,527 --> 00:00:33,548
+[SPEAKER_00] Mais oui, exact, ok, d'accord, (conf: 0.59)
+
+33
+00:00:33,567 --> 00:00:34,289
+[SPEAKER_00] excusez-moi. (conf: 0.59)
+
+34
+00:00:34,308 --> 00:00:35,210
+[SPEAKER_00] Ça marchera jamais. (conf: 0.77)
+
+35
+00:00:35,229 --> 00:00:36,710
+[SPEAKER_00] Mais si, j'ai compris. (conf: 0.70)
+
+36
+00:00:36,731 --> 00:00:37,811
+[SPEAKER_00] C'est pas simple, mais j'ai (conf: 0.64)
+
+37
+00:00:37,832 --> 00:00:38,152
+[SPEAKER_00] compris.
+
+38
+00:00:38,171 --> 00:00:38,872
+[SPEAKER_00] Mais quoi c'est pas simple (conf: 0.69)
+
+39
+00:00:38,893 --> 00:00:38,912
+[SPEAKER_00] ?
+
+40
+00:00:38,932 --> 00:00:39,673
+[SPEAKER_00] C'est tout simple, vous êtes (conf: 0.67)
+
+41
+00:00:39,694 --> 00:00:40,854
+[SPEAKER_00] producteur, ok ? (conf: 0.40)
+
+42
+00:00:40,875 --> 00:00:41,335
+[SPEAKER_00] Ok, ok. Vous avez une (conf: 0.39)
+
+43
+00:00:41,354 --> 00:00:42,615
+[SPEAKER_00] maison de production à Paris.
+
+44
+00:00:42,637 --> 00:00:43,097
+[SPEAKER_00] Non, pas à Paris, il (conf: 0.56)
+
+45
+00:00:43,137 --> 00:00:43,676
+[SPEAKER_00] connaît tout le monde.
+
+46
+00:00:43,697 --> 00:00:45,598
+[SPEAKER_00] Vous êtes un producteur étranger. (conf: 0.74)
+
+47
+00:00:45,618 --> 00:00:47,341
+[SPEAKER_00] Ok, américain, allemand ? (conf: 0.52)
+
+48
+00:00:47,360 --> 00:00:48,142
+[SPEAKER_00] Belge. (conf: 0.75)
+
+49
+00:00:48,161 --> 00:00:50,042
+[SPEAKER_00] Voilà, c'est parfait ça, belge. (conf: 0.66)
+
+50
+00:00:50,063 --> 00:00:50,984
+[SPEAKER_00] Pourquoi belge ?
+
+51
+00:00:51,003 --> 00:00:51,704
+[SPEAKER_00] Parce que c'est très bien,
+
+52
+00:00:51,725 --> 00:00:52,445
+[SPEAKER_00] belge.
+
+53
+00:00:52,466 --> 00:00:53,365
+[SPEAKER_00] Vous êtes un gros producteur (conf: 0.78)
+
+54
+00:00:53,405 --> 00:00:54,506
+[SPEAKER_00] belge, vous avez lu Le
+
+55
+00:00:54,546 --> 00:00:55,508
+[SPEAKER_00] Petit Cheval de Manège, c'est (conf: 0.74)
+
+56
+00:00:55,548 --> 00:00:56,329
+[SPEAKER_00] le titre du roman, et (conf: 0.76)
+
+57
+00:00:56,368 --> 00:00:57,049
+[SPEAKER_00] vous voulez lui acheter les (conf: 0.77)
+
+58
+00:00:57,070 --> 00:00:58,771
+[SPEAKER_00] droits pour le cinéma, ok (conf: 0.67)
+
+59
+00:00:58,790 --> 00:00:58,811
+[SPEAKER_00] ? (conf: 0.48)
+
+60
+00:00:58,831 --> 00:00:59,551
+[SPEAKER_00] C'est un bon livre ?
+
+61
+00:01:00,662 --> 00:01:02,865
+[SPEAKER_00] Très mauvais qu'à l'importance. (conf: 0.29)
+
+62
+00:01:02,884 --> 00:01:04,647
+[SPEAKER_00] Ça m'embête un peu, ça. (conf: 0.59)
+
+63
+00:01:04,667 --> 00:01:05,227
+[SPEAKER_00] Pourquoi ? (conf: 0.51)
+
+64
+00:01:05,248 --> 00:01:06,188
+[SPEAKER_00] Si le bouquin est mauvais, (conf: 0.67)
+
+65
+00:01:06,209 --> 00:01:09,912
+[SPEAKER_00] pourquoi j'irais acheter les droits (conf: 0.67)
+
+66
+00:01:09,933 --> 00:01:09,953
+[UNKNOWN] ? (conf: 0.00)
+
+67
+00:01:09,972 --> 00:01:10,054
+[UNKNOWN] Ah ! (conf: 0.00)
+
+68
+00:01:10,073 --> 00:01:10,153
+[UNKNOWN] Ah ! (conf: 0.00)
+
+69
+00:01:10,174 --> 00:01:10,254
+[UNKNOWN] Ah ! (conf: 0.00)
+
+70
+00:01:10,274 --> 00:01:10,353
+[UNKNOWN] Ah ! (conf: 0.00)
+
+71
+00:01:10,373 --> 00:01:10,453
+[SPEAKER_00] Ah ! (conf: 0.48)
+
+72
+00:01:10,474 --> 00:01:12,335
+[SPEAKER_00] Monsieur Pignon, vous n'êtes pas (conf: 0.77)
+
+73
+00:01:12,376 --> 00:01:13,576
+[SPEAKER_00] producteur.
+
+74
+00:01:13,596 --> 00:01:13,677
+[SPEAKER_00] Non. (conf: 0.34)
+
+75
+00:01:13,737 --> 00:01:14,477
+[SPEAKER_00] Vous n'êtes pas belge non (conf: 0.73)
+
+76
+00:01:14,498 --> 00:01:14,838
+[SPEAKER_00] plus. (conf: 0.59)
+
+77
+00:01:14,858 --> 00:01:15,379
+[SPEAKER_00] Ah non. (conf: 0.45)
+
+78
+00:01:15,400 --> 00:01:16,060
+[SPEAKER_00] Ça n'est donc pas pour
+
+79
+00:01:16,099 --> 00:01:16,840
+[SPEAKER_00] acheter les droits du livre (conf: 0.78)
+
+80
+00:01:16,881 --> 00:01:17,701
+[SPEAKER_00] que vous téléphonez, mais pour
+
+81
+00:01:17,742 --> 00:01:18,703
+[SPEAKER_00] essayer de savoir où est (conf: 0.69)
+
+82
+00:01:18,722 --> 00:01:20,525
+[SPEAKER_00] ma femme.
+
+83
+00:01:20,545 --> 00:01:22,126
+[SPEAKER_00] Oh ! (conf: 0.70)
+
+84
+00:01:22,147 --> 00:01:23,709
+[SPEAKER_00] Alors ça, c'est très tordu, (conf: 0.72)
+
+85
+00:01:23,728 --> 00:01:25,210
+[SPEAKER_00] mais bougrement intelligent.
+
+86
+00:01:25,230 --> 00:01:26,591
+[SPEAKER_00] C'est quoi son numéro ? (conf: 0.63)
+
+87
+00:01:26,611 --> 00:01:27,733
+[SPEAKER_00] 01 47 47. (conf: 0.64)
+
+88
+00:01:28,394 --> 00:01:29,234
+[SPEAKER_00] Je vais le faire moi-même. (conf: 0.70)
+
+89
+00:01:30,953 --> 00:01:32,594
+[SPEAKER_00] Il s'appelle Juste Leblanc. (conf: 0.70)
+
+90
+00:01:32,635 --> 00:01:33,094
+[SPEAKER_01] Ah bon, il n'a pas (conf: 0.49)
+
+91
+00:01:33,135 --> 00:01:34,796
+[SPEAKER_01] de prénom ? (conf: 0.54)
+
+92
+00:01:34,816 --> 00:01:35,277
+[SPEAKER_00] Je viens de vous le
+
+93
+00:01:35,296 --> 00:01:40,322
+[SPEAKER_00] dire, Juste Leblanc.
+
+94
+00:01:40,343 --> 00:01:41,403
+[SPEAKER_00] Leblanc, c'est son nom et (conf: 0.72)
+
+95
+00:01:41,444 --> 00:01:45,927
+[SPEAKER_00] c'est Juste son prénom. (conf: 0.78)
+
+96
+00:01:45,947 --> 00:01:47,750
+[SPEAKER_00] Monsieur Pignon, votre prénom à
+
+97
+00:01:47,790 --> 00:01:49,792
+[SPEAKER_00] vous, c'est François, c'est Juste (conf: 0.78)
+
+98
+00:01:49,811 --> 00:01:49,831
+[UNKNOWN] ? (conf: 0.00)
+
+99
+00:01:49,852 --> 00:01:49,932
+[SPEAKER_00] Oui. (conf: 0.11)
+
+100
+00:01:49,951 --> 00:01:50,753
+[SPEAKER_00] Eh bien, lui, c'est pareil, (conf: 0.46)
+
+101
+00:01:50,772 --> 00:01:54,135
+[SPEAKER_00] c'est Juste.
+
+102
+00:01:54,156 --> 00:01:54,777
+[SPEAKER_00] Bon, on a assez perdu (conf: 0.45)
+
+103
+00:01:54,796 --> 00:01:55,677
+[SPEAKER_00] le temps comme ça. (conf: 0.50)
+
+104
+00:01:56,079 --> 00:01:56,740
+[SPEAKER_00] Ma femme a signé le (conf: 0.31)
+
+105
+00:01:56,760 --> 00:01:57,421
+[SPEAKER_00] roman de son autre jeune (conf: 0.63)
+
+106
+00:01:57,462 --> 00:01:58,884
+[SPEAKER_00] fille, Christine Le Guirec. (conf: 0.73)
+
+107
+00:01:58,903 --> 00:01:59,545
+[SPEAKER_00] Ah bon ? (conf: 0.33)
+
+108
+00:01:59,564 --> 00:02:01,246
+[SPEAKER_00] Elle est bretonne ? (conf: 0.64)
+
+109
+00:02:01,266 --> 00:02:02,188
+[SPEAKER_00] Je vous en prie, restez
+
+110
+00:02:02,227 --> 00:02:02,709
+[SPEAKER_00] concentrés.
+
+111
+00:02:02,728 --> 00:02:04,251
+[SPEAKER_00] Excusez-moi. (conf: 0.53)
+
+112
+00:02:04,271 --> 00:02:05,433
+[SPEAKER_00] Et vous n'oubliez pas, en (conf: 0.78)
+
+113
+00:02:05,453 --> 00:02:06,674
+[SPEAKER_00] fin de conversation, vous lui (conf: 0.65)
+
+114
+00:02:06,713 --> 00:02:07,816
+[SPEAKER_00] demandez où vous pouvez joindre
+
+115
+00:02:07,855 --> 00:02:09,679
+[SPEAKER_00] Christine Le Guirec. (conf: 0.80)
+
+116
+00:02:09,699 --> 00:02:10,199
+[SPEAKER_00] Ça sonne, je vous mets (conf: 0.52)
+
+117
+00:02:10,218 --> 00:02:11,039
+[SPEAKER_00] sur haut-parleur. (conf: 0.62)
+
+118
+00:02:11,060 --> 00:02:12,421
+[SPEAKER_00] C'est à vous. (conf: 0.68)
+
+119
+00:02:12,442 --> 00:02:19,352
+[SPEAKER_00] Je prends l'accent belge ? (conf: 0.56)
+
+120
+00:02:19,372 --> 00:02:19,451
+[SPEAKER_01] Non. (conf: 0.01)
+
+121
+00:02:19,472 --> 00:02:19,592
+[SPEAKER_01] Allô ? (conf: 0.00)
+
+122
+00:02:19,611 --> 00:02:19,731
+[SPEAKER_01] Allô ? (conf: 0.00)
+
+123
+00:02:19,752 --> 00:02:19,872
+[SPEAKER_01] Allô ? (conf: 0.26)
+
+124
+00:02:19,891 --> 00:02:21,955
+[SPEAKER_01] Pourrais-je parler à monsieur Leblanc, (conf: 0.54)
+
+125
+00:02:21,974 --> 00:02:23,777
+[SPEAKER_01] juste une fois ? (conf: 0.71)
+
+126
+00:02:23,798 --> 00:02:23,978
+[UNKNOWN] Fais-moi. (conf: 0.22)
+
+127
+00:02:24,751 --> 00:02:27,133
+[SPEAKER_01] Bonsoir, monsieur Leblanc. (conf: 0.75)
+
+128
+00:02:27,153 --> 00:02:28,757
+[SPEAKER_01] Georges Van Brueghel à l'appareil. (conf: 0.57)
+
+129
+00:02:28,776 --> 00:02:29,538
+[SPEAKER_01] Pardon de vous déranger à (conf: 0.72)
+
+130
+00:02:29,557 --> 00:02:30,558
+[SPEAKER_01] une heure aussi tardive.
+
+131
+00:02:30,579 --> 00:02:31,881
+[SPEAKER_01] Je suis producteur belge de (conf: 0.68)
+
+132
+00:02:31,901 --> 00:02:32,502
+[SPEAKER_01] sport. (conf: 0.35)
+
+133
+00:02:32,521 --> 00:02:33,903
+[SPEAKER_01] J'arrive dans Belgique une fois (conf: 0.63)
+
+134
+00:02:33,963 --> 00:02:35,126
+[SPEAKER_01] et je suis très intéressé (conf: 0.79)
+
+135
+00:02:35,165 --> 00:02:37,408
+[SPEAKER_01] par votre roman. (conf: 0.79)
+
+136
+00:02:37,590 --> 00:02:39,132
+[SPEAKER_01] Votre roman ? (conf: 0.14)
+
+137
+00:02:39,151 --> 00:02:39,733
+[SPEAKER_01] Le Petit Cheval de Manège. (conf: 0.06)
+
+138
+00:02:39,752 --> 00:02:40,293
+[SPEAKER_01] Le Petit Cheval de Manège. (conf: 0.03)
+
+139
+00:02:40,313 --> 00:02:43,258
+[SPEAKER_01] Et j'aimerais discuter l'achat des (conf: 0.70)
+
+140
+00:02:43,277 --> 00:02:44,960
+[SPEAKER_01] droits pour le cinéma. (conf: 0.70)
+
+141
+00:02:44,979 --> 00:02:47,103
+[SPEAKER_01] C'est une blague ou quoi (conf: 0.43)
+
+142
+00:02:47,122 --> 00:02:47,143
+[SPEAKER_01] ? (conf: 0.01)
+
+143
+00:02:47,163 --> 00:02:50,908
+[SPEAKER_01] Pas du tout. (conf: 0.71)
+
+144
+00:02:50,929 --> 00:02:51,348
+[SPEAKER_01] Pourquoi une blague ? (conf: 0.00)
+
+145
+00:02:51,368 --> 00:02:51,530
+[SPEAKER_01] Étienne. (conf: 0.06)
+
+146
+00:02:51,550 --> 00:02:51,750
+[SPEAKER_01] Pardon ? (conf: 0.33)
+
+147
+00:02:51,770 --> 00:02:52,631
+[SPEAKER_01] Arrête tes conneries, Étienne. (conf: 0.15)
+
+148
+00:02:52,651 --> 00:02:53,812
+[SPEAKER_01] Je t'ai reconnu. (conf: 0.30)
+
+149
+00:02:55,800 --> 00:02:57,522
+[SPEAKER_01] Vous faites erreur, M. Leblanc.
+
+150
+00:02:57,544 --> 00:02:59,986
+[SPEAKER_01] Je suis producteur et j'arrive
+
+151
+00:03:00,007 --> 00:03:03,932
+[SPEAKER_01] de Bruxelles.
+
+152
+00:03:04,152 --> 00:03:06,896
+[SPEAKER_01] Quelle production ? (conf: 0.09)
+
+153
+00:03:06,917 --> 00:03:07,076
+[SPEAKER_01] Pardon ? (conf: 0.00)
+
+154
+00:03:07,097 --> 00:03:07,758
+[SPEAKER_01] Votre maison de production, c'est (conf: 0.00)
+
+155
+00:03:07,777 --> 00:03:07,899
+[SPEAKER_01] quoi ? (conf: 0.02)
+
+156
+00:03:07,919 --> 00:03:08,378
+[SPEAKER_01] Les films du plat-pays. (conf: 0.03)
+
+157
+00:03:08,399 --> 00:03:09,159
+[SPEAKER_01] Les films du plat-pays ? (conf: 0.15)
+
+158
+00:03:09,199 --> 00:03:10,842
+[SPEAKER_01] Une production jeune mais dynamique.
+
+159
+00:03:11,864 --> 00:03:16,411
+[SPEAKER_01] Vous êtes intéressé (conf: 0.60)
+
+160
+00:03:16,431 --> 00:03:16,730
+[SPEAKER_01] par mon roman ? (conf: 0.00)
+
+161
+00:03:16,751 --> 00:03:17,292
+[UNKNOWN] Absolument, très intéressé. (conf: 0.00)
+
+162
+00:03:17,312 --> 00:03:17,772
+[UNKNOWN] C'est pour le cinéma ou (conf: 0.00)
+
+163
+00:03:17,793 --> 00:03:17,973
+[UNKNOWN] la télé ? (conf: 0.13)
+
+164
+00:03:17,992 --> 00:03:19,695
+[SPEAKER_01] Pour le cinéma, M. Leblanc, (conf: 0.60)
+
+165
+00:03:19,716 --> 00:03:21,418
+[SPEAKER_01] pour le grand écran.
+
+166
+00:03:21,437 --> 00:03:22,719
+[SPEAKER_01] Pas pour la petite lucarne.
+
+167
+00:03:23,948 --> 00:03:24,968
+[SPEAKER_01] Je dois vous prévenir que (conf: 0.48)
+
+168
+00:03:24,989 --> 00:03:27,371
+[SPEAKER_01] j'aimerais faire l'adaptation moi-même. (conf: 0.72)
+
+169
+00:03:27,390 --> 00:03:28,072
+[SPEAKER_01] Je ne parie pas poser (conf: 0.53)
+
+170
+00:03:28,092 --> 00:03:29,393
+[SPEAKER_01] de problème, ça, monsieur Leblanc.
+
+171
+00:03:29,413 --> 00:03:31,555
+[SPEAKER_01] Mais vous devez seulement s'avouer (conf: 0.63)
+
+172
+00:03:31,574 --> 00:03:32,175
+[SPEAKER_01] que nous n'avons pas une (conf: 0.37)
+
+173
+00:03:32,195 --> 00:03:33,776
+[SPEAKER_01] grosse production et que nous (conf: 0.36)
+
+174
+00:03:33,796 --> 00:03:34,418
+[SPEAKER_01] n'avons pas de normes moyennes. (conf: 0.00)
+
+175
+00:03:34,437 --> 00:03:36,359
+[SPEAKER_01] Mais si vous n'êtes pas (conf: 0.40)
+
+176
+00:03:36,378 --> 00:03:37,020
+[SPEAKER_01] trop gourmand... On réglera les (conf: 0.18)
+
+177
+00:03:37,039 --> 00:03:40,043
+[SPEAKER_01] questions d'argent plus (conf: 0.26)
+
+178
+00:03:40,062 --> 00:03:40,163
+[SPEAKER_01] tard. (conf: 0.01)
+
+179
+00:03:40,182 --> 00:03:40,963
+[SPEAKER_01] Quand puis-je vous rencontrer, monsieur (conf: 0.03)
+
+180
+00:03:40,984 --> 00:03:41,003
+[SPEAKER_01] ? (conf: 0.00)
+
+181
+00:03:41,024 --> 00:03:41,223
+[SPEAKER_01] Monsieur ? (conf: 0.28)
+
+182
+00:03:41,243 --> 00:03:43,165
+[SPEAKER_01] Va à Bruegel, alors écoutez (conf: 0.33)
+
+183
+00:03:43,186 --> 00:03:43,205
+[SPEAKER_01] ! (conf: 0.00)
+
+184
+00:03:43,225 --> 00:03:44,006
+[SPEAKER_01] Alors écoutez, je vous appelle (conf: 0.56)
+
+185
+00:03:44,045 --> 00:03:44,606
+[SPEAKER_01] demain chez vous et on (conf: 0.63)
+
+186
+00:03:44,646 --> 00:03:45,987
+[SPEAKER_01] prend rendez-vous une fois. (conf: 0.60)
+
+187
+00:03:46,008 --> 00:03:47,049
+[SPEAKER_01] Entendu, à demain. (conf: 0.74)
+
+188
+00:03:47,068 --> 00:03:49,330
+[SPEAKER_01] À demain, monsieur Leblanc ! (conf: 0.38)
+
+189
+00:03:49,350 --> 00:03:50,652
+[SPEAKER_01] Et voilà, on a les (conf: 0.44)
+
+190
+00:03:50,693 --> 00:03:52,114
+[SPEAKER_01] droits ! (conf: 0.31)
+
+191
+00:03:52,133 --> 00:03:52,234
+[UNKNOWN] Ouh ! (conf: 0.49)
+
+192
+00:03:52,753 --> 00:03:55,837
+[SPEAKER_01] Pour (conf: 0.75)
+
+193
+00:03:55,877 --> 00:03:56,679
+[SPEAKER_01] pas cher à mon avis,
+
+194
+00:03:56,739 --> 00:03:57,639
+[SPEAKER_01] il a marché ! (conf: 0.51)
+
+195
+00:03:57,659 --> 00:03:58,501
+[SPEAKER_01] Il a marché à fond, (conf: 0.69)
+
+196
+00:03:58,520 --> 00:03:59,902
+[SPEAKER_01] le gars ! (conf: 0.53)
+
+197
+00:03:59,923 --> 00:04:01,965
+[SPEAKER_00] Et ma femme ? (conf: 0.72)
+
+198
+00:04:01,985 --> 00:04:05,008
+[SPEAKER_00] Quoi (conf: 0.60)
+
+199
+00:04:05,028 --> 00:04:05,049
+[SPEAKER_00] ? (conf: 0.01)
+
+200
+00:04:05,068 --> 00:04:07,331
+[SPEAKER_00] Il a oublié ma femme. (conf: 0.79)
+
+201
+00:04:07,391 --> 00:04:08,212
+[SPEAKER_00] Il fait le clown pendant (conf: 0.78)
+
+202
+00:04:08,272 --> 00:04:09,174
+[SPEAKER_00] cinq minutes et il oublie (conf: 0.64)
+
+203
+00:04:09,193 --> 00:04:11,016
+[SPEAKER_00] ma femme.
+
+204
+00:04:11,037 --> 00:04:13,360
+[SPEAKER_00] À la boulette ! (conf: 0.62)
+
+205
+00:04:13,379 --> 00:04:14,341
+[SPEAKER_00] Ça dépasse tout ce que
+
+206
+00:04:14,381 --> 00:04:15,301
+[SPEAKER_00] j'ai pu imaginer. (conf: 0.79)

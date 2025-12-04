@@ -48,18 +48,9 @@ source venv/bin/activate
 echo "📦 Upgrading pip..."
 pip install --upgrade pip
 
-# Install PyTorch (let it install the version it needs)
-echo "📦 Installing PyTorch..."
-if command -v nvidia-smi &> /dev/null; then
-    echo "   CUDA detected, installing PyTorch with CUDA support..."
-    pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
-else
-    echo "   No CUDA detected, installing CPU-only PyTorch..."
-    pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-fi
-
-# Install other dependencies
-echo "📦 Installing Python dependencies..."
+# Install dependencies from requirements.txt
+# (includes PyTorch with CUDA 12.1 support)
+echo "📦 Installing Python dependencies (including PyTorch with CUDA 12.1)..."
 pip install -r requirements.txt
 
 # Check for .env file

@@ -33,5 +33,14 @@ set -a  # Automatically export all variables
 source "$SCRIPT_DIR/.env"
 set +a
 
+# PyTorch 2.6+ compatibility: Disable weights-only loading for trusted model checkpoints
+# This allows loading of pyannote/WhisperX models that contain library-specific classes
+# See: https://github.com/m-bain/whisperX/issues/1304
+export TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
+
+# Add cuDNN libraries from venv to library path
+# PyTorch 2.8+ installs cuDNN as a pip package, but we need to ensure it's found at runtime
+export LD_LIBRARY_PATH="$SCRIPT_DIR/venv/lib/python3.10/site-packages/nvidia/cudnn/lib:${LD_LIBRARY_PATH}"
+
 # Run the Python script with all arguments passed through
 python "$SCRIPT_DIR/main.py" "$@"

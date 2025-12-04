@@ -94,14 +94,37 @@ The diarization JSON (`/public/cues/*.json`) follows this schema:
 # Build the diarization container
 docker build -t obs-rythmo-diarizer ./diarizer
 
-# Run diarization on a video file
+# Run diarization on a video file (basic - uses all defaults)
+docker run --rm -e HF_TOKEN=$HF_TOKEN \
+  -v "$PWD/in":/in -v "$PWD/out":/out \
+  obs-rythmo-diarizer
+
+# With model selection and speaker constraints (recommended for better accuracy)
 docker run --rm -e HF_TOKEN=$HF_TOKEN \
   -v "$PWD/in":/in -v "$PWD/out":/out \
   obs-rythmo-diarizer \
-  --input /in/scene01.mp4 --output /out/scene01.json --model small
+  --model large-v3 --min-speakers 2 --max-speakers 4
 
-# Available models: tiny, base, small, medium (default: small)
+# With segment quality tuning (reduce fragmentation)
+docker run --rm -e HF_TOKEN=$HF_TOKEN \
+  -v "$PWD/in":/in -v "$PWD/out":/out \
+  obs-rythmo-diarizer \
+  --merge-gap 0.8 --silence-threshold 0.6 --min-duration 0.4
+
+# Full tuning (recommended for production)
+docker run --rm -e HF_TOKEN=$HF_TOKEN \
+  -v "$PWD/in":/in -v "$PWD/out":/out \
+  obs-rythmo-diarizer \
+  --model large-v3 \
+  --min-speakers 2 --max-speakers 4 \
+  --merge-gap 0.8 --silence-threshold 0.6 --min-duration 0.4 \
+  --clustering-threshold 0.9
+
+# Available Whisper models: tiny, base, small, medium, large, large-v2, large-v3 (default: medium)
+# large-v3 provides best accuracy but is slowest
 # Available languages: auto, fr, en (default: auto)
+# Speaker constraints: Use --min-speakers and --max-speakers when you know the expected range
+# Segment tuning: --silence-threshold, --merge-gap, --min-duration (see below for details)
 ```
 
 ### Next.js Application
@@ -149,6 +172,110 @@ Default values (configurable via props):
 - Set size to match video resolution
 - Video can be muted (overlay only) or audible for rehearsal
 - Keep audio for Twitch output on actors' microphones, not video
+
+## Improving Speaker Detection Accuracy
+
+Speaker diarization accuracy depends on several factors. The system now uses **word-level timestamps** to dramatically reduce fragmentation and improve segment boundaries.
+
+### 1. Model Selection
+- **Whisper model size**: Larger models (large-v3) provide better transcription quality
+  - `tiny`: Fastest, least accurate
+  - `small`: Good balance for testing
+  - `medium`: Default, good for most cases
+  - `large-v3`: Best accuracy, slowest (recommended for production)
+
+### 2. Speaker Constraints
+When you know the expected number of speakers, use constraints:
+```bash
+--min-speakers 2 --max-speakers 4
+```
+This prevents over-segmentation (too many speakers) or under-segmentation (too few).
+
+### 3. Segment Quality Tuning (Word-Level Processing)
+
+**NEW**: The system now leverages word-level timestamps from WhisperX to provide precise segment boundaries and reduce fragmentation.
+
+#### Silence Threshold (`--silence-threshold`)
+Splits segments when the gap between words exceeds this duration (in seconds).
+- **Default**: 0.5 seconds
+- **Lower (0.2-0.4)**: More sensitive to pauses, creates shorter segments
+- **Higher (0.8-1.0)**: Allows longer natural pauses within segments
+- **Use case**: Increase for conversational speech with thinking pauses
+
+Example:
+```bash
+--silence-threshold 0.8  # Allow longer pauses in conversational content
+```
+
+#### Merge Gap (`--merge-gap`)
+Merges adjacent same-speaker segments when the gap between them is less than this duration (in seconds).
+- **Default**: 0.5 seconds
+- **Lower (0.2-0.3)**: Less aggressive merging, preserves more segment boundaries
+- **Higher (0.8-1.0)**: More aggressive merging, reduces fragmentation
+- **Use case**: Increase if you see many tiny segments from same speaker
+
+Example:
+```bash
+--merge-gap 0.8  # Aggressively merge fragmented segments
+```
+
+#### Minimum Duration (`--min-duration`)
+Filters out segments shorter than this duration (in seconds).
+- **Default**: 0.3 seconds
+- **Lower (0.1-0.2)**: Preserves short utterances like "yes", "okay"
+- **Higher (0.5-1.0)**: More aggressive filtering, removes filler words
+- **Use case**: Increase to clean up noisy diarization with many tiny segments
+
+Example:
+```bash
+--min-duration 0.5  # Filter short filler segments
+```
+
+### 4. Speaker Clustering Threshold (`--clustering-threshold`)
+
+Controls how aggressively the system groups similar voices together at the diarization level.
+- **Default**: ~0.7 (auto, set by pyannote model)
+- **Range**: 0.0 to 2.0
+- **Lower (0.5-0.6)**: More speakers, less merging (use if different people are incorrectly merged)
+- **Higher (0.8-1.0)**: Fewer speakers, more merging (use if one person is incorrectly split)
+
+Example:
+```bash
+--clustering-threshold 0.9  # Merge voices that sound similar (reduce fragmentation)
+```
+
+### 5. Audio Quality
+- Clear audio with minimal background noise
+- Distinct speaker voices (different pitch, tone)
+- Minimal voice overlap (though simultaneous speech is supported)
+
+### 6. Pyannote.audio Version
+Current version: Determined by WhisperX 3.7.4 (likely 3.2.x or 3.3.x)
+- WhisperX 3.7.4 uses newer pyannote versions with improved clustering
+- Supports better speaker separation for similar-sounding voices
+
+### 7. Language Specification
+If you know the language, specify it instead of using auto-detection:
+```bash
+--language fr  # French
+--language en  # English
+```
+
+### Recommended Workflow for Tuning
+
+1. **First run**: Use defaults to assess baseline quality
+2. **If fragmented** (one person → many segments):
+   - Increase `--merge-gap` to 0.8
+   - Increase `--clustering-threshold` to 0.9
+3. **If merged** (different people → one speaker):
+   - Decrease `--clustering-threshold` to 0.6
+   - Decrease `--merge-gap` to 0.3
+4. **If too many tiny segments**:
+   - Increase `--min-duration` to 0.5
+   - Increase `--merge-gap` to 0.8
+5. **If losing short interjections**:
+   - Decrease `--min-duration` to 0.2
+   - Decrease `--silence-threshold` to 0.3
 
 ## Security Considerations
 

@@ -3,36 +3,56 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense } from 'react';
 import RythmoOverlay from '@/components/RythmoOverlay';
-import { loadCuesFromUrl, type CuesData } from '@/lib/loadCues';
+import { loadCuesFromUrl, loadSubtitlesFromUrl, type CuesData, type Subtitle } from '@/lib/loadCues';
 
 function RythmoOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [cues, setCues] = useState<CuesData | null>(null);
+  const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Get query parameters with defaults
   const videoSrc = searchParams.get('video') || '/media/juste-leblanc.mp4';
   const cuesUrl = searchParams.get('cues') || '/cues/juste-leblanc.json';
+  const subtitlesUrl = searchParams.get('subtitles') || null;
 
   // Load cues data on mount or when cuesUrl changes
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    loadCuesFromUrl(cuesUrl)
-      .then(data => {
-        setCues(data);
+    const loadData = async () => {
+      try {
+        // Load cues (required)
+        const cuesData = await loadCuesFromUrl(cuesUrl);
+        setCues(cuesData);
+
+        // Load subtitles (optional)
+        if (subtitlesUrl) {
+          try {
+            const srtData = await loadSubtitlesFromUrl(subtitlesUrl);
+            setSubtitles(srtData);
+          } catch (srtError) {
+            console.warn('Failed to load subtitles, continuing without them:', srtError);
+            setSubtitles([]);
+          }
+        } else {
+          setSubtitles([]);
+        }
+
         setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Failed to load cues:', err);
         setError(err instanceof Error ? err.message : 'Failed to load cues');
         setLoading(false);
-      });
-  }, [cuesUrl]);
+      }
+    };
+
+    loadData();
+  }, [cuesUrl, subtitlesUrl]);
 
   return (
     <div className="relative w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
@@ -67,13 +87,14 @@ function RythmoOverlayContent() {
           />
 
           {/* Canvas overlay - absolutely positioned over video */}
-          <div className="absolute top-0 left-0 w-full pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
             <RythmoOverlay
               videoRef={videoRef}
               cues={cues}
               windowMs={6000}
               laneHeight={20}
               laneGap={8}
+              subtitles={subtitles}
             />
           </div>
         </div>

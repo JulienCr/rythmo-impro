@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, RefObject } from 'react';
-import { CuesData } from '@/lib/loadCues';
+import { useEffect, useRef, RefObject, useState } from 'react';
+import { CuesData, Subtitle } from '@/lib/loadCues';
 
 interface RythmoOverlayProps {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -9,6 +9,7 @@ interface RythmoOverlayProps {
   windowMs?: number;      // Default: 6000 (±3s rolling window)
   laneHeight?: number;    // Default: 20px
   laneGap?: number;       // Default: 8px
+  subtitles?: Subtitle[]; // Optional SRT subtitles
 }
 
 // Lane colors - fixed mapping per specification
@@ -26,8 +27,10 @@ export default function RythmoOverlay({
   windowMs = 6000,
   laneHeight = 20,
   laneGap = 8,
+  subtitles = [],
 }: RythmoOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [currentSubtitle, setCurrentSubtitle] = useState<string>('');
 
   // Calculate number of lanes needed
   const numLanes = Math.max(...Object.values(cues.laneMap)) + 1;
@@ -132,6 +135,14 @@ export default function RythmoOverlay({
       ctx.lineTo(canvas.width / 2, totalHeight);
       ctx.stroke();
 
+      // Update current subtitle
+      if (subtitles.length > 0) {
+        const activeSubtitle = subtitles.find(
+          sub => currentTimeMs >= sub.t0 && currentTimeMs <= sub.t1
+        );
+        setCurrentSubtitle(activeSubtitle?.text || '');
+      }
+
       // Schedule next frame
       animationFrameId = requestAnimationFrame(render);
     };
@@ -142,13 +153,27 @@ export default function RythmoOverlay({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [videoRef, cues, windowMs, laneHeight, laneGap, totalHeight]);
+  }, [videoRef, cues, windowMs, laneHeight, laneGap, totalHeight, subtitles]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="block"
-      style={{ imageRendering: 'crisp-edges' }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className="block"
+        style={{ imageRendering: 'crisp-edges' }}
+      />
+      {currentSubtitle && (
+        <div
+          className="absolute bottom-4 left-0 right-0 text-center pointer-events-none"
+          style={{
+            textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)'
+          }}
+        >
+          <p className="text-white text-2xl font-bold px-4">
+            {currentSubtitle}
+          </p>
+        </div>
+      )}
+    </>
   );
 }

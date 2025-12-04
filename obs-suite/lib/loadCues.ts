@@ -12,6 +12,13 @@ export interface Segment {
   t1: number;  // milliseconds - end time
 }
 
+export interface Subtitle {
+  t0: number;  // milliseconds - start time
+  t1: number;  // milliseconds - end time
+  text: string;
+  speaker?: string;  // optional speaker ID from [SPEAKER_XX] tag
+}
+
 export interface CuesData {
   version: number;
   video: {
@@ -21,6 +28,7 @@ export interface CuesData {
   speakers: Speaker[];
   segments: Segment[];
   laneMap: Record<string, number>;
+  subtitles?: Subtitle[];  // optional subtitles from SRT
 }
 
 /**
@@ -106,7 +114,86 @@ export function validateCuesData(data: unknown): data is CuesData {
 }
 
 /**
+ * SRT timestamp format: HH:MM:SS,mmm
+ * Converts to milliseconds
+ */
+function parseSrtTimestamp(timestamp: string): number {
+  const [time, ms] = timestamp.split(',');
+  const [hours, minutes, seconds] = time.split(':').map(Number);
+  return (hours * 3600 + minutes * 60 + seconds) * 1000 + Number(ms);
+}
+
+/**
+ * Extract speaker ID from SRT subtitle text
+ * Format: [SPEAKER_00] text or [UNKNOWN] text
+ * Returns { speaker, text } or null if no speaker tag found
+ */
+function extractSpeaker(text: string): { speaker: string; text: string } | null {
+  const match = text.match(/^\[([A-Z_0-9]+)\]\s*(.*)/);
+  if (!match) return null;
+  return { speaker: match[1], text: match[2] };
+}
+
+/**
+ * Parse SRT file content into subtitles
+ */
+function parseSrtToSubtitles(content: string): Subtitle[] {
+  const subtitles: Subtitle[] = [];
+  const blocks = content.trim().split(/\n\n+/);
+
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    if (lines.length < 3) continue;
+
+    // Line 0: sequence number (ignored)
+    // Line 1: timestamp range
+    // Line 2+: subtitle text
+    const timestampLine = lines[1];
+    const textLines = lines.slice(2).join(' ');
+
+    // Parse timestamps
+    const timestampMatch = timestampLine.match(/(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/);
+    if (!timestampMatch) continue;
+
+    const t0 = parseSrtTimestamp(timestampMatch[1]);
+    const t1 = parseSrtTimestamp(timestampMatch[2]);
+
+    // Extract speaker (optional)
+    const speakerData = extractSpeaker(textLines);
+
+    subtitles.push({
+      t0,
+      t1,
+      text: speakerData ? speakerData.text : textLines,
+      speaker: speakerData?.speaker,
+    });
+  }
+
+  return subtitles;
+}
+
+/**
+ * Load subtitles from SRT URL
+ */
+export async function loadSubtitlesFromUrl(url: string): Promise<Subtitle[]> {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch subtitles: ${response.status} ${response.statusText}`);
+    }
+
+    const content = await response.text();
+    return parseSrtToSubtitles(content);
+  } catch (error) {
+    console.error('Failed to load subtitles:', error);
+    throw error;
+  }
+}
+
+/**
  * Loads and validates cues data from a URL
+ * Only supports JSON format for cues
  */
 export async function loadCuesFromUrl(url: string): Promise<CuesData> {
   try {

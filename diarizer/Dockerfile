@@ -1,5 +1,6 @@
 # CUDA-enabled base for faster GPU processing
-FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+# Using CUDA 12.1 with cuDNN 9 for PyTorch 2.8+ compatibility (required by WhisperX 3.7.4)
+FROM nvidia/cuda:12.1.0-cudnn9-runtime-ubuntu22.04
 
 # Prevent interactive prompts during build
 ENV DEBIAN_FRONTEND=noninteractive
@@ -22,8 +23,9 @@ WORKDIR /app
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 
-# Install PyTorch with CUDA support first
-RUN pip install --no-cache-dir torch==2.0.1 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
+# Install PyTorch with CUDA 12.1 support first
+# WhisperX 3.7.4 requires torch~=2.8.0 which needs cuDNN 9
+RUN pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # Install remaining dependencies
 RUN pip install --no-cache-dir -r requirements.txt

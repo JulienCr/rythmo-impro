@@ -1,18 +1,22 @@
+# PyTorch/torchaudio - Latest versions with CUDA support
+# PyTorch 2.8+ required by WhisperX 3.7.4
+# Note: PyTorch 2.8 automatically installs nvidia-cudnn-cu12 (cuDNN 9.x) as a pip package
+torch>=2.8.0
+torchaudio>=2.8.0
+
 # Core dependencies for WhisperX with diarization
-whisperx==3.2.0
+# Latest version with improved speaker detection and clustering parameter support
+whisperx==3.7.4
 transformers>=4.30.0
 
-# Diarization (pyannote) - version required by whisperx 3.2.0
-pyannote.audio==3.1.1
+# Diarization (pyannote) - version will be resolved by whisperx 3.7.4 dependencies
+# WhisperX 3.7.4 should support newer pyannote versions with better clustering
+pyannote.audio
 onnxruntime>=1.15.0
-
-# PyTorch/torchaudio - pin to versions compatible with pyannote.audio 3.1.1
-torch>=2.0.0,<2.1.0
-torchaudio>=2.0.0,<2.1.0
 
 # Audio/video processing
 ffmpeg-python>=0.2.0
 
 # Utilities
-numpy>=1.24.0,<2.0.0
+numpy
 tqdm>=4.65.0
