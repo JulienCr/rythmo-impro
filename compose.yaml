@@ -1,6 +1,0 @@
-services:
-  rythmoimpro:
-    image: rythmoimpro
-    build:
-      context: .
-      dockerfile: ./Dockerfile
