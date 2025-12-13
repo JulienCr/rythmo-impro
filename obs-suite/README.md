@@ -8,11 +8,14 @@ Next.js application for speaker diarization visualization overlays for OBS.
 # Install dependencies
 pnpm install
 
-# Start development server
+# Start development server (default port 3000)
 pnpm dev
+
+# Or with custom port
+PORT=8080 NEXT_PUBLIC_PORT=8080 pnpm dev
 ```
 
-**Then open**: http://localhost:3000/overlay/rythmo
+**Then open**: http://localhost:3000/overlay/rythmo (or your custom port)
 
 ## Usage
 
@@ -73,11 +76,49 @@ obs-suite/
 - **Simultaneous speech**: Multiple speakers shown at once
 - **Type-safe**: TypeScript with runtime JSON validation
 
+## Configuration
+
+### Port Configuration
+
+The server port can be customized via environment variables:
+
+**Option 1: Command line**
+```bash
+PORT=8080 NEXT_PUBLIC_PORT=8080 pnpm dev
+```
+
+**Option 2: .env file**
+```bash
+# Copy example config
+cp .env.example .env
+
+# Edit .env and set:
+PORT=8080
+NEXT_PUBLIC_PORT=8080
+NEXT_PUBLIC_HOSTNAME=localhost
+
+# Run normally
+pnpm dev
+```
+
+**Important**:
+- `PORT` - Server port (used by Node.js server)
+- `NEXT_PUBLIC_PORT` - Public port (exposed to browser for WebSocket)
+- These should **always match** for WebSocket to work correctly
+- WebSocket automatically uses the correct port when accessed via browser
+
+### Available Overlays
+
+- `/overlay/rythmo` - Legacy single-video overlay with bande rythmo
+- `/overlay/composite` - **New!** Dual-video overlay with character info and bande rythmo (16:9 ratio)
+
 ## Troubleshooting
 
-**Can't see overlay**: Make sure you're at `/overlay/rythmo`, not just `/`
+**Can't see overlay**: Make sure you're at `/overlay/rythmo` or `/overlay/composite`, not just `/`
 
 **Video won't play**: Verify file is in `public/media/` with correct path
+
+**WebSocket connection failed**: Ensure PORT and NEXT_PUBLIC_PORT match in your .env file
 
 **OBS alignment issues**: Match Browser Source dimensions to video resolution
 
