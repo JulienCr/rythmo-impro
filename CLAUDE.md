@@ -4,12 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**rythmo-impro** is an OBS overlay system that visualizes speaker diarization from video files. It consists of:
+**rythmo-impro** is a speaker diarization system that processes video files to identify who speaks when (without identity recognition). It consists of:
 
-1. **Dockerized Python service** (`/diarizer/`) - Uses WhisperX + pyannote to perform speaker diarization and output JSON timing data
-2. **Next.js overlay application** (`/obs-suite/`) - Renders video with a fixed-lane "bande rythmo" visualization for OBS browser sources
+1. **Dockerized Python service** (`/diarizer/`) - Uses WhisperX + pyannote to perform speaker diarization and output word-level detailed JSON data
+2. **Next.js overlay application** (`/obs-suite/`) - *(Legacy)* Renders video with a fixed-lane "bande rythmo" visualization for OBS browser sources
 
-The system takes video files as input, identifies who speaks when (without identity recognition), and displays color-coded lanes showing speech timing suitable for theatrical improvisation rehearsal.
+The system takes video files as input and outputs detailed transcription with word-level timestamps, suitable for:
+- CLI audio player playback with synchronized transcripts
+- Theatrical improvisation rehearsal analysis
+- Subtitle generation
+- Speech analysis and debugging
 
 ## Architecture
 
@@ -17,16 +21,16 @@ The system takes video files as input, identifies who speaks when (without ident
 
 **Location**: `/diarizer/`
 
-- **Entry point**: `main.py` - CLI that accepts video input and outputs JSON
+- **Entry point**: `main.py` - CLI that accepts video input and outputs multiple JSON formats + SRT subtitles
 - **Technology**: WhisperX with pyannote.audio for speaker diarization
 - **Authentication**: Requires `HF_TOKEN` environment variable (Hugging Face) for pyannote models
-- **Input/Output**: Mounted volumes at `/in` (video files) and `/out` (JSON output)
+- **Input/Output**: Mounted volumes at `/in` (video files) and `/out` (JSON + SRT output)
 
 **Critical constraints**:
 - Python runs ONLY inside Docker (never on host)
 - Input paths must be validated (no directory traversal outside `/in`)
 - Never log `HF_TOKEN` in any output
-- All times must be in milliseconds (integers)
+- Output format uses seconds (floats) for timestamps, preserving word-level precision
 
 ### Next.js Overlay Application
 
@@ -41,34 +45,106 @@ The system takes video files as input, identifies who speaks when (without ident
 
 **Technology stack**: Next.js + Tailwind CSS + pnpm
 
-## Data Format
+## Output Formats
 
-The diarization JSON (`/public/cues/*.json`) follows this schema:
+The diarization service generates **three output files** per video:
+
+### 1. CLI Player JSON Format (`video.cli.json`)
+
+Strict WhisperX-compatible format for use with CLI audio players:
+
+```json
+{
+  "segments": [
+    {
+      "start": 1.246,
+      "end": 4.669,
+      "speaker": "SPEAKER_00",
+      "text": "Monsieur Pignon, what a pleasure to see you again.",
+      "words": [
+        {"start": 1.246, "end": 1.550, "word": "Monsieur"},
+        {"start": 1.560, "end": 2.100, "word": "Pignon"},
+        {"start": 2.120, "end": 2.300, "word": "what"}
+      ]
+    }
+  ]
+}
+```
+
+**Key features**:
+- Times in **seconds** (floats)
+- Word-level timestamps for each word
+- Transcribed text with punctuation (when available)
+- Compatible with https://github.com/cheuerde/tools/tree/main/cli_audio_player_with_transcripts
+
+### 2. Enhanced JSON Format (`video.enhanced.json`)
+
+Extended format with metadata and confidence scores for debugging:
 
 ```json
 {
   "version": 1,
+  "format": "enhanced",
   "video": {
-    "src": "scene01.mp4",
-    "durationMs": 123456
+    "filename": "scene01.mp4",
+    "durationMs": 123456,
+    "durationSec": 123.456
   },
   "speakers": [
-    { "id": "SPEAKER_00" },
-    { "id": "SPEAKER_01" }
+    {"id": "SPEAKER_00"},
+    {"id": "SPEAKER_01"}
   ],
   "segments": [
-    { "speaker": "SPEAKER_00", "t0": 2510, "t1": 5320 },
-    { "speaker": "SPEAKER_01", "t0": 5400, "t1": 6900 }
+    {
+      "id": 0,
+      "start": 1.246,
+      "end": 4.669,
+      "speaker": "SPEAKER_00",
+      "text": "Monsieur Pignon, what a pleasure to see you again.",
+      "word_count": 9,
+      "words": [
+        {
+          "start": 1.246,
+          "end": 1.550,
+          "word": "Monsieur",
+          "confidence": 0.92
+        }
+      ]
+    }
   ],
-  "laneMap": {
-    "SPEAKER_00": 0,
-    "SPEAKER_01": 1
+  "stats": {
+    "total_segments": 28,
+    "total_speakers": 2,
+    "total_words": 245
   }
 }
 ```
 
-- All times are milliseconds (integers)
-- `laneMap` assigns speakers to fixed visual lanes using a deterministic algorithm
+**Key features**:
+- Includes confidence scores for each word
+- Video metadata and statistics
+- Segment IDs for reference
+- Useful for quality analysis and debugging
+
+### 3. SRT Subtitle Format (`video.srt`)
+
+Standard SRT subtitle file with speaker labels:
+
+```
+1
+00:00:01,246 --> 00:00:04,669
+[SPEAKER_00] Monsieur Pignon, what a pleasure to see you again.
+
+2
+00:00:13,921 --> 00:00:14,622
+[SPEAKER_01] Thank you.
+```
+
+**Key features**:
+- Standard SRT format compatible with video editors
+- Shows speaker labels in brackets
+- Includes confidence warnings for low-quality segments
+- Useful for subtitle creation and manual review
 
 ## Lane Assignment Algorithm
 
@@ -88,46 +164,154 @@ The diarization JSON (`/public/cues/*.json`) follows this schema:
 
 ## Common Commands
 
-### Docker (Diarization Service)
+### Interactive Video Processing (Recommended)
+
+**Location**: `/obs-suite/scripts/process-video.ts`
+
+The easiest way to process videos is using the interactive CLI, which handles both diarization and FCP XML generation:
 
 ```bash
-# Build the diarization container
-docker build -t obs-rythmo-diarizer ./diarizer
+# Navigate to obs-suite directory
+cd obs-suite
 
-# Run diarization on a video file (basic - uses all defaults)
-docker run --rm -e HF_TOKEN=$HF_TOKEN \
-  -v "$PWD/in":/in -v "$PWD/out":/out \
-  obs-rythmo-diarizer
+# Interactive mode - process all videos with prompts
+pnpm process-video
+
+# Process all videos without prompts (skip existing files)
+pnpm process-video --all
+
+# Process specific video (skip existing files by default)
+pnpm process-video juste-leblanc.mp4
+
+# Force regenerate everything for all videos
+pnpm process-video --all --force
+
+# Process all videos but skip vocal removal
+pnpm process-video --all --skip-vocal-removal
+
+# Show help
+pnpm process-video --help
+```
+
+**Features**:
+- Batch processing: Processes all videos in `/in` directory by default
+- Smart skip-existing: Automatically skips videos that already have outputs
+- Interactive prompts for configuration (model selection, speaker constraints)
+- Generates diarization outputs, FCP XML, thumbnails, AND vocal-removed videos in one command
+- Uses WSL Python environment (no Docker required)
+- Default model: `large-v3` (best accuracy)
+
+**Workflow**:
+1. Scans `/in` directory for all video files
+2. Runs diarization (skips videos with existing outputs unless `--force`)
+3. Generates FCP XML for each video (skips if XML exists unless `--force`)
+4. Generates thumbnails for each video (skips if thumbnail exists unless `--force`)
+5. Removes vocals from each video using audio-separator (skips if final video exists unless `--force`)
+6. Shows summary of processed/skipped files
+
+**Prerequisites**:
+- WSL environment with Python venv setup
+- HF_TOKEN in `diarizer/.env`
+- Run `diarizer/setup-wsl.sh` first if not set up
+- audio-separator installed: `pip install audio-separator onnxruntime-gpu`
+- CUDA GPU recommended for vocal removal (30-60s vs 3-10min CPU)
+
+### WSL Python (Diarization Service)
+
+**Note**: Docker is no longer used. The system now runs directly in WSL with a Python virtual environment.
+
+```bash
+# Setup (first time only)
+cd diarizer
+./setup-wsl.sh
+
+# Create .env file with your Hugging Face token
+echo "HF_TOKEN=your_token_here" > .env
+
+# Run diarization on all videos in ../in/ (uses defaults)
+./run-wsl.sh --input-dir ../in --output-dir ../out
+
+# Process a single video
+./run-wsl.sh --input-dir ../in --output-dir ../out --input video.mp4
+
+# Process all videos with large-v3 model (default) and skip existing
+./run-wsl.sh --input-dir ../in --output-dir ../out --model large-v3
+
+# Force reprocess all videos (skip-existing is default, use --no-skip-existing to override)
+./run-wsl.sh --input-dir ../in --output-dir ../out --no-skip-existing
 
 # With model selection and speaker constraints (recommended for better accuracy)
-docker run --rm -e HF_TOKEN=$HF_TOKEN \
-  -v "$PWD/in":/in -v "$PWD/out":/out \
-  obs-rythmo-diarizer \
+./run-wsl.sh --input-dir ../in --output-dir ../out \
   --model large-v3 --min-speakers 2 --max-speakers 4
 
 # With segment quality tuning (reduce fragmentation)
-docker run --rm -e HF_TOKEN=$HF_TOKEN \
-  -v "$PWD/in":/in -v "$PWD/out":/out \
-  obs-rythmo-diarizer \
+./run-wsl.sh --input-dir ../in --output-dir ../out \
   --merge-gap 0.8 --silence-threshold 0.6 --min-duration 0.4
 
 # Full tuning (recommended for production)
-docker run --rm -e HF_TOKEN=$HF_TOKEN \
-  -v "$PWD/in":/in -v "$PWD/out":/out \
-  obs-rythmo-diarizer \
+./run-wsl.sh --input-dir ../in --output-dir ../out \
   --model large-v3 \
   --min-speakers 2 --max-speakers 4 \
   --merge-gap 0.8 --silence-threshold 0.6 --min-duration 0.4 \
   --clustering-threshold 0.9
 
-# Available Whisper models: tiny, base, small, medium, large, large-v2, large-v3 (default: medium)
+# Available Whisper models: tiny, base, small, medium, large, large-v2, large-v3 (default: large-v3)
 # large-v3 provides best accuracy but is slowest
 # Available languages: auto, fr, en (default: auto)
 # Speaker constraints: Use --min-speakers and --max-speakers when you know the expected range
 # Segment tuning: --silence-threshold, --merge-gap, --min-duration (see below for details)
+
+# Skip existing (default behavior):
+# - --skip-existing (default): Skip videos that already have all 3 output files
+# - --no-skip-existing: Force reprocess all videos even if outputs exist
+
+# Output files generated per video:
+# - video.cli.json (CLI player format with word-level detail)
+# - video.enhanced.json (extended format with confidence scores)
+# - video.srt (SRT subtitles)
+# - video.xml (FCP XML for NLE import)
+# - thumbs/video.jpg (thumbnail image)
+# - final-vids/video.mp4 (video with vocals removed)
 ```
 
-### Next.js Application
+### Vocal Removal (audio-separator)
+
+The vocal removal step uses `audio-separator` with the MDX23C-InstVoc HQ model to create instrumental versions of videos. This is integrated into the `process-video` pipeline as Step 4.
+
+```bash
+# Skip vocal removal in the pipeline
+pnpm process-video --all --skip-vocal-removal
+
+# Standalone vocal removal (if needed)
+cd diarizer
+./run-vocal-removal.sh --input ../in/video.mp4 --output ../out/final-vids/video.mp4
+
+# Force regenerate
+./run-vocal-removal.sh --input ../in/video.mp4 --output ../out/final-vids/video.mp4 --force
+
+# Custom model (default: MDX23C-InstVoc HQ)
+./run-vocal-removal.sh --input ../in/video.mp4 --output ../out/final-vids/video.mp4 --model "MDX23C-InstVoc HQ"
+```
+
+**How it works**:
+1. Extracts audio as WAV from input video (ffmpeg)
+2. Removes vocals using audio-separator with CUDA acceleration
+3. Remuxes instrumental audio with original video track (video codec copied, no re-encode)
+
+**Output**:
+- Creates `out/final-vids/video.mp4` with instrumental audio only
+- Preserves original video quality (video stream is copied, not re-encoded)
+- Audio encoded as AAC at 192kbps
+
+**Performance**:
+- With CUDA GPU: 30-60 seconds per video
+- With CPU only: 3-10 minutes per video (automatic fallback if GPU unavailable)
+
+**Special cases**:
+- Videos without audio tracks are copied as-is (no processing)
+- If GPU memory is insufficient, automatically falls back to CPU processing
+
+### Next.js Application *(Legacy - Not Currently Used)*
 
 ```bash
 # Install dependencies
@@ -143,10 +327,7 @@ pnpm build
 pnpm start
 ```
 
-**Overlay URL format** (for OBS Browser Source):
-```
-http://localhost:3000/overlay/rythmo?video=/media/scene01.mp4&cues=/cues/scene01.json
-```
+**Note**: The overlay application is currently not actively used. The diarization service focuses on generating detailed word-level JSON formats for external tools like CLI audio players.
 
 ## Key Implementation Details
 
@@ -300,9 +481,13 @@ If you know the language, specify it instead of using auto-detection:
 
 ## Acceptance Criteria
 
-1. Docker container processes sample `.mp4` and outputs valid JSON with ≥1 speaker
-2. Overlay displays video with stable top-to-bottom colored lanes
-3. Overlapping speech shows multiple bars simultaneously (each in its fixed lane)
-4. Visual remains smooth at 60fps on 1080p in OBS Browser Source
-5. Lane assignments are deterministic across multiple runs on same video
-- when we need to pin a python lib version, keep it the reason + version in a file for good memory
+1. Docker container processes sample `.mp4` and outputs 3 files (CLI JSON, enhanced JSON, SRT)
+2. CLI JSON matches WhisperX format specification with word-level timestamps
+3. Enhanced JSON includes confidence scores and metadata for all segments
+4. All segments contain transcribed text (no empty text fields)
+5. Word arrays are complete with start/end timestamps for every word
+6. Output is deterministic (same input → identical output files across runs)
+7. SRT file format is valid and compatible with video editors
+8. Text quality: Uses original WhisperX transcription when available, word concatenation as fallback
+
+**Note**: When pinning Python library versions, document the reason + version in DEPENDENCIES.md for good memory.
