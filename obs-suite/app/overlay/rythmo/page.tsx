@@ -1,116 +1,231 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState, Suspense } from 'react';
-import RythmoOverlay from '@/components/RythmoOverlay';
-import { loadCuesFromUrl, loadSubtitlesFromUrl, type CuesData, type Subtitle } from '@/lib/loadCues';
+import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
+import FcpxmlOverlay from '@/components/FcpxmlOverlay';
+import IntroPanel from '@/components/IntroPanel';
+import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
+import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import {
+  isLoadVideoCommand,
+  isPlayCommand,
+  isPauseCommand,
+  isSeekCommand,
+  generateClientId,
+  type StateUpdate,
+} from '@/lib/websocket/types';
 
-function RythmoOverlayContent() {
+function FcpxmlOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [cues, setCues] = useState<CuesData | null>(null);
-  const [subtitles, setSubtitles] = useState<Subtitle[]>([]);
+  const [visualizationData, setVisualizationData] = useState<CharacterVisualizationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [wsVideoSrc, setWsVideoSrc] = useState<string>('');
+  const [wsTracksUrl, setWsTracksUrl] = useState<string>('');
+  const [showIntro, setShowIntro] = useState(false);
+  const lastStateUpdateRef = useRef<number>(0);
+  const clientIdRef = useRef<string>(generateClientId());
 
-  // Get query parameters with defaults
-  const videoSrc = searchParams.get('video') || '/media/juste-leblanc.mp4';
-  const cuesUrl = searchParams.get('cues') || '/cues/juste-leblanc.json';
-  const subtitlesUrl = searchParams.get('subtitles') || null;
+  // WebSocket connection (display client)
+  const { connected, send } = useWebSocket({
+    clientType: 'display',
+    onMessage: (message) => {
+      // Handle load_video command
+      if (isLoadVideoCommand(message)) {
+        console.log('[WS] Loading video:', message.videoPath);
+        setWsVideoSrc(message.videoPath);
+        setWsTracksUrl(message.tracksPath);
+      }
 
-  // Load cues data on mount or when cuesUrl changes
+      // Handle play command
+      if (isPlayCommand(message)) {
+        console.log('[WS] Play command');
+        // Hide intro panel when play command is received
+        setShowIntro(false);
+        videoRef.current?.play().catch(err => {
+          console.warn('[WS] Play failed:', err);
+        });
+      }
+
+      // Handle pause command
+      if (isPauseCommand(message)) {
+        console.log('[WS] Pause command');
+        videoRef.current?.pause();
+      }
+
+      // Handle seek command
+      if (isSeekCommand(message)) {
+        console.log('[WS] Seek command:', message.time);
+        if (videoRef.current) {
+          videoRef.current.currentTime = message.time;
+        }
+      }
+    },
+  });
+
+  // Send state update via WebSocket (throttled)
+  const sendStateUpdate = useCallback((force = false) => {
+    const now = Date.now();
+    // Throttle to 2 updates per second (unless forced)
+    if (!force && now - lastStateUpdateRef.current < 500) return;
+
+    const video = videoRef.current;
+    if (!video || !connected) return;
+
+    const stateUpdate: Omit<StateUpdate, 'timestamp'> = {
+      type: 'state_update',
+      clientId: clientIdRef.current,
+      state: {
+        playing: !video.paused,
+        currentTime: video.currentTime,
+        duration: video.duration || 0,
+        rate: video.playbackRate,
+        videoPath: video.src,
+      },
+    };
+
+    console.log('[Display] Sending state update:', stateUpdate.state);
+    send(stateUpdate);
+    lastStateUpdateRef.current = now;
+  }, [connected, send]);
+
+  // Get query parameters
+  const videoParam = searchParams.get('video');
+  const tracksParam = searchParams.get('tracks');
+
+  // Derive paths: WebSocket state takes priority over query parameters
+  let videoSrc: string;
+  let tracksUrl: string;
+
+  if (wsVideoSrc && wsTracksUrl) {
+    // WebSocket command has set the video
+    videoSrc = wsVideoSrc;
+    tracksUrl = wsTracksUrl;
+  } else if (videoParam) {
+    // Fall back to query parameters
+    videoSrc = videoParam;
+    // If tracks param provided, use it; otherwise derive from video basename
+    if (tracksParam) {
+      tracksUrl = tracksParam;
+    } else {
+      // Extract basename from video path
+      const videoFilename = videoParam.split('/').pop() || '';
+      const basename = videoFilename.replace(/\.[^.]+$/, ''); // Remove extension
+      tracksUrl = `/api/out/final-json/${basename}.json`;
+    }
+  } else {
+    // No video loaded - show nothing (transparent)
+    videoSrc = '';
+    tracksUrl = '';
+  }
+
+  // Load tracks on mount or URL change
   useEffect(() => {
+    if (!videoSrc || !tracksUrl) {
+      // No video selected yet
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     const loadData = async () => {
       try {
-        // Load cues (required)
-        const cuesData = await loadCuesFromUrl(cuesUrl);
-        setCues(cuesData);
-
-        // Load subtitles (optional)
-        if (subtitlesUrl) {
-          try {
-            const srtData = await loadSubtitlesFromUrl(subtitlesUrl);
-            setSubtitles(srtData);
-          } catch (srtError) {
-            console.warn('Failed to load subtitles, continuing without them:', srtError);
-            setSubtitles([]);
-          }
-        } else {
-          setSubtitles([]);
-        }
-
+        const vizData = await loadTracksFromUrl(tracksUrl);
+        setVisualizationData(vizData);
         setLoading(false);
+        // Show intro panel when data is loaded
+        setShowIntro(true);
       } catch (err) {
-        console.error('Failed to load cues:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load cues');
+        console.error('Failed to load tracks:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load tracks');
         setLoading(false);
       }
     };
 
     loadData();
-  }, [cuesUrl, subtitlesUrl]);
+  }, [tracksUrl, videoSrc]);
+
+  // Send state updates via WebSocket
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Event handlers
+    const handleTimeUpdate = () => sendStateUpdate();
+    const handlePlay = () => sendStateUpdate(true); // Force send on play
+    const handlePause = () => sendStateUpdate(true); // Force send on pause
+    const handleLoadedMetadata = () => sendStateUpdate(true); // Force send on load
+
+    // Attach event listeners
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    // Send initial state when connected
+    if (connected) {
+      sendStateUpdate(true);
+    }
+
+    // Cleanup - always runs
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [sendStateUpdate, connected]);
+
+  // Extract video name from URL
+  const videoName = videoSrc
+    ? decodeURIComponent(videoSrc.split('/').pop()?.replace(/\.[^.]+$/, '') || 'Vidéo inconnue')
+    : 'Vidéo inconnue';
 
   return (
-    <div className="relative w-screen h-screen bg-black flex items-center justify-center overflow-hidden">
-      {loading && (
-        <div className="text-white text-xl">
-          Loading cues...
-        </div>
+    <div className="relative w-full h-screen bg-transparent flex flex-col overflow-hidden">
+      {/* Always render video, hide if no source */}
+      <video
+        ref={videoRef}
+        src={videoSrc}
+        className={videoSrc ? "w-full h-auto" : "hidden"}
+        playsInline
+      />
+
+      {/* Overlay - only shown when video is loaded */}
+      {videoSrc && visualizationData && !loading && !error && (
+        <FcpxmlOverlay
+          videoRef={videoRef}
+          visualizationData={visualizationData}
+          windowMs={6000}
+          laneHeight={32}
+          laneGap={1}
+        />
       )}
 
-      {error && (
-        <div className="text-red-500 text-xl p-8 max-w-2xl">
-          <h2 className="font-bold mb-4">Error Loading Cues</h2>
-          <p className="font-mono text-sm bg-red-900/20 p-4 rounded">
-            {error}
-          </p>
-          <p className="mt-4 text-sm text-gray-400">
-            URL: {cuesUrl}
-          </p>
-        </div>
-      )}
-
-      {cues && !loading && !error && (
-        <div className="relative">
-          {/* Video element */}
-          <video
-            ref={videoRef}
-            src={videoSrc}
-            className="block max-w-full max-h-screen"
-            controls
-            playsInline
-            autoPlay={false}
-          />
-
-          {/* Canvas overlay - absolutely positioned over video */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-            <RythmoOverlay
-              videoRef={videoRef}
-              cues={cues}
-              windowMs={6000}
-              laneHeight={20}
-              laneGap={8}
-              subtitles={subtitles}
-            />
-          </div>
-        </div>
+      {/* Intro panel - shown initially when data is loaded, hidden on play */}
+      {showIntro && visualizationData && (
+        <IntroPanel
+          visualizationData={visualizationData}
+          videoName={videoName}
+        />
       )}
     </div>
   );
 }
 
-export default function RythmoOverlayPage() {
+export default function FcpxmlOverlayPage() {
   return (
     <Suspense fallback={
       <div className="w-screen h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <div className="text-white text-xl">Chargement...</div>
       </div>
     }>
-      <RythmoOverlayContent />
+      <FcpxmlOverlayContent />
     </Suspense>
   );
 }

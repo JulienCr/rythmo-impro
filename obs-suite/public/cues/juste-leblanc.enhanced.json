@@ -1,0 +1,4061 @@
+{
+  "version": 2,
+  "format": "enhanced",
+  "video": {
+    "filename": "juste-leblanc.mp4",
+    "durationMs": 255699,
+    "durationSec": 255.699
+  },
+  "speakers": [
+    {
+      "id": "SPEAKER_00"
+    },
+    {
+      "id": "SPEAKER_01"
+    }
+  ],
+  "segments": [
+    {
+      "id": 0,
+      "start": 1.246,
+      "end": 2.53,
+      "speaker": "SPEAKER_00",
+      "text": "Monsieur Pignon",
+      "word_count": 2,
+      "words": [
+        {
+          "start": 1.246,
+          "end": 1.506,
+          "word": "Monsieur",
+          "confidence": 0.941
+        },
+        {
+          "start": 1.586,
+          "end": 2.53,
+          "word": "Pignon",
+          "confidence": 0.331
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "start": 4.85,
+      "end": 13.881,
+      "speaker": "SPEAKER_00",
+      "text": "Si je vous dis précisément ce qu'il faut lui dire, vous pensez que vous pouvez le faire Il y a des moments, j'ai vraiment l'impression que vous prenez pour imbécile. Mais bien sûr que je peux le faire !",
+      "word_count": 37,
+      "words": [
+        {
+          "start": 4.85,
+          "end": 4.97,
+          "word": "Si",
+          "confidence": 0.989
+        },
+        {
+          "start": 5.01,
+          "end": 5.071,
+          "word": "je",
+          "confidence": 0.98
+        },
+        {
+          "start": 5.111,
+          "end": 5.231,
+          "word": "vous",
+          "confidence": 0.899
+        },
+        {
+          "start": 5.271,
+          "end": 5.551,
+          "word": "dis",
+          "confidence": 0.781
+        },
+        {
+          "start": 5.611,
+          "end": 6.172,
+          "word": "précisément",
+          "confidence": 0.913
+        },
+        {
+          "start": 6.192,
+          "end": 6.232,
+          "word": "ce",
+          "confidence": 0.501
+        },
+        {
+          "start": 6.332,
+          "end": 6.432,
+          "word": "qu'il",
+          "confidence": 0.851
+        },
+        {
+          "start": 6.452,
+          "end": 6.552,
+          "word": "faut",
+          "confidence": 0.62
+        },
+        {
+          "start": 6.592,
+          "end": 6.712,
+          "word": "lui",
+          "confidence": 0.589
+        },
+        {
+          "start": 6.753,
+          "end": 6.933,
+          "word": "dire,",
+          "confidence": 0.873
+        },
+        {
+          "start": 6.973,
+          "end": 7.093,
+          "word": "vous",
+          "confidence": 0.932
+        },
+        {
+          "start": 7.133,
+          "end": 7.353,
+          "word": "pensez",
+          "confidence": 0.882
+        },
+        {
+          "start": 7.393,
+          "end": 7.453,
+          "word": "que",
+          "confidence": 0.995
+        },
+        {
+          "start": 7.473,
+          "end": 7.574,
+          "word": "vous",
+          "confidence": 0.74
+        },
+        {
+          "start": 7.614,
+          "end": 7.794,
+          "word": "pouvez",
+          "confidence": 0.723
+        },
+        {
+          "start": 7.834,
+          "end": 7.894,
+          "word": "le",
+          "confidence": 0.876
+        },
+        {
+          "start": 7.914,
+          "end": 8.455,
+          "word": "faire",
+          "confidence": 0.847
+        },
+        {
+          "start": 8.515,
+          "end": 8.555,
+          "word": "Il",
+          "confidence": 0.861
+        },
+        {
+          "start": 8.595,
+          "end": 8.615,
+          "word": "y",
+          "confidence": 0.909
+        },
+        {
+          "start": 8.655,
+          "end": 8.695,
+          "word": "a",
+          "confidence": 0.886
+        },
+        {
+          "start": 8.735,
+          "end": 8.835,
+          "word": "des",
+          "confidence": 0.821
+        },
+        {
+          "start": 8.875,
+          "end": 9.195,
+          "word": "moments,",
+          "confidence": 0.872
+        },
+        {
+          "start": 9.276,
+          "end": 9.396,
+          "word": "j'ai",
+          "confidence": 0.889
+        },
+        {
+          "start": 9.436,
+          "end": 9.656,
+          "word": "vraiment",
+          "confidence": 0.824
+        },
+        {
+          "start": 9.736,
+          "end": 10.076,
+          "word": "l'impression",
+          "confidence": 0.869
+        },
+        {
+          "start": 10.097,
+          "end": 10.157,
+          "word": "que",
+          "confidence": 0.408
+        },
+        {
+          "start": 10.177,
+          "end": 10.297,
+          "word": "vous",
+          "confidence": 0.501
+        },
+        {
+          "start": 10.377,
+          "end": 10.577,
+          "word": "prenez",
+          "confidence": 0.612
+        },
+        {
+          "start": 10.637,
+          "end": 10.797,
+          "word": "pour",
+          "confidence": 0.435
+        },
+        {
+          "start": 10.877,
+          "end": 11.661,
+          "word": "imbécile.",
+          "confidence": 0.539
+        },
+        {
+          "start": 12.9,
+          "end": 13.04,
+          "word": "Mais",
+          "confidence": 0.628
+        },
+        {
+          "start": 13.08,
+          "end": 13.26,
+          "word": "bien",
+          "confidence": 0.849
+        },
+        {
+          "start": 13.28,
+          "end": 13.42,
+          "word": "sûr",
+          "confidence": 0.64
+        },
+        {
+          "start": 13.461,
+          "end": 13.541,
+          "word": "que",
+          "confidence": 0.918
+        },
+        {
+          "start": 13.561,
+          "end": 13.621,
+          "word": "je",
+          "confidence": 0.574
+        },
+        {
+          "start": 13.661,
+          "end": 13.761,
+          "word": "peux",
+          "confidence": 0.748
+        },
+        {
+          "start": 13.801,
+          "end": 13.881,
+          "word": "le",
+          "confidence": 0.911
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "start": 13.921,
+      "end": 14.622,
+      "speaker": "SPEAKER_01",
+      "text": "faire",
+      "word_count": 1,
+      "words": [
+        {
+          "start": 13.921,
+          "end": 14.622,
+          "word": "faire",
+          "confidence": 0.781
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "start": 14.682,
+      "end": 23.512,
+      "speaker": "SPEAKER_00",
+      "text": "Qu'est-ce que je dois dire On pourrait se servir du bouquin qu'ils ont écrit ensemble. Vous appelez Leblanc et vous lui dites que vous êtes producteur de films. Vous avez lu le roman et vous voulez acheter les pour le cinéma.",
+      "word_count": 41,
+      "words": [
+        {
+          "start": 14.682,
+          "end": 14.902,
+          "word": "Qu'est-ce",
+          "confidence": 0.532
+        },
+        {
+          "start": 14.922,
+          "end": 14.982,
+          "word": "que",
+          "confidence": 0.81
+        },
+        {
+          "start": 15.002,
+          "end": 15.062,
+          "word": "je",
+          "confidence": 0.708
+        },
+        {
+          "start": 15.082,
+          "end": 15.223,
+          "word": "dois",
+          "confidence": 0.72
+        },
+        {
+          "start": 15.243,
+          "end": 15.883,
+          "word": "dire",
+          "confidence": 0.792
+        },
+        {
+          "start": 15.943,
+          "end": 16.004,
+          "word": "On",
+          "confidence": 0.654
+        },
+        {
+          "start": 16.024,
+          "end": 16.184,
+          "word": "pourrait",
+          "confidence": 0.444
+        },
+        {
+          "start": 16.204,
+          "end": 16.244,
+          "word": "se",
+          "confidence": 0.465
+        },
+        {
+          "start": 16.264,
+          "end": 16.464,
+          "word": "servir",
+          "confidence": 0.824
+        },
+        {
+          "start": 16.504,
+          "end": 16.564,
+          "word": "du",
+          "confidence": 0.86
+        },
+        {
+          "start": 16.584,
+          "end": 16.804,
+          "word": "bouquin",
+          "confidence": 0.686
+        },
+        {
+          "start": 16.824,
+          "end": 16.945,
+          "word": "qu'ils",
+          "confidence": 0.743
+        },
+        {
+          "start": 16.985,
+          "end": 17.045,
+          "word": "ont",
+          "confidence": 0.883
+        },
+        {
+          "start": 17.085,
+          "end": 17.265,
+          "word": "écrit",
+          "confidence": 0.407
+        },
+        {
+          "start": 17.305,
+          "end": 17.961,
+          "word": "ensemble.",
+          "confidence": 0.757
+        },
+        {
+          "start": 18.466,
+          "end": 18.567,
+          "word": "Vous",
+          "confidence": 0.664
+        },
+        {
+          "start": 18.607,
+          "end": 18.787,
+          "word": "appelez",
+          "confidence": 0.834
+        },
+        {
+          "start": 18.827,
+          "end": 19.067,
+          "word": "Leblanc",
+          "confidence": 0.841
+        },
+        {
+          "start": 19.107,
+          "end": 19.147,
+          "word": "et",
+          "confidence": 0.613
+        },
+        {
+          "start": 19.187,
+          "end": 19.267,
+          "word": "vous",
+          "confidence": 0.757
+        },
+        {
+          "start": 19.307,
+          "end": 19.368,
+          "word": "lui",
+          "confidence": 0.781
+        },
+        {
+          "start": 19.388,
+          "end": 19.488,
+          "word": "dites",
+          "confidence": 0.652
+        },
+        {
+          "start": 19.508,
+          "end": 19.568,
+          "word": "que",
+          "confidence": 0.607
+        },
+        {
+          "start": 19.588,
+          "end": 19.668,
+          "word": "vous",
+          "confidence": 0.839
+        },
+        {
+          "start": 19.688,
+          "end": 19.788,
+          "word": "êtes",
+          "confidence": 0.77
+        },
+        {
+          "start": 19.828,
+          "end": 20.108,
+          "word": "producteur",
+          "confidence": 0.856
+        },
+        {
+          "start": 20.148,
+          "end": 20.209,
+          "word": "de",
+          "confidence": 0.93
+        },
+        {
+          "start": 20.249,
+          "end": 20.969,
+          "word": "films.",
+          "confidence": 0.766
+        },
+        {
+          "start": 21.09,
+          "end": 21.19,
+          "word": "Vous",
+          "confidence": 0.974
+        },
+        {
+          "start": 21.21,
+          "end": 21.33,
+          "word": "avez",
+          "confidence": 0.502
+        },
+        {
+          "start": 21.37,
+          "end": 21.45,
+          "word": "lu",
+          "confidence": 0.364
+        },
+        {
+          "start": 21.49,
+          "end": 21.53,
+          "word": "le",
+          "confidence": 0.81
+        },
+        {
+          "start": 21.57,
+          "end": 21.931,
+          "word": "roman",
+          "confidence": 0.687
+        },
+        {
+          "start": 21.971,
+          "end": 22.031,
+          "word": "et",
+          "confidence": 0.847
+        },
+        {
+          "start": 22.051,
+          "end": 22.131,
+          "word": "vous",
+          "confidence": 0.685
+        },
+        {
+          "start": 22.171,
+          "end": 22.311,
+          "word": "voulez",
+          "confidence": 0.851
+        },
+        {
+          "start": 22.331,
+          "end": 22.511,
+          "word": "acheter",
+          "confidence": 0.908
+        },
+        {
+          "start": 22.531,
+          "end": 22.591,
+          "word": "les",
+          "confidence": 0.958
+        },
+        {
+          "start": 22.752,
+          "end": 22.832,
+          "word": "pour",
+          "confidence": 0.612
+        },
+        {
+          "start": 22.852,
+          "end": 22.892,
+          "word": "le",
+          "confidence": 0.91
+        },
+        {
+          "start": 22.912,
+          "end": 23.512,
+          "word": "cinéma.",
+          "confidence": 0.572
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "start": 23.693,
+      "end": 24.373,
+      "speaker": "SPEAKER_00",
+      "text": "c'est bien",
+      "word_count": 2,
+      "words": [
+        {
+          "start": 23.693,
+          "end": 23.853,
+          "word": "c'est",
+          "confidence": 0.47
+        },
+        {
+          "start": 23.873,
+          "end": 24.373,
+          "word": "bien",
+          "confidence": 0.804
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "start": 24.494,
+      "end": 29.019,
+      "speaker": "SPEAKER_00",
+      "text": "Et en fin de conversation, vous lui demandez où vous pouvez joindre sa collaboratrice. Quelle collaboratrice",
+      "word_count": 16,
+      "words": [
+        {
+          "start": 24.494,
+          "end": 24.594,
+          "word": "Et",
+          "confidence": 0.626
+        },
+        {
+          "start": 24.654,
+          "end": 24.694,
+          "word": "en",
+          "confidence": 0.404
+        },
+        {
+          "start": 24.714,
+          "end": 24.794,
+          "word": "fin",
+          "confidence": 0.882
+        },
+        {
+          "start": 24.834,
+          "end": 24.874,
+          "word": "de",
+          "confidence": 0.94
+        },
+        {
+          "start": 24.914,
+          "end": 25.375,
+          "word": "conversation,",
+          "confidence": 0.836
+        },
+        {
+          "start": 25.395,
+          "end": 25.475,
+          "word": "vous",
+          "confidence": 0.972
+        },
+        {
+          "start": 25.495,
+          "end": 25.555,
+          "word": "lui",
+          "confidence": 0.32
+        },
+        {
+          "start": 25.595,
+          "end": 25.895,
+          "word": "demandez",
+          "confidence": 0.901
+        },
+        {
+          "start": 25.955,
+          "end": 26.015,
+          "word": "où",
+          "confidence": 0.706
+        },
+        {
+          "start": 26.055,
+          "end": 26.136,
+          "word": "vous",
+          "confidence": 0.728
+        },
+        {
+          "start": 26.176,
+          "end": 26.356,
+          "word": "pouvez",
+          "confidence": 0.831
+        },
+        {
+          "start": 26.396,
+          "end": 26.616,
+          "word": "joindre",
+          "confidence": 0.827
+        },
+        {
+          "start": 26.636,
+          "end": 26.756,
+          "word": "sa",
+          "confidence": 0.697
+        },
+        {
+          "start": 26.796,
+          "end": 27.548,
+          "word": "collaboratrice.",
+          "confidence": 0.929
+        },
+        {
+          "start": 28.098,
+          "end": 28.278,
+          "word": "Quelle",
+          "confidence": 0.45
+        },
+        {
+          "start": 28.358,
+          "end": 29.019,
+          "word": "collaboratrice",
+          "confidence": 0.83
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "start": 30.085,
+      "end": 31.927,
+      "speaker": "SPEAKER_00",
+      "text": "Ma je vous ai dit qu'il avait écrit en bouquin avec",
+      "word_count": 11,
+      "words": [
+        {
+          "start": 30.085,
+          "end": 30.505,
+          "word": "Ma",
+          "confidence": 0.322
+        },
+        {
+          "start": 30.666,
+          "end": 30.706,
+          "word": "je",
+          "confidence": 0.988
+        },
+        {
+          "start": 30.746,
+          "end": 30.826,
+          "word": "vous",
+          "confidence": 0.991
+        },
+        {
+          "start": 30.866,
+          "end": 30.906,
+          "word": "ai",
+          "confidence": 0.503
+        },
+        {
+          "start": 30.926,
+          "end": 31.006,
+          "word": "dit",
+          "confidence": 0.389
+        },
+        {
+          "start": 31.046,
+          "end": 31.166,
+          "word": "qu'il",
+          "confidence": 0.74
+        },
+        {
+          "start": 31.186,
+          "end": 31.326,
+          "word": "avait",
+          "confidence": 0.781
+        },
+        {
+          "start": 31.346,
+          "end": 31.466,
+          "word": "écrit",
+          "confidence": 0.487
+        },
+        {
+          "start": 31.486,
+          "end": 31.546,
+          "word": "en",
+          "confidence": 0.611
+        },
+        {
+          "start": 31.566,
+          "end": 31.767,
+          "word": "bouquin",
+          "confidence": 0.459
+        },
+        {
+          "start": 31.787,
+          "end": 31.927,
+          "word": "avec",
+          "confidence": 0.82
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "start": 32.527,
+      "end": 40.815,
+      "speaker": "SPEAKER_00",
+      "text": "Mais oui, exact, ok, d'accord, excusez-moi. Ça marchera jamais. Mais si, j'ai compris. C'est pas simple, mais j'ai compris. Mais quoi c'est pas simple ? C'est tout simple, vous êtes producteur, ok",
+      "word_count": 32,
+      "words": [
+        {
+          "start": 32.527,
+          "end": 32.627,
+          "word": "Mais",
+          "confidence": 0.633
+        },
+        {
+          "start": 32.667,
+          "end": 32.807,
+          "word": "oui,",
+          "confidence": 0.497
+        },
+        {
+          "start": 32.868,
+          "end": 33.088,
+          "word": "exact,",
+          "confidence": 0.556
+        },
+        {
+          "start": 33.108,
+          "end": 33.288,
+          "word": "ok,",
+          "confidence": 0.534
+        },
+        {
+          "start": 33.308,
+          "end": 33.548,
+          "word": "d'accord,",
+          "confidence": 0.749
+        },
+        {
+          "start": 33.568,
+          "end": 34.289,
+          "word": "excusez-moi.",
+          "confidence": 0.59
+        },
+        {
+          "start": 34.309,
+          "end": 34.369,
+          "word": "Ça",
+          "confidence": 0.684
+        },
+        {
+          "start": 34.409,
+          "end": 34.709,
+          "word": "marchera",
+          "confidence": 0.803
+        },
+        {
+          "start": 34.729,
+          "end": 35.21,
+          "word": "jamais.",
+          "confidence": 0.825
+        },
+        {
+          "start": 35.23,
+          "end": 35.39,
+          "word": "Mais",
+          "confidence": 0.283
+        },
+        {
+          "start": 35.41,
+          "end": 35.79,
+          "word": "si,",
+          "confidence": 0.934
+        },
+        {
+          "start": 35.81,
+          "end": 35.95,
+          "word": "j'ai",
+          "confidence": 0.684
+        },
+        {
+          "start": 35.97,
+          "end": 36.711,
+          "word": "compris.",
+          "confidence": 0.904
+        },
+        {
+          "start": 36.731,
+          "end": 36.991,
+          "word": "C'est",
+          "confidence": 0.536
+        },
+        {
+          "start": 37.011,
+          "end": 37.192,
+          "word": "pas",
+          "confidence": 0.869
+        },
+        {
+          "start": 37.252,
+          "end": 37.532,
+          "word": "simple,",
+          "confidence": 0.769
+        },
+        {
+          "start": 37.552,
+          "end": 37.672,
+          "word": "mais",
+          "confidence": 0.558
+        },
+        {
+          "start": 37.712,
+          "end": 37.812,
+          "word": "j'ai",
+          "confidence": 0.479
+        },
+        {
+          "start": 37.832,
+          "end": 38.152,
+          "word": "compris.",
+          "confidence": 0.836
+        },
+        {
+          "start": 38.172,
+          "end": 38.273,
+          "word": "Mais",
+          "confidence": 0.783
+        },
+        {
+          "start": 38.313,
+          "end": 38.413,
+          "word": "quoi",
+          "confidence": 0.844
+        },
+        {
+          "start": 38.453,
+          "end": 38.613,
+          "word": "c'est",
+          "confidence": 0.631
+        },
+        {
+          "start": 38.633,
+          "end": 38.693,
+          "word": "pas",
+          "confidence": 0.809
+        },
+        {
+          "start": 38.753,
+          "end": 38.873,
+          "word": "simple",
+          "confidence": 0.376
+        },
+        {
+          "start": 38.893,
+          "end": 38.913,
+          "word": "?",
+          "confidence": 0.802
+        },
+        {
+          "start": 38.933,
+          "end": 39.033,
+          "word": "C'est",
+          "confidence": 0.506
+        },
+        {
+          "start": 39.073,
+          "end": 39.173,
+          "word": "tout",
+          "confidence": 0.891
+        },
+        {
+          "start": 39.233,
+          "end": 39.394,
+          "word": "simple,",
+          "confidence": 0.856
+        },
+        {
+          "start": 39.434,
+          "end": 39.534,
+          "word": "vous",
+          "confidence": 0.592
+        },
+        {
+          "start": 39.554,
+          "end": 39.674,
+          "word": "êtes",
+          "confidence": 0.502
+        },
+        {
+          "start": 39.694,
+          "end": 40.034,
+          "word": "producteur,",
+          "confidence": 0.802
+        },
+        {
+          "start": 40.074,
+          "end": 40.815,
+          "word": "ok",
+          "confidence": 0.374
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "start": 40.955,
+      "end": 47.729,
+      "speaker": "SPEAKER_00",
+      "text": "ok. Vous avez maison de production à Paris. Non, pas à Paris, il connaît tout le monde. Vous êtes un producteur étranger. Ok, américain, allemand Belge.",
+      "word_count": 26,
+      "words": [
+        {
+          "start": 40.955,
+          "end": 41.015,
+          "word": "ok.",
+          "confidence": 0.309
+        },
+        {
+          "start": 41.035,
+          "end": 41.135,
+          "word": "Vous",
+          "confidence": 0.678
+        },
+        {
+          "start": 41.155,
+          "end": 41.255,
+          "word": "avez",
+          "confidence": 0.815
+        },
+        {
+          "start": 41.355,
+          "end": 41.515,
+          "word": "maison",
+          "confidence": 0.88
+        },
+        {
+          "start": 41.535,
+          "end": 41.576,
+          "word": "de",
+          "confidence": 0.831
+        },
+        {
+          "start": 41.596,
+          "end": 41.856,
+          "word": "production",
+          "confidence": 0.829
+        },
+        {
+          "start": 41.916,
+          "end": 41.936,
+          "word": "à",
+          "confidence": 0.62
+        },
+        {
+          "start": 41.996,
+          "end": 42.364,
+          "word": "Paris.",
+          "confidence": 0.847
+        },
+        {
+          "start": 42.637,
+          "end": 42.737,
+          "word": "Non,",
+          "confidence": 0.656
+        },
+        {
+          "start": 42.757,
+          "end": 42.817,
+          "word": "pas",
+          "confidence": 0.816
+        },
+        {
+          "start": 42.877,
+          "end": 42.897,
+          "word": "à",
+          "confidence": 0.581
+        },
+        {
+          "start": 42.917,
+          "end": 43.037,
+          "word": "Paris,",
+          "confidence": 0.309
+        },
+        {
+          "start": 43.057,
+          "end": 43.097,
+          "word": "il",
+          "confidence": 0.459
+        },
+        {
+          "start": 43.137,
+          "end": 43.297,
+          "word": "connaît",
+          "confidence": 0.824
+        },
+        {
+          "start": 43.317,
+          "end": 43.397,
+          "word": "tout",
+          "confidence": 0.67
+        },
+        {
+          "start": 43.437,
+          "end": 43.477,
+          "word": "le",
+          "confidence": 0.95
+        },
+        {
+          "start": 43.497,
+          "end": 43.677,
+          "word": "monde.",
+          "confidence": 0.919
+        },
+        {
+          "start": 43.697,
+          "end": 43.778,
+          "word": "Vous",
+          "confidence": 0.56
+        },
+        {
+          "start": 43.838,
+          "end": 43.918,
+          "word": "êtes",
+          "confidence": 0.469
+        },
+        {
+          "start": 43.938,
+          "end": 43.978,
+          "word": "un",
+          "confidence": 0.949
+        },
+        {
+          "start": 44.018,
+          "end": 44.398,
+          "word": "producteur",
+          "confidence": 0.886
+        },
+        {
+          "start": 44.458,
+          "end": 45.562,
+          "word": "étranger.",
+          "confidence": 0.836
+        },
+        {
+          "start": 45.619,
+          "end": 45.679,
+          "word": "Ok,",
+          "confidence": 0.406
+        },
+        {
+          "start": 45.699,
+          "end": 46.1,
+          "word": "américain,",
+          "confidence": 0.769
+        },
+        {
+          "start": 46.16,
+          "end": 46.72,
+          "word": "allemand",
+          "confidence": 0.881
+        },
+        {
+          "start": 47.361,
+          "end": 47.729,
+          "word": "Belge.",
+          "confidence": 0.748
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "start": 48.302,
+      "end": 59.512,
+      "speaker": "SPEAKER_00",
+      "text": "c'est parfait ça, belge. Pourquoi belge ? Parce que c'est très bien, belge. Vous êtes un gros producteur belge, vous avez lu Le Petit Cheval de Manège, c'est le titre du roman, et vous voulez lui acheter les droits pour le cinéma, ? C'est un bon livre",
+      "word_count": 47,
+      "words": [
+        {
+          "start": 48.302,
+          "end": 48.442,
+          "word": "c'est",
+          "confidence": 0.709
+        },
+        {
+          "start": 48.482,
+          "end": 48.742,
+          "word": "parfait",
+          "confidence": 0.863
+        },
+        {
+          "start": 48.802,
+          "end": 48.902,
+          "word": "ça,",
+          "confidence": 0.584
+        },
+        {
+          "start": 48.922,
+          "end": 49.354,
+          "word": "belge.",
+          "confidence": 0.95
+        },
+        {
+          "start": 50.063,
+          "end": 50.364,
+          "word": "Pourquoi",
+          "confidence": 0.924
+        },
+        {
+          "start": 50.404,
+          "end": 50.772,
+          "word": "belge",
+          "confidence": 0.709
+        },
+        {
+          "start": 50.964,
+          "end": 50.984,
+          "word": "?",
+          "confidence": 0.938
+        },
+        {
+          "start": 51.004,
+          "end": 51.124,
+          "word": "Parce",
+          "confidence": 0.864
+        },
+        {
+          "start": 51.144,
+          "end": 51.204,
+          "word": "que",
+          "confidence": 0.79
+        },
+        {
+          "start": 51.244,
+          "end": 51.365,
+          "word": "c'est",
+          "confidence": 0.734
+        },
+        {
+          "start": 51.385,
+          "end": 51.505,
+          "word": "très",
+          "confidence": 0.809
+        },
+        {
+          "start": 51.545,
+          "end": 51.705,
+          "word": "bien,",
+          "confidence": 0.915
+        },
+        {
+          "start": 51.725,
+          "end": 52.446,
+          "word": "belge.",
+          "confidence": 0.803
+        },
+        {
+          "start": 52.466,
+          "end": 52.546,
+          "word": "Vous",
+          "confidence": 0.973
+        },
+        {
+          "start": 52.586,
+          "end": 52.686,
+          "word": "êtes",
+          "confidence": 0.724
+        },
+        {
+          "start": 52.746,
+          "end": 52.806,
+          "word": "un",
+          "confidence": 0.718
+        },
+        {
+          "start": 52.846,
+          "end": 53.006,
+          "word": "gros",
+          "confidence": 0.707
+        },
+        {
+          "start": 53.026,
+          "end": 53.366,
+          "word": "producteur",
+          "confidence": 0.798
+        },
+        {
+          "start": 53.406,
+          "end": 53.947,
+          "word": "belge,",
+          "confidence": 0.904
+        },
+        {
+          "start": 53.967,
+          "end": 54.087,
+          "word": "vous",
+          "confidence": 0.834
+        },
+        {
+          "start": 54.127,
+          "end": 54.247,
+          "word": "avez",
+          "confidence": 0.582
+        },
+        {
+          "start": 54.307,
+          "end": 54.407,
+          "word": "lu",
+          "confidence": 0.77
+        },
+        {
+          "start": 54.447,
+          "end": 54.507,
+          "word": "Le",
+          "confidence": 0.948
+        },
+        {
+          "start": 54.547,
+          "end": 54.708,
+          "word": "Petit",
+          "confidence": 0.714
+        },
+        {
+          "start": 54.748,
+          "end": 54.968,
+          "word": "Cheval",
+          "confidence": 0.748
+        },
+        {
+          "start": 55.008,
+          "end": 55.048,
+          "word": "de",
+          "confidence": 0.794
+        },
+        {
+          "start": 55.068,
+          "end": 55.388,
+          "word": "Manège,",
+          "confidence": 0.809
+        },
+        {
+          "start": 55.408,
+          "end": 55.508,
+          "word": "c'est",
+          "confidence": 0.619
+        },
+        {
+          "start": 55.548,
+          "end": 55.588,
+          "word": "le",
+          "confidence": 0.989
+        },
+        {
+          "start": 55.628,
+          "end": 55.789,
+          "word": "titre",
+          "confidence": 0.772
+        },
+        {
+          "start": 55.829,
+          "end": 55.929,
+          "word": "du",
+          "confidence": 0.458
+        },
+        {
+          "start": 55.949,
+          "end": 56.229,
+          "word": "roman,",
+          "confidence": 0.758
+        },
+        {
+          "start": 56.289,
+          "end": 56.329,
+          "word": "et",
+          "confidence": 0.838
+        },
+        {
+          "start": 56.369,
+          "end": 56.449,
+          "word": "vous",
+          "confidence": 0.827
+        },
+        {
+          "start": 56.489,
+          "end": 56.669,
+          "word": "voulez",
+          "confidence": 0.683
+        },
+        {
+          "start": 56.689,
+          "end": 56.769,
+          "word": "lui",
+          "confidence": 0.425
+        },
+        {
+          "start": 56.789,
+          "end": 56.97,
+          "word": "acheter",
+          "confidence": 0.915
+        },
+        {
+          "start": 56.99,
+          "end": 57.05,
+          "word": "les",
+          "confidence": 0.986
+        },
+        {
+          "start": 57.07,
+          "end": 57.21,
+          "word": "droits",
+          "confidence": 0.895
+        },
+        {
+          "start": 57.25,
+          "end": 57.35,
+          "word": "pour",
+          "confidence": 0.627
+        },
+        {
+          "start": 57.37,
+          "end": 57.41,
+          "word": "le",
+          "confidence": 0.958
+        },
+        {
+          "start": 57.43,
+          "end": 58.214,
+          "word": "cinéma,",
+          "confidence": 0.798
+        },
+        {
+          "start": 58.791,
+          "end": 58.811,
+          "word": "?",
+          "confidence": 0.476
+        },
+        {
+          "start": 58.831,
+          "end": 58.951,
+          "word": "C'est",
+          "confidence": 0.571
+        },
+        {
+          "start": 58.992,
+          "end": 59.052,
+          "word": "un",
+          "confidence": 0.822
+        },
+        {
+          "start": 59.072,
+          "end": 59.192,
+          "word": "bon",
+          "confidence": 0.951
+        },
+        {
+          "start": 59.232,
+          "end": 59.512,
+          "word": "livre",
+          "confidence": 0.823
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "start": 61.244,
+      "end": 67.414,
+      "speaker": "SPEAKER_00",
+      "text": "l'importance. m'embête un peu, ça. Pourquoi Si le bouquin est mauvais, pourquoi j'irais acheter les droits",
+      "word_count": 16,
+      "words": [
+        {
+          "start": 61.244,
+          "end": 61.836,
+          "word": "l'importance.",
+          "confidence": 0.675
+        },
+        {
+          "start": 62.946,
+          "end": 63.206,
+          "word": "m'embête",
+          "confidence": 0.471
+        },
+        {
+          "start": 63.246,
+          "end": 63.306,
+          "word": "un",
+          "confidence": 0.95
+        },
+        {
+          "start": 63.326,
+          "end": 63.79,
+          "word": "peu,",
+          "confidence": 0.862
+        },
+        {
+          "start": 64.587,
+          "end": 64.647,
+          "word": "ça.",
+          "confidence": 0.536
+        },
+        {
+          "start": 64.667,
+          "end": 65.188,
+          "word": "Pourquoi",
+          "confidence": 0.885
+        },
+        {
+          "start": 65.248,
+          "end": 65.368,
+          "word": "Si",
+          "confidence": 0.548
+        },
+        {
+          "start": 65.408,
+          "end": 65.468,
+          "word": "le",
+          "confidence": 0.917
+        },
+        {
+          "start": 65.508,
+          "end": 65.749,
+          "word": "bouquin",
+          "confidence": 0.437
+        },
+        {
+          "start": 65.789,
+          "end": 65.869,
+          "word": "est",
+          "confidence": 0.614
+        },
+        {
+          "start": 65.909,
+          "end": 66.189,
+          "word": "mauvais,",
+          "confidence": 0.825
+        },
+        {
+          "start": 66.209,
+          "end": 66.409,
+          "word": "pourquoi",
+          "confidence": 0.667
+        },
+        {
+          "start": 66.429,
+          "end": 66.59,
+          "word": "j'irais",
+          "confidence": 0.379
+        },
+        {
+          "start": 66.61,
+          "end": 66.81,
+          "word": "acheter",
+          "confidence": 0.483
+        },
+        {
+          "start": 66.85,
+          "end": 66.91,
+          "word": "les",
+          "confidence": 0.909
+        },
+        {
+          "start": 66.95,
+          "end": 67.414,
+          "word": "droits",
+          "confidence": 0.899
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "start": 70.474,
+      "end": 73.512,
+      "speaker": "SPEAKER_00",
+      "text": "Monsieur Pignon, vous n'êtes pas producteur.",
+      "word_count": 6,
+      "words": [
+        {
+          "start": 70.474,
+          "end": 70.674,
+          "word": "Monsieur",
+          "confidence": 0.949
+        },
+        {
+          "start": 70.714,
+          "end": 71.402,
+          "word": "Pignon,",
+          "confidence": 0.795
+        },
+        {
+          "start": 71.976,
+          "end": 72.096,
+          "word": "vous",
+          "confidence": 0.723
+        },
+        {
+          "start": 72.116,
+          "end": 72.236,
+          "word": "n'êtes",
+          "confidence": 0.57
+        },
+        {
+          "start": 72.256,
+          "end": 72.336,
+          "word": "pas",
+          "confidence": 0.823
+        },
+        {
+          "start": 72.376,
+          "end": 73.512,
+          "word": "producteur.",
+          "confidence": 0.875
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "start": 73.738,
+      "end": 87.733,
+      "speaker": "SPEAKER_00",
+      "text": "Vous n'êtes pas belge non plus. Ah non. Ça n'est donc pas pour acheter les droits du livre que vous téléphonez, mais pour essayer de savoir où est ma femme. Oh ! Alors ça, c'est très tordu, mais bougrement intelligent. C'est quoi son numéro ? 01 47 47.",
+      "word_count": 48,
+      "words": [
+        {
+          "start": 73.738,
+          "end": 73.838,
+          "word": "Vous",
+          "confidence": 0.852
+        },
+        {
+          "start": 73.878,
+          "end": 74.018,
+          "word": "n'êtes",
+          "confidence": 0.883
+        },
+        {
+          "start": 74.038,
+          "end": 74.118,
+          "word": "pas",
+          "confidence": 0.807
+        },
+        {
+          "start": 74.138,
+          "end": 74.358,
+          "word": "belge",
+          "confidence": 0.475
+        },
+        {
+          "start": 74.398,
+          "end": 74.478,
+          "word": "non",
+          "confidence": 0.619
+        },
+        {
+          "start": 74.499,
+          "end": 74.839,
+          "word": "plus.",
+          "confidence": 0.59
+        },
+        {
+          "start": 74.859,
+          "end": 74.899,
+          "word": "Ah",
+          "confidence": 0.236
+        },
+        {
+          "start": 74.919,
+          "end": 75.223,
+          "word": "non.",
+          "confidence": 0.666
+        },
+        {
+          "start": 75.4,
+          "end": 75.5,
+          "word": "Ça",
+          "confidence": 0.656
+        },
+        {
+          "start": 75.54,
+          "end": 75.64,
+          "word": "n'est",
+          "confidence": 0.802
+        },
+        {
+          "start": 75.68,
+          "end": 75.84,
+          "word": "donc",
+          "confidence": 0.947
+        },
+        {
+          "start": 75.86,
+          "end": 75.94,
+          "word": "pas",
+          "confidence": 0.823
+        },
+        {
+          "start": 75.98,
+          "end": 76.06,
+          "word": "pour",
+          "confidence": 0.984
+        },
+        {
+          "start": 76.1,
+          "end": 76.281,
+          "word": "acheter",
+          "confidence": 0.876
+        },
+        {
+          "start": 76.321,
+          "end": 76.381,
+          "word": "les",
+          "confidence": 0.829
+        },
+        {
+          "start": 76.401,
+          "end": 76.521,
+          "word": "droits",
+          "confidence": 0.926
+        },
+        {
+          "start": 76.541,
+          "end": 76.601,
+          "word": "du",
+          "confidence": 0.484
+        },
+        {
+          "start": 76.641,
+          "end": 76.841,
+          "word": "livre",
+          "confidence": 0.767
+        },
+        {
+          "start": 76.881,
+          "end": 76.941,
+          "word": "que",
+          "confidence": 0.76
+        },
+        {
+          "start": 76.981,
+          "end": 77.061,
+          "word": "vous",
+          "confidence": 0.999
+        },
+        {
+          "start": 77.081,
+          "end": 77.442,
+          "word": "téléphonez,",
+          "confidence": 0.603
+        },
+        {
+          "start": 77.462,
+          "end": 77.562,
+          "word": "mais",
+          "confidence": 0.866
+        },
+        {
+          "start": 77.582,
+          "end": 77.702,
+          "word": "pour",
+          "confidence": 0.868
+        },
+        {
+          "start": 77.742,
+          "end": 78.002,
+          "word": "essayer",
+          "confidence": 0.804
+        },
+        {
+          "start": 78.022,
+          "end": 78.083,
+          "word": "de",
+          "confidence": 0.746
+        },
+        {
+          "start": 78.123,
+          "end": 78.423,
+          "word": "savoir",
+          "confidence": 0.807
+        },
+        {
+          "start": 78.463,
+          "end": 78.523,
+          "word": "où",
+          "confidence": 0.559
+        },
+        {
+          "start": 78.583,
+          "end": 78.703,
+          "word": "est",
+          "confidence": 0.515
+        },
+        {
+          "start": 78.723,
+          "end": 78.823,
+          "word": "ma",
+          "confidence": 0.9
+        },
+        {
+          "start": 78.863,
+          "end": 79.263,
+          "word": "femme.",
+          "confidence": 0.852
+        },
+        {
+          "start": 80.545,
+          "end": 82.027,
+          "word": "Oh",
+          "confidence": 0.872
+        },
+        {
+          "start": 82.047,
+          "end": 82.127,
+          "word": "!",
+          "confidence": 0.522
+        },
+        {
+          "start": 82.147,
+          "end": 82.367,
+          "word": "Alors",
+          "confidence": 0.861
+        },
+        {
+          "start": 82.407,
+          "end": 82.628,
+          "word": "ça,",
+          "confidence": 0.468
+        },
+        {
+          "start": 82.648,
+          "end": 82.908,
+          "word": "c'est",
+          "confidence": 0.585
+        },
+        {
+          "start": 82.968,
+          "end": 83.208,
+          "word": "très",
+          "confidence": 0.774
+        },
+        {
+          "start": 83.268,
+          "end": 83.709,
+          "word": "tordu,",
+          "confidence": 0.906
+        },
+        {
+          "start": 83.729,
+          "end": 83.949,
+          "word": "mais",
+          "confidence": 0.851
+        },
+        {
+          "start": 83.989,
+          "end": 84.43,
+          "word": "bougrement",
+          "confidence": 0.818
+        },
+        {
+          "start": 84.47,
+          "end": 85.211,
+          "word": "intelligent.",
+          "confidence": 0.896
+        },
+        {
+          "start": 85.231,
+          "end": 85.351,
+          "word": "C'est",
+          "confidence": 0.759
+        },
+        {
+          "start": 85.371,
+          "end": 85.511,
+          "word": "quoi",
+          "confidence": 0.802
+        },
+        {
+          "start": 85.531,
+          "end": 85.631,
+          "word": "son",
+          "confidence": 0.747
+        },
+        {
+          "start": 85.691,
+          "end": 86.091,
+          "word": "numéro",
+          "confidence": 0.538
+        },
+        {
+          "start": 86.572,
+          "end": 86.592,
+          "word": "?",
+          "confidence": 0.299
+        },
+        {
+          "start": 86.612,
+          "end": 86.972,
+          "word": "01",
+          "confidence": 0.8
+        },
+        {
+          "start": 86.993,
+          "end": 87.293,
+          "word": "47",
+          "confidence": 0.383
+        },
+        {
+          "start": 87.313,
+          "end": 87.733,
+          "word": "47.",
+          "confidence": 0.737
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "start": 88.394,
+      "end": 89.134,
+      "speaker": "SPEAKER_00",
+      "text": "Je vais le faire moi-même.",
+      "word_count": 5,
+      "words": [
+        {
+          "start": 88.394,
+          "end": 88.434,
+          "word": "Je",
+          "confidence": 0.958
+        },
+        {
+          "start": 88.454,
+          "end": 88.534,
+          "word": "vais",
+          "confidence": 0.338
+        },
+        {
+          "start": 88.554,
+          "end": 88.594,
+          "word": "le",
+          "confidence": 0.488
+        },
+        {
+          "start": 88.614,
+          "end": 88.714,
+          "word": "faire",
+          "confidence": 0.883
+        },
+        {
+          "start": 88.734,
+          "end": 89.134,
+          "word": "moi-même.",
+          "confidence": 0.847
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "start": 90.953,
+      "end": 92.058,
+      "speaker": "SPEAKER_00",
+      "text": " Il s'appelle Juste Leblanc.",
+      "word_count": 4,
+      "words": [
+        {
+          "start": 90.953,
+          "end": 91.093,
+          "word": "Il",
+          "confidence": 0.424
+        },
+        {
+          "start": 91.113,
+          "end": 91.393,
+          "word": "s'appelle",
+          "confidence": 0.777
+        },
+        {
+          "start": 91.413,
+          "end": 91.574,
+          "word": "Juste",
+          "confidence": 0.727
+        },
+        {
+          "start": 91.594,
+          "end": 92.058,
+          "word": "Leblanc.",
+          "confidence": 0.872
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "start": 92.635,
+      "end": 93.659,
+      "speaker": "SPEAKER_01",
+      "text": "Ah bon, n'a pas de prénom",
+      "word_count": 6,
+      "words": [
+        {
+          "start": 92.635,
+          "end": 92.675,
+          "word": "Ah",
+          "confidence": 0.278
+        },
+        {
+          "start": 92.695,
+          "end": 92.815,
+          "word": "bon,",
+          "confidence": 0.481
+        },
+        {
+          "start": 92.955,
+          "end": 93.015,
+          "word": "n'a",
+          "confidence": 0.874
+        },
+        {
+          "start": 93.035,
+          "end": 93.095,
+          "word": "pas",
+          "confidence": 0.704
+        },
+        {
+          "start": 93.135,
+          "end": 93.175,
+          "word": "de",
+          "confidence": 0.919
+        },
+        {
+          "start": 93.195,
+          "end": 93.659,
+          "word": "prénom",
+          "confidence": 0.488
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "start": 94.817,
+      "end": 109.687,
+      "speaker": "SPEAKER_00",
+      "text": "Je viens de vous le dire, Juste Leblanc. Leblanc, c'est son nom et c'est Juste son prénom. Monsieur Pignon, votre prénom à vous, c'est François, c'est Juste",
+      "word_count": 27,
+      "words": [
+        {
+          "start": 94.817,
+          "end": 94.877,
+          "word": "Je",
+          "confidence": 0.909
+        },
+        {
+          "start": 94.917,
+          "end": 95.017,
+          "word": "viens",
+          "confidence": 0.997
+        },
+        {
+          "start": 95.037,
+          "end": 95.097,
+          "word": "de",
+          "confidence": 0.748
+        },
+        {
+          "start": 95.117,
+          "end": 95.197,
+          "word": "vous",
+          "confidence": 0.998
+        },
+        {
+          "start": 95.217,
+          "end": 95.277,
+          "word": "le",
+          "confidence": 0.821
+        },
+        {
+          "start": 95.297,
+          "end": 95.678,
+          "word": "dire,",
+          "confidence": 0.748
+        },
+        {
+          "start": 95.698,
+          "end": 96.058,
+          "word": "Juste",
+          "confidence": 0.894
+        },
+        {
+          "start": 96.078,
+          "end": 96.51,
+          "word": "Leblanc.",
+          "confidence": 0.762
+        },
+        {
+          "start": 100.343,
+          "end": 100.623,
+          "word": "Leblanc,",
+          "confidence": 0.745
+        },
+        {
+          "start": 100.643,
+          "end": 100.763,
+          "word": "c'est",
+          "confidence": 0.689
+        },
+        {
+          "start": 100.783,
+          "end": 100.923,
+          "word": "son",
+          "confidence": 0.849
+        },
+        {
+          "start": 100.943,
+          "end": 101.263,
+          "word": "nom",
+          "confidence": 0.757
+        },
+        {
+          "start": 101.323,
+          "end": 101.404,
+          "word": "et",
+          "confidence": 0.552
+        },
+        {
+          "start": 101.444,
+          "end": 101.644,
+          "word": "c'est",
+          "confidence": 0.858
+        },
+        {
+          "start": 101.684,
+          "end": 101.944,
+          "word": "Juste",
+          "confidence": 0.903
+        },
+        {
+          "start": 101.984,
+          "end": 102.084,
+          "word": "son",
+          "confidence": 0.65
+        },
+        {
+          "start": 102.124,
+          "end": 102.556,
+          "word": "prénom.",
+          "confidence": 0.691
+        },
+        {
+          "start": 105.948,
+          "end": 106.128,
+          "word": "Monsieur",
+          "confidence": 0.848
+        },
+        {
+          "start": 106.188,
+          "end": 106.652,
+          "word": "Pignon,",
+          "confidence": 0.879
+        },
+        {
+          "start": 107.229,
+          "end": 107.41,
+          "word": "votre",
+          "confidence": 0.955
+        },
+        {
+          "start": 107.45,
+          "end": 107.69,
+          "word": "prénom",
+          "confidence": 0.552
+        },
+        {
+          "start": 107.73,
+          "end": 107.75,
+          "word": "à",
+          "confidence": 0.799
+        },
+        {
+          "start": 107.79,
+          "end": 107.89,
+          "word": "vous,",
+          "confidence": 0.888
+        },
+        {
+          "start": 107.91,
+          "end": 108.01,
+          "word": "c'est",
+          "confidence": 0.625
+        },
+        {
+          "start": 108.05,
+          "end": 108.331,
+          "word": "François,",
+          "confidence": 0.886
+        },
+        {
+          "start": 108.391,
+          "end": 108.511,
+          "word": "c'est",
+          "confidence": 0.675
+        },
+        {
+          "start": 108.551,
+          "end": 109.687,
+          "word": "Juste",
+          "confidence": 0.801
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "start": 109.952,
+      "end": 115.377,
+      "speaker": "SPEAKER_00",
+      "text": "Eh lui, c'est pareil, c'est Juste. Bon, on a assez perdu le temps comme",
+      "word_count": 14,
+      "words": [
+        {
+          "start": 109.952,
+          "end": 110.012,
+          "word": "Eh",
+          "confidence": 0.505
+        },
+        {
+          "start": 110.172,
+          "end": 110.313,
+          "word": "lui,",
+          "confidence": 0.727
+        },
+        {
+          "start": 110.333,
+          "end": 110.433,
+          "word": "c'est",
+          "confidence": 0.402
+        },
+        {
+          "start": 110.453,
+          "end": 110.753,
+          "word": "pareil,",
+          "confidence": 0.466
+        },
+        {
+          "start": 110.773,
+          "end": 110.893,
+          "word": "c'est",
+          "confidence": 0.699
+        },
+        {
+          "start": 110.933,
+          "end": 111.269,
+          "word": "Juste.",
+          "confidence": 0.902
+        },
+        {
+          "start": 114.156,
+          "end": 114.257,
+          "word": "Bon,",
+          "confidence": 0.289
+        },
+        {
+          "start": 114.277,
+          "end": 114.337,
+          "word": "on",
+          "confidence": 0.64
+        },
+        {
+          "start": 114.357,
+          "end": 114.377,
+          "word": "a",
+          "confidence": 0.217
+        },
+        {
+          "start": 114.397,
+          "end": 114.617,
+          "word": "assez",
+          "confidence": 0.536
+        },
+        {
+          "start": 114.637,
+          "end": 114.777,
+          "word": "perdu",
+          "confidence": 0.589
+        },
+        {
+          "start": 114.797,
+          "end": 114.837,
+          "word": "le",
+          "confidence": 0.461
+        },
+        {
+          "start": 114.857,
+          "end": 114.957,
+          "word": "temps",
+          "confidence": 0.814
+        },
+        {
+          "start": 114.977,
+          "end": 115.377,
+          "word": "comme",
+          "confidence": 0.445
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "start": 116.08,
+      "end": 120.441,
+      "speaker": "SPEAKER_00",
+      "text": "Ma femme signé roman de son autre jeune fille, Christine Le Guirec. Ah bon Elle est bretonne ?",
+      "word_count": 17,
+      "words": [
+        {
+          "start": 116.08,
+          "end": 116.26,
+          "word": "Ma",
+          "confidence": 0.556
+        },
+        {
+          "start": 116.28,
+          "end": 116.42,
+          "word": "femme",
+          "confidence": 0.242
+        },
+        {
+          "start": 116.521,
+          "end": 116.681,
+          "word": "signé",
+          "confidence": 0.405
+        },
+        {
+          "start": 116.761,
+          "end": 116.901,
+          "word": "roman",
+          "confidence": 0.447
+        },
+        {
+          "start": 116.921,
+          "end": 116.981,
+          "word": "de",
+          "confidence": 0.747
+        },
+        {
+          "start": 117.021,
+          "end": 117.101,
+          "word": "son",
+          "confidence": 0.86
+        },
+        {
+          "start": 117.161,
+          "end": 117.262,
+          "word": "autre",
+          "confidence": 0.397
+        },
+        {
+          "start": 117.282,
+          "end": 117.422,
+          "word": "jeune",
+          "confidence": 0.689
+        },
+        {
+          "start": 117.462,
+          "end": 117.662,
+          "word": "fille,",
+          "confidence": 0.654
+        },
+        {
+          "start": 117.682,
+          "end": 118.043,
+          "word": "Christine",
+          "confidence": 0.727
+        },
+        {
+          "start": 118.083,
+          "end": 118.143,
+          "word": "Le",
+          "confidence": 0.95
+        },
+        {
+          "start": 118.163,
+          "end": 118.884,
+          "word": "Guirec.",
+          "confidence": 0.608
+        },
+        {
+          "start": 118.904,
+          "end": 118.984,
+          "word": "Ah",
+          "confidence": 0.416
+        },
+        {
+          "start": 119.004,
+          "end": 119.505,
+          "word": "bon",
+          "confidence": 0.542
+        },
+        {
+          "start": 119.565,
+          "end": 119.645,
+          "word": "Elle",
+          "confidence": 0.227
+        },
+        {
+          "start": 119.685,
+          "end": 119.745,
+          "word": "est",
+          "confidence": 0.817
+        },
+        {
+          "start": 119.785,
+          "end": 120.441,
+          "word": "bretonne",
+          "confidence": 0.692
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "start": 121.267,
+      "end": 133.283,
+      "speaker": "SPEAKER_00",
+      "text": "Je vous en prie, restez concentrés. Excusez-moi. Et vous n'oubliez pas, en fin de conversation, vous lui demandez où vous pouvez joindre Christine Le Guirec. Ça sonne, je vous mets sur haut-parleur. C'est à vous. Je l'accent belge",
+      "word_count": 38,
+      "words": [
+        {
+          "start": 121.267,
+          "end": 121.347,
+          "word": "Je",
+          "confidence": 0.985
+        },
+        {
+          "start": 121.387,
+          "end": 121.487,
+          "word": "vous",
+          "confidence": 0.908
+        },
+        {
+          "start": 121.547,
+          "end": 121.608,
+          "word": "en",
+          "confidence": 0.538
+        },
+        {
+          "start": 121.628,
+          "end": 121.908,
+          "word": "prie,",
+          "confidence": 0.712
+        },
+        {
+          "start": 121.928,
+          "end": 122.188,
+          "word": "restez",
+          "confidence": 0.869
+        },
+        {
+          "start": 122.228,
+          "end": 122.709,
+          "word": "concentrés.",
+          "confidence": 0.829
+        },
+        {
+          "start": 122.729,
+          "end": 123.225,
+          "word": "Excusez-moi.",
+          "confidence": 0.529
+        },
+        {
+          "start": 124.271,
+          "end": 124.331,
+          "word": "Et",
+          "confidence": 0.794
+        },
+        {
+          "start": 124.351,
+          "end": 124.431,
+          "word": "vous",
+          "confidence": 0.983
+        },
+        {
+          "start": 124.451,
+          "end": 124.812,
+          "word": "n'oubliez",
+          "confidence": 0.732
+        },
+        {
+          "start": 124.852,
+          "end": 125.353,
+          "word": "pas,",
+          "confidence": 0.89
+        },
+        {
+          "start": 125.373,
+          "end": 125.433,
+          "word": "en",
+          "confidence": 0.518
+        },
+        {
+          "start": 125.453,
+          "end": 125.553,
+          "word": "fin",
+          "confidence": 0.732
+        },
+        {
+          "start": 125.593,
+          "end": 125.653,
+          "word": "de",
+          "confidence": 0.335
+        },
+        {
+          "start": 125.673,
+          "end": 126.457,
+          "word": "conversation,",
+          "confidence": 0.969
+        },
+        {
+          "start": 126.494,
+          "end": 126.594,
+          "word": "vous",
+          "confidence": 0.832
+        },
+        {
+          "start": 126.614,
+          "end": 126.674,
+          "word": "lui",
+          "confidence": 0.387
+        },
+        {
+          "start": 126.714,
+          "end": 127.075,
+          "word": "demandez",
+          "confidence": 0.63
+        },
+        {
+          "start": 127.135,
+          "end": 127.215,
+          "word": "où",
+          "confidence": 0.855
+        },
+        {
+          "start": 127.255,
+          "end": 127.335,
+          "word": "vous",
+          "confidence": 0.99
+        },
+        {
+          "start": 127.375,
+          "end": 127.536,
+          "word": "pouvez",
+          "confidence": 0.936
+        },
+        {
+          "start": 127.576,
+          "end": 127.816,
+          "word": "joindre",
+          "confidence": 0.692
+        },
+        {
+          "start": 127.856,
+          "end": 128.136,
+          "word": "Christine",
+          "confidence": 0.795
+        },
+        {
+          "start": 128.176,
+          "end": 128.237,
+          "word": "Le",
+          "confidence": 0.864
+        },
+        {
+          "start": 128.257,
+          "end": 128.721,
+          "word": "Guirec.",
+          "confidence": 0.738
+        },
+        {
+          "start": 129.699,
+          "end": 129.779,
+          "word": "Ça",
+          "confidence": 0.567
+        },
+        {
+          "start": 129.799,
+          "end": 129.919,
+          "word": "sonne,",
+          "confidence": 0.273
+        },
+        {
+          "start": 129.939,
+          "end": 129.979,
+          "word": "je",
+          "confidence": 0.965
+        },
+        {
+          "start": 130.019,
+          "end": 130.099,
+          "word": "vous",
+          "confidence": 0.415
+        },
+        {
+          "start": 130.119,
+          "end": 130.199,
+          "word": "mets",
+          "confidence": 0.375
+        },
+        {
+          "start": 130.219,
+          "end": 130.299,
+          "word": "sur",
+          "confidence": 0.72
+        },
+        {
+          "start": 130.339,
+          "end": 130.867,
+          "word": "haut-parleur.",
+          "confidence": 0.526
+        },
+        {
+          "start": 131.06,
+          "end": 131.201,
+          "word": "C'est",
+          "confidence": 0.615
+        },
+        {
+          "start": 131.221,
+          "end": 131.261,
+          "word": "à",
+          "confidence": 0.683
+        },
+        {
+          "start": 131.281,
+          "end": 132.422,
+          "word": "vous.",
+          "confidence": 0.732
+        },
+        {
+          "start": 132.442,
+          "end": 132.522,
+          "word": "Je",
+          "confidence": 0.702
+        },
+        {
+          "start": 132.683,
+          "end": 132.863,
+          "word": "l'accent",
+          "confidence": 0.276
+        },
+        {
+          "start": 132.883,
+          "end": 133.283,
+          "word": "belge",
+          "confidence": 0.678
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "start": 133.303,
+      "end": 139.352,
+      "speaker": "SPEAKER_01",
+      "text": "?",
+      "word_count": 1,
+      "words": [
+        {
+          "start": 133.303,
+          "end": 139.352,
+          "word": "?",
+          "confidence": 0.982
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "start": 139.892,
+      "end": 141.034,
+      "speaker": "SPEAKER_01",
+      "text": "Pourrais-je parler à monsieur",
+      "word_count": 4,
+      "words": [
+        {
+          "start": 139.892,
+          "end": 140.293,
+          "word": "Pourrais-je",
+          "confidence": 0.523
+        },
+        {
+          "start": 140.313,
+          "end": 140.533,
+          "word": "parler",
+          "confidence": 0.773
+        },
+        {
+          "start": 140.573,
+          "end": 140.613,
+          "word": "à",
+          "confidence": 0.782
+        },
+        {
+          "start": 140.674,
+          "end": 141.034,
+          "word": "monsieur",
+          "confidence": 0.476
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "start": 141.975,
+      "end": 143.778,
+      "speaker": "SPEAKER_01",
+      "text": "juste une fois ?",
+      "word_count": 4,
+      "words": [
+        {
+          "start": 141.975,
+          "end": 142.156,
+          "word": "juste",
+          "confidence": 0.795
+        },
+        {
+          "start": 142.216,
+          "end": 142.296,
+          "word": "une",
+          "confidence": 0.694
+        },
+        {
+          "start": 142.336,
+          "end": 143.497,
+          "word": "fois",
+          "confidence": 0.712
+        },
+        {
+          "start": 143.517,
+          "end": 143.778,
+          "word": "?",
+          "confidence": 0.649
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "start": 144.751,
+      "end": 156.295,
+      "speaker": "SPEAKER_01",
+      "text": " Bonsoir, monsieur Leblanc. Georges Van Brueghel à l'appareil. Pardon de vous déranger à une heure aussi tardive. Je suis producteur belge de sport. J'arrive dans une fois et je suis très intéressé par votre roman.",
+      "word_count": 35,
+      "words": [
+        {
+          "start": 144.751,
+          "end": 145.512,
+          "word": "Bonsoir,",
+          "confidence": 0.621
+        },
+        {
+          "start": 145.532,
+          "end": 145.772,
+          "word": "monsieur",
+          "confidence": 0.859
+        },
+        {
+          "start": 145.793,
+          "end": 146.417,
+          "word": "Leblanc.",
+          "confidence": 0.781
+        },
+        {
+          "start": 147.154,
+          "end": 147.395,
+          "word": "Georges",
+          "confidence": 0.256
+        },
+        {
+          "start": 147.415,
+          "end": 147.535,
+          "word": "Van",
+          "confidence": 0.484
+        },
+        {
+          "start": 147.555,
+          "end": 147.835,
+          "word": "Brueghel",
+          "confidence": 0.507
+        },
+        {
+          "start": 147.916,
+          "end": 147.936,
+          "word": "à",
+          "confidence": 0.809
+        },
+        {
+          "start": 147.956,
+          "end": 148.757,
+          "word": "l'appareil.",
+          "confidence": 0.797
+        },
+        {
+          "start": 148.777,
+          "end": 148.957,
+          "word": "Pardon",
+          "confidence": 0.327
+        },
+        {
+          "start": 148.997,
+          "end": 149.037,
+          "word": "de",
+          "confidence": 0.84
+        },
+        {
+          "start": 149.077,
+          "end": 149.157,
+          "word": "vous",
+          "confidence": 0.883
+        },
+        {
+          "start": 149.197,
+          "end": 149.498,
+          "word": "déranger",
+          "confidence": 0.572
+        },
+        {
+          "start": 149.518,
+          "end": 149.538,
+          "word": "à",
+          "confidence": 0.997
+        },
+        {
+          "start": 149.558,
+          "end": 149.638,
+          "word": "une",
+          "confidence": 0.856
+        },
+        {
+          "start": 149.658,
+          "end": 149.778,
+          "word": "heure",
+          "confidence": 0.698
+        },
+        {
+          "start": 149.818,
+          "end": 149.999,
+          "word": "aussi",
+          "confidence": 0.963
+        },
+        {
+          "start": 150.039,
+          "end": 150.559,
+          "word": "tardive.",
+          "confidence": 0.916
+        },
+        {
+          "start": 150.579,
+          "end": 150.66,
+          "word": "Je",
+          "confidence": 0.71
+        },
+        {
+          "start": 150.7,
+          "end": 150.84,
+          "word": "suis",
+          "confidence": 0.741
+        },
+        {
+          "start": 150.94,
+          "end": 151.461,
+          "word": "producteur",
+          "confidence": 0.972
+        },
+        {
+          "start": 151.481,
+          "end": 151.781,
+          "word": "belge",
+          "confidence": 0.341
+        },
+        {
+          "start": 151.821,
+          "end": 151.881,
+          "word": "de",
+          "confidence": 0.644
+        },
+        {
+          "start": 151.901,
+          "end": 152.502,
+          "word": "sport.",
+          "confidence": 0.354
+        },
+        {
+          "start": 152.522,
+          "end": 152.823,
+          "word": "J'arrive",
+          "confidence": 0.854
+        },
+        {
+          "start": 152.883,
+          "end": 153.043,
+          "word": "dans",
+          "confidence": 0.586
+        },
+        {
+          "start": 153.323,
+          "end": 153.404,
+          "word": "une",
+          "confidence": 0.878
+        },
+        {
+          "start": 153.444,
+          "end": 153.904,
+          "word": "fois",
+          "confidence": 0.724
+        },
+        {
+          "start": 153.964,
+          "end": 154.024,
+          "word": "et",
+          "confidence": 0.802
+        },
+        {
+          "start": 154.064,
+          "end": 154.145,
+          "word": "je",
+          "confidence": 0.768
+        },
+        {
+          "start": 154.185,
+          "end": 154.345,
+          "word": "suis",
+          "confidence": 0.802
+        },
+        {
+          "start": 154.385,
+          "end": 154.525,
+          "word": "très",
+          "confidence": 0.751
+        },
+        {
+          "start": 154.685,
+          "end": 155.126,
+          "word": "intéressé",
+          "confidence": 0.848
+        },
+        {
+          "start": 155.166,
+          "end": 155.286,
+          "word": "par",
+          "confidence": 0.864
+        },
+        {
+          "start": 155.326,
+          "end": 155.547,
+          "word": "votre",
+          "confidence": 0.787
+        },
+        {
+          "start": 155.607,
+          "end": 156.295,
+          "word": "roman.",
+          "confidence": 0.712
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "start": 157.59,
+      "end": 158.972,
+      "speaker": "SPEAKER_01",
+      "text": "Votre",
+      "word_count": 1,
+      "words": [
+        {
+          "start": 157.59,
+          "end": 158.972,
+          "word": "Votre",
+          "confidence": 0.333
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "start": 160.314,
+      "end": 165.481,
+      "speaker": "SPEAKER_01",
+      "text": "Et j'aimerais discuter l'achat droits pour le cinéma. C'est une blague",
+      "word_count": 11,
+      "words": [
+        {
+          "start": 160.314,
+          "end": 161.375,
+          "word": "Et",
+          "confidence": 0.895
+        },
+        {
+          "start": 161.415,
+          "end": 161.876,
+          "word": "j'aimerais",
+          "confidence": 0.86
+        },
+        {
+          "start": 161.916,
+          "end": 162.797,
+          "word": "discuter",
+          "confidence": 0.888
+        },
+        {
+          "start": 162.837,
+          "end": 163.178,
+          "word": "l'achat",
+          "confidence": 0.726
+        },
+        {
+          "start": 163.278,
+          "end": 163.578,
+          "word": "droits",
+          "confidence": 0.492
+        },
+        {
+          "start": 163.618,
+          "end": 163.738,
+          "word": "pour",
+          "confidence": 0.906
+        },
+        {
+          "start": 163.758,
+          "end": 163.819,
+          "word": "le",
+          "confidence": 0.724
+        },
+        {
+          "start": 163.839,
+          "end": 164.367,
+          "word": "cinéma.",
+          "confidence": 0.679
+        },
+        {
+          "start": 164.98,
+          "end": 165.12,
+          "word": "C'est",
+          "confidence": 0.652
+        },
+        {
+          "start": 165.161,
+          "end": 165.261,
+          "word": "une",
+          "confidence": 0.779
+        },
+        {
+          "start": 165.281,
+          "end": 165.481,
+          "word": "blague",
+          "confidence": 0.721
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "start": 167.163,
+      "end": 170.909,
+      "speaker": "SPEAKER_01",
+      "text": "Pas du tout.",
+      "word_count": 3,
+      "words": [
+        {
+          "start": 167.163,
+          "end": 167.244,
+          "word": "Pas",
+          "confidence": 0.666
+        },
+        {
+          "start": 167.264,
+          "end": 167.344,
+          "word": "du",
+          "confidence": 0.718
+        },
+        {
+          "start": 167.364,
+          "end": 170.909,
+          "word": "tout.",
+          "confidence": 0.742
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "start": 172.391,
+      "end": 173.813,
+      "speaker": "SPEAKER_01",
+      "text": "Étienne. t'ai reconnu.",
+      "word_count": 3,
+      "words": [
+        {
+          "start": 172.391,
+          "end": 172.631,
+          "word": "Étienne.",
+          "confidence": 0.35
+        },
+        {
+          "start": 172.711,
+          "end": 172.852,
+          "word": "t'ai",
+          "confidence": 0.355
+        },
+        {
+          "start": 172.872,
+          "end": 173.813,
+          "word": "reconnu.",
+          "confidence": 0.551
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "start": 175.801,
+      "end": 183.475,
+      "speaker": "SPEAKER_01",
+      "text": " Vous faites erreur, M. Leblanc. Je suis producteur et j'arrive de Bruxelles.",
+      "word_count": 12,
+      "words": [
+        {
+          "start": 175.801,
+          "end": 176.202,
+          "word": "Vous",
+          "confidence": 0.919
+        },
+        {
+          "start": 176.242,
+          "end": 176.382,
+          "word": "faites",
+          "confidence": 0.878
+        },
+        {
+          "start": 176.442,
+          "end": 176.722,
+          "word": "erreur,",
+          "confidence": 0.86
+        },
+        {
+          "start": 176.742,
+          "end": 176.923,
+          "word": "M.",
+          "confidence": 0.604
+        },
+        {
+          "start": 176.943,
+          "end": 177.523,
+          "word": "Leblanc.",
+          "confidence": 0.741
+        },
+        {
+          "start": 177.544,
+          "end": 177.584,
+          "word": "Je",
+          "confidence": 0.78
+        },
+        {
+          "start": 177.684,
+          "end": 178.785,
+          "word": "suis",
+          "confidence": 0.796
+        },
+        {
+          "start": 178.825,
+          "end": 179.366,
+          "word": "producteur",
+          "confidence": 0.913
+        },
+        {
+          "start": 179.406,
+          "end": 179.506,
+          "word": "et",
+          "confidence": 0.844
+        },
+        {
+          "start": 179.566,
+          "end": 179.987,
+          "word": "j'arrive",
+          "confidence": 0.927
+        },
+        {
+          "start": 180.007,
+          "end": 180.167,
+          "word": "de",
+          "confidence": 0.87
+        },
+        {
+          "start": 180.227,
+          "end": 183.475,
+          "word": "Bruxelles.",
+          "confidence": 0.758
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "start": 184.153,
+      "end": 186.637,
+      "speaker": "SPEAKER_01",
+      "text": "Quelle",
+      "word_count": 1,
+      "words": [
+        {
+          "start": 184.153,
+          "end": 186.637,
+          "word": "Quelle",
+          "confidence": 0.263
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "start": 189.2,
+      "end": 190.843,
+      "speaker": "SPEAKER_01",
+      "text": "Une production jeune mais dynamique.",
+      "word_count": 5,
+      "words": [
+        {
+          "start": 189.2,
+          "end": 189.301,
+          "word": "Une",
+          "confidence": 0.764
+        },
+        {
+          "start": 189.341,
+          "end": 189.741,
+          "word": "production",
+          "confidence": 0.905
+        },
+        {
+          "start": 189.781,
+          "end": 190.002,
+          "word": "jeune",
+          "confidence": 0.881
+        },
+        {
+          "start": 190.042,
+          "end": 190.182,
+          "word": "mais",
+          "confidence": 0.82
+        },
+        {
+          "start": 190.202,
+          "end": 190.843,
+          "word": "dynamique.",
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "start": 191.864,
+      "end": 196.411,
+      "speaker": "SPEAKER_01",
+      "text": "Vous êtes intéressé",
+      "word_count": 3,
+      "words": [
+        {
+          "start": 191.864,
+          "end": 191.964,
+          "word": "Vous",
+          "confidence": 0.744
+        },
+        {
+          "start": 192.045,
+          "end": 192.125,
+          "word": "êtes",
+          "confidence": 0.275
+        },
+        {
+          "start": 192.165,
+          "end": 196.411,
+          "word": "intéressé",
+          "confidence": 0.768
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "start": 197.993,
+      "end": 202.555,
+      "speaker": "SPEAKER_01",
+      "text": "Pour le cinéma, M. Leblanc, pour le grand écran. Pas pour la petite lucarne.",
+      "word_count": 14,
+      "words": [
+        {
+          "start": 197.993,
+          "end": 198.173,
+          "word": "Pour",
+          "confidence": 0.804
+        },
+        {
+          "start": 198.193,
+          "end": 198.474,
+          "word": "le",
+          "confidence": 0.455
+        },
+        {
+          "start": 198.494,
+          "end": 199.075,
+          "word": "cinéma,",
+          "confidence": 0.421
+        },
+        {
+          "start": 199.095,
+          "end": 199.295,
+          "word": "M.",
+          "confidence": 0.532
+        },
+        {
+          "start": 199.355,
+          "end": 199.696,
+          "word": "Leblanc,",
+          "confidence": 0.778
+        },
+        {
+          "start": 199.716,
+          "end": 199.896,
+          "word": "pour",
+          "confidence": 0.93
+        },
+        {
+          "start": 199.936,
+          "end": 200.076,
+          "word": "le",
+          "confidence": 0.912
+        },
+        {
+          "start": 200.256,
+          "end": 200.557,
+          "word": "grand",
+          "confidence": 0.763
+        },
+        {
+          "start": 200.577,
+          "end": 201.201,
+          "word": "écran.",
+          "confidence": 0.842
+        },
+        {
+          "start": 201.438,
+          "end": 201.558,
+          "word": "Pas",
+          "confidence": 0.87
+        },
+        {
+          "start": 201.598,
+          "end": 201.699,
+          "word": "pour",
+          "confidence": 0.925
+        },
+        {
+          "start": 201.739,
+          "end": 201.779,
+          "word": "la",
+          "confidence": 0.928
+        },
+        {
+          "start": 201.799,
+          "end": 201.999,
+          "word": "petite",
+          "confidence": 0.715
+        },
+        {
+          "start": 202.059,
+          "end": 202.555,
+          "word": "lucarne.",
+          "confidence": 0.608
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "start": 203.948,
+      "end": 210.874,
+      "speaker": "SPEAKER_01",
+      "text": "Je vous prévenir que j'aimerais faire l'adaptation moi-même. Je ne parie pas poser de problème, ça, monsieur Leblanc. Mais vous devez seulement",
+      "word_count": 22,
+      "words": [
+        {
+          "start": 203.948,
+          "end": 204.068,
+          "word": "Je",
+          "confidence": 0.272
+        },
+        {
+          "start": 204.188,
+          "end": 204.288,
+          "word": "vous",
+          "confidence": 0.671
+        },
+        {
+          "start": 204.308,
+          "end": 204.669,
+          "word": "prévenir",
+          "confidence": 0.582
+        },
+        {
+          "start": 204.709,
+          "end": 204.969,
+          "word": "que",
+          "confidence": 0.799
+        },
+        {
+          "start": 204.989,
+          "end": 205.229,
+          "word": "j'aimerais",
+          "confidence": 0.873
+        },
+        {
+          "start": 205.289,
+          "end": 205.389,
+          "word": "faire",
+          "confidence": 0.783
+        },
+        {
+          "start": 205.409,
+          "end": 206.05,
+          "word": "l'adaptation",
+          "confidence": 0.903
+        },
+        {
+          "start": 206.07,
+          "end": 206.47,
+          "word": "moi-même.",
+          "confidence": 0.321
+        },
+        {
+          "start": 207.391,
+          "end": 207.431,
+          "word": "Je",
+          "confidence": 0.436
+        },
+        {
+          "start": 207.471,
+          "end": 207.571,
+          "word": "ne",
+          "confidence": 0.304
+        },
+        {
+          "start": 207.591,
+          "end": 207.751,
+          "word": "parie",
+          "confidence": 0.531
+        },
+        {
+          "start": 207.772,
+          "end": 207.832,
+          "word": "pas",
+          "confidence": 0.773
+        },
+        {
+          "start": 207.892,
+          "end": 208.072,
+          "word": "poser",
+          "confidence": 0.616
+        },
+        {
+          "start": 208.092,
+          "end": 208.152,
+          "word": "de",
+          "confidence": 0.863
+        },
+        {
+          "start": 208.172,
+          "end": 208.412,
+          "word": "problème,",
+          "confidence": 0.92
+        },
+        {
+          "start": 208.432,
+          "end": 208.552,
+          "word": "ça,",
+          "confidence": 0.681
+        },
+        {
+          "start": 208.572,
+          "end": 208.732,
+          "word": "monsieur",
+          "confidence": 0.924
+        },
+        {
+          "start": 208.772,
+          "end": 209.393,
+          "word": "Leblanc.",
+          "confidence": 0.677
+        },
+        {
+          "start": 209.413,
+          "end": 209.913,
+          "word": "Mais",
+          "confidence": 0.644
+        },
+        {
+          "start": 209.934,
+          "end": 210.074,
+          "word": "vous",
+          "confidence": 0.756
+        },
+        {
+          "start": 210.114,
+          "end": 210.334,
+          "word": "devez",
+          "confidence": 0.706
+        },
+        {
+          "start": 210.354,
+          "end": 210.874,
+          "word": "seulement",
+          "confidence": 0.853
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "start": 211.655,
+      "end": 213.777,
+      "speaker": "SPEAKER_01",
+      "text": "nous n'avons pas une production que nous",
+      "word_count": 7,
+      "words": [
+        {
+          "start": 211.655,
+          "end": 211.735,
+          "word": "nous",
+          "confidence": 0.471
+        },
+        {
+          "start": 211.755,
+          "end": 211.955,
+          "word": "n'avons",
+          "confidence": 0.325
+        },
+        {
+          "start": 211.975,
+          "end": 212.055,
+          "word": "pas",
+          "confidence": 0.512
+        },
+        {
+          "start": 212.075,
+          "end": 212.176,
+          "word": "une",
+          "confidence": 0.542
+        },
+        {
+          "start": 212.336,
+          "end": 212.696,
+          "word": "production",
+          "confidence": 0.55
+        },
+        {
+          "start": 212.776,
+          "end": 212.836,
+          "word": "que",
+          "confidence": 0.388
+        },
+        {
+          "start": 212.856,
+          "end": 213.777,
+          "word": "nous",
+          "confidence": 0.767
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "start": 214.598,
+      "end": 215.894,
+      "speaker": "SPEAKER_01",
+      "text": "vous n'êtes pas",
+      "word_count": 3,
+      "words": [
+        {
+          "start": 214.598,
+          "end": 214.718,
+          "word": "vous",
+          "confidence": 0.509
+        },
+        {
+          "start": 214.738,
+          "end": 214.898,
+          "word": "n'êtes",
+          "confidence": 0.412
+        },
+        {
+          "start": 214.918,
+          "end": 215.894,
+          "word": "pas",
+          "confidence": 0.818
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "start": 216.94,
+      "end": 217.26,
+      "speaker": "SPEAKER_01",
+      "text": "les questions",
+      "word_count": 2,
+      "words": [
+        {
+          "start": 216.94,
+          "end": 217.02,
+          "word": "les",
+          "confidence": 0.758
+        },
+        {
+          "start": 217.04,
+          "end": 217.26,
+          "word": "questions",
+          "confidence": 0.775
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "start": 221.244,
+      "end": 223.166,
+      "speaker": "SPEAKER_01",
+      "text": "Va Bruegel, écoutez",
+      "word_count": 3,
+      "words": [
+        {
+          "start": 221.244,
+          "end": 221.364,
+          "word": "Va",
+          "confidence": 0.642
+        },
+        {
+          "start": 221.424,
+          "end": 221.724,
+          "word": "Bruegel,",
+          "confidence": 0.446
+        },
+        {
+          "start": 221.905,
+          "end": 223.166,
+          "word": "écoutez",
+          "confidence": 0.349
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "start": 223.526,
+      "end": 229.291,
+      "speaker": "SPEAKER_01",
+      "text": "je vous appelle demain chez vous et on prend rendez-vous une fois. Entendu, à demain. À demain, monsieur Leblanc",
+      "word_count": 19,
+      "words": [
+        {
+          "start": 223.526,
+          "end": 223.606,
+          "word": "je",
+          "confidence": 0.964
+        },
+        {
+          "start": 223.646,
+          "end": 223.766,
+          "word": "vous",
+          "confidence": 0.888
+        },
+        {
+          "start": 223.806,
+          "end": 224.006,
+          "word": "appelle",
+          "confidence": 0.795
+        },
+        {
+          "start": 224.046,
+          "end": 224.187,
+          "word": "demain",
+          "confidence": 0.545
+        },
+        {
+          "start": 224.207,
+          "end": 224.307,
+          "word": "chez",
+          "confidence": 0.624
+        },
+        {
+          "start": 224.347,
+          "end": 224.427,
+          "word": "vous",
+          "confidence": 0.904
+        },
+        {
+          "start": 224.467,
+          "end": 224.527,
+          "word": "et",
+          "confidence": 0.584
+        },
+        {
+          "start": 224.567,
+          "end": 224.607,
+          "word": "on",
+          "confidence": 0.491
+        },
+        {
+          "start": 224.647,
+          "end": 224.787,
+          "word": "prend",
+          "confidence": 0.502
+        },
+        {
+          "start": 224.807,
+          "end": 225.027,
+          "word": "rendez-vous",
+          "confidence": 0.471
+        },
+        {
+          "start": 225.047,
+          "end": 225.148,
+          "word": "une",
+          "confidence": 0.725
+        },
+        {
+          "start": 225.168,
+          "end": 225.988,
+          "word": "fois.",
+          "confidence": 0.702
+        },
+        {
+          "start": 226.008,
+          "end": 226.329,
+          "word": "Entendu,",
+          "confidence": 0.826
+        },
+        {
+          "start": 226.349,
+          "end": 226.389,
+          "word": "à",
+          "confidence": 0.703
+        },
+        {
+          "start": 226.409,
+          "end": 227.049,
+          "word": "demain.",
+          "confidence": 0.678
+        },
+        {
+          "start": 227.069,
+          "end": 227.089,
+          "word": "À",
+          "confidence": 0.367
+        },
+        {
+          "start": 227.109,
+          "end": 227.83,
+          "word": "demain,",
+          "confidence": 0.492
+        },
+        {
+          "start": 227.87,
+          "end": 228.07,
+          "word": "monsieur",
+          "confidence": 0.772
+        },
+        {
+          "start": 228.15,
+          "end": 229.291,
+          "word": "Leblanc",
+          "confidence": 0.247
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "start": 230.312,
+      "end": 232.074,
+      "speaker": "SPEAKER_01",
+      "text": "on a les droits",
+      "word_count": 4,
+      "words": [
+        {
+          "start": 230.312,
+          "end": 230.432,
+          "word": "on",
+          "confidence": 0.587
+        },
+        {
+          "start": 230.472,
+          "end": 230.532,
+          "word": "a",
+          "confidence": 0.46
+        },
+        {
+          "start": 230.552,
+          "end": 230.653,
+          "word": "les",
+          "confidence": 0.765
+        },
+        {
+          "start": 230.693,
+          "end": 232.074,
+          "word": "droits",
+          "confidence": 0.61
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "start": 232.754,
+      "end": 239.863,
+      "speaker": "SPEAKER_01",
+      "text": "Pour pas cher à mon avis, il a marché Il a marché à fond, le gars",
+      "word_count": 16,
+      "words": [
+        {
+          "start": 232.754,
+          "end": 235.838,
+          "word": "Pour",
+          "confidence": 0.754
+        },
+        {
+          "start": 235.878,
+          "end": 236.018,
+          "word": "pas",
+          "confidence": 0.495
+        },
+        {
+          "start": 236.038,
+          "end": 236.218,
+          "word": "cher",
+          "confidence": 0.796
+        },
+        {
+          "start": 236.258,
+          "end": 236.278,
+          "word": "à",
+          "confidence": 0.96
+        },
+        {
+          "start": 236.338,
+          "end": 236.459,
+          "word": "mon",
+          "confidence": 0.956
+        },
+        {
+          "start": 236.499,
+          "end": 236.679,
+          "word": "avis,",
+          "confidence": 0.821
+        },
+        {
+          "start": 236.739,
+          "end": 236.779,
+          "word": "il",
+          "confidence": 0.345
+        },
+        {
+          "start": 236.839,
+          "end": 236.899,
+          "word": "a",
+          "confidence": 0.776
+        },
+        {
+          "start": 236.939,
+          "end": 237.435,
+          "word": "marché",
+          "confidence": 0.922
+        },
+        {
+          "start": 237.66,
+          "end": 237.72,
+          "word": "Il",
+          "confidence": 0.57
+        },
+        {
+          "start": 237.78,
+          "end": 237.86,
+          "word": "a",
+          "confidence": 0.673
+        },
+        {
+          "start": 237.9,
+          "end": 238.101,
+          "word": "marché",
+          "confidence": 0.825
+        },
+        {
+          "start": 238.141,
+          "end": 238.241,
+          "word": "à",
+          "confidence": 0.897
+        },
+        {
+          "start": 238.281,
+          "end": 238.501,
+          "word": "fond,",
+          "confidence": 0.472
+        },
+        {
+          "start": 238.521,
+          "end": 238.601,
+          "word": "le",
+          "confidence": 0.968
+        },
+        {
+          "start": 238.641,
+          "end": 239.863,
+          "word": "gars",
+          "confidence": 0.63
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "start": 239.923,
+      "end": 255.302,
+      "speaker": "SPEAKER_00",
+      "text": "Et ma femme ? Quoi Il a oublié ma femme. Il fait le clown pendant cinq minutes et il oublie ma femme. À la boulette Ça dépasse tout ce que j'ai pu imaginer.",
+      "word_count": 33,
+      "words": [
+        {
+          "start": 239.923,
+          "end": 240.003,
+          "word": "Et",
+          "confidence": 0.852
+        },
+        {
+          "start": 240.063,
+          "end": 240.143,
+          "word": "ma",
+          "confidence": 0.882
+        },
+        {
+          "start": 240.183,
+          "end": 240.551,
+          "word": "femme",
+          "confidence": 0.833
+        },
+        {
+          "start": 241.945,
+          "end": 241.965,
+          "word": "?",
+          "confidence": 0.325
+        },
+        {
+          "start": 241.985,
+          "end": 242.385,
+          "word": "Quoi",
+          "confidence": 0.604
+        },
+        {
+          "start": 245.069,
+          "end": 245.169,
+          "word": "Il",
+          "confidence": 0.736
+        },
+        {
+          "start": 245.209,
+          "end": 245.23,
+          "word": "a",
+          "confidence": 0.633
+        },
+        {
+          "start": 245.29,
+          "end": 245.53,
+          "word": "oublié",
+          "confidence": 0.855
+        },
+        {
+          "start": 245.63,
+          "end": 245.71,
+          "word": "ma",
+          "confidence": 0.914
+        },
+        {
+          "start": 245.75,
+          "end": 247.332,
+          "word": "femme.",
+          "confidence": 0.798
+        },
+        {
+          "start": 247.392,
+          "end": 247.472,
+          "word": "Il",
+          "confidence": 0.839
+        },
+        {
+          "start": 247.512,
+          "end": 247.632,
+          "word": "fait",
+          "confidence": 0.713
+        },
+        {
+          "start": 247.693,
+          "end": 247.733,
+          "word": "le",
+          "confidence": 0.924
+        },
+        {
+          "start": 247.773,
+          "end": 247.973,
+          "word": "clown",
+          "confidence": 0.543
+        },
+        {
+          "start": 247.993,
+          "end": 248.213,
+          "word": "pendant",
+          "confidence": 0.895
+        },
+        {
+          "start": 248.273,
+          "end": 248.413,
+          "word": "cinq",
+          "confidence": 0.77
+        },
+        {
+          "start": 248.433,
+          "end": 248.654,
+          "word": "minutes",
+          "confidence": 0.828
+        },
+        {
+          "start": 248.734,
+          "end": 248.794,
+          "word": "et",
+          "confidence": 0.62
+        },
+        {
+          "start": 248.834,
+          "end": 248.914,
+          "word": "il",
+          "confidence": 0.212
+        },
+        {
+          "start": 248.934,
+          "end": 249.174,
+          "word": "oublie",
+          "confidence": 0.768
+        },
+        {
+          "start": 249.194,
+          "end": 249.295,
+          "word": "ma",
+          "confidence": 0.826
+        },
+        {
+          "start": 249.315,
+          "end": 251.017,
+          "word": "femme.",
+          "confidence": 0.783
+        },
+        {
+          "start": 251.037,
+          "end": 251.077,
+          "word": "À",
+          "confidence": 0.702
+        },
+        {
+          "start": 251.117,
+          "end": 251.177,
+          "word": "la",
+          "confidence": 0.954
+        },
+        {
+          "start": 251.197,
+          "end": 253.32,
+          "word": "boulette",
+          "confidence": 0.813
+        },
+        {
+          "start": 253.38,
+          "end": 253.64,
+          "word": "Ça",
+          "confidence": 0.74
+        },
+        {
+          "start": 253.68,
+          "end": 254.04,
+          "word": "dépasse",
+          "confidence": 0.911
+        },
+        {
+          "start": 254.081,
+          "end": 254.181,
+          "word": "tout",
+          "confidence": 0.782
+        },
+        {
+          "start": 254.201,
+          "end": 254.241,
+          "word": "ce",
+          "confidence": 0.992
+        },
+        {
+          "start": 254.281,
+          "end": 254.341,
+          "word": "que",
+          "confidence": 0.997
+        },
+        {
+          "start": 254.381,
+          "end": 254.481,
+          "word": "j'ai",
+          "confidence": 0.668
+        },
+        {
+          "start": 254.521,
+          "end": 254.621,
+          "word": "pu",
+          "confidence": 0.78
+        },
+        {
+          "start": 254.681,
+          "end": 255.302,
+          "word": "imaginer.",
+          "confidence": 0.914
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "total_segments": 42,
+    "total_speakers": 2,
+    "total_words": 602
+  },
+  "vad_trimming": {
+    "enabled": true,
+    "threshold": 0.5,
+    "aggressiveness": "medium"
+  }
+}

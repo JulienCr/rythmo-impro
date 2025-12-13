@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef, RefObject, useState } from 'react';
-import { CuesData, Subtitle } from '@/lib/loadCues';
+import { VisualizationData, Subtitle } from '@/lib/loadCues';
 
 interface RythmoOverlayProps {
   videoRef: RefObject<HTMLVideoElement | null>;
-  cues: CuesData;
+  visualizationData: VisualizationData;
   windowMs?: number;      // Default: 6000 (±3s rolling window)
   laneHeight?: number;    // Default: 20px
   laneGap?: number;       // Default: 8px
@@ -23,7 +23,7 @@ const LANE_COLORS: Record<number, string> = {
 
 export default function RythmoOverlay({
   videoRef,
-  cues,
+  visualizationData,
   windowMs = 6000,
   laneHeight = 20,
   laneGap = 8,
@@ -33,7 +33,7 @@ export default function RythmoOverlay({
   const [currentSubtitle, setCurrentSubtitle] = useState<string>('');
 
   // Calculate number of lanes needed
-  const numLanes = Math.max(...Object.values(cues.laneMap)) + 1;
+  const numLanes = visualizationData.speakers.length;
   const totalHeight = numLanes * (laneHeight + laneGap) - laneGap;
 
   // Effect 1: Handle canvas sizing based on video dimensions
@@ -99,31 +99,45 @@ export default function RythmoOverlay({
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw each segment that intersects the window
-      for (const segment of cues.segments) {
-        // Skip segments outside the window
-        if (segment.t1 < windowStart || segment.t0 > windowEnd) {
+      // Collect currently active words (for text display)
+      const activeWords: Array<{ text: string; speaker: string; lane: number }> = [];
+
+      // Draw each word that intersects the window
+      // Words are sorted by t0, so we can break early
+      for (const word of visualizationData.words) {
+        // Break early if we've passed the window end
+        if (word.t0 > windowEnd) {
+          break;
+        }
+
+        // Skip words before the window
+        if (word.t1 < windowStart) {
           continue;
         }
 
-        // Get lane for this segment
-        const lane = cues.laneMap[segment.speaker];
-        if (lane === undefined) continue;
+        // Check if word is currently being spoken (intersects current time)
+        if (word.t0 <= currentTimeMs && word.t1 >= currentTimeMs) {
+          activeWords.push({
+            text: word.text,
+            speaker: word.speaker,
+            lane: word.lane
+          });
+        }
 
-        // Calculate visible portion of segment within window
-        const visibleStart = Math.max(segment.t0, windowStart);
-        const visibleEnd = Math.min(segment.t1, windowEnd);
+        // Calculate visible portion of word within window
+        const visibleStart = Math.max(word.t0, windowStart);
+        const visibleEnd = Math.min(word.t1, windowEnd);
 
         // Map time to canvas X coordinates
         const xStart = ((visibleStart - windowStart) / windowMs) * canvas.width;
         const xEnd = ((visibleEnd - windowStart) / windowMs) * canvas.width;
         const width = xEnd - xStart;
 
-        // Calculate Y position based on lane
-        const y = lane * (laneHeight + laneGap);
+        // Calculate Y position based on pre-calculated lane
+        const y = word.lane * (laneHeight + laneGap);
 
-        // Draw the bar
-        ctx.fillStyle = LANE_COLORS[lane] || '#888888';
+        // Draw the word bar
+        ctx.fillStyle = LANE_COLORS[word.lane] || '#888888';
         ctx.fillRect(xStart, y, width, laneHeight);
       }
 
@@ -135,12 +149,36 @@ export default function RythmoOverlay({
       ctx.lineTo(canvas.width / 2, totalHeight);
       ctx.stroke();
 
-      // Update current subtitle
-      if (subtitles.length > 0) {
+      // Update current text from JSON data
+      if (activeWords.length > 0) {
+        // Group by speaker and lane, then join text
+        const textBySpeaker = new Map<string, string[]>();
+
+        for (const word of activeWords) {
+          const key = `${word.speaker}`;
+          if (!textBySpeaker.has(key)) {
+            textBySpeaker.set(key, []);
+          }
+          textBySpeaker.get(key)!.push(word.text);
+        }
+
+        // Format text with speaker labels if multiple speakers
+        const formattedText = Array.from(textBySpeaker.entries())
+          .map(([speaker, words]) => {
+            const text = words.join(' ');
+            return textBySpeaker.size > 1 ? `[${speaker}] ${text}` : text;
+          })
+          .join(' | ');
+
+        setCurrentSubtitle(formattedText);
+      } else if (subtitles.length > 0) {
+        // Fall back to SRT subtitles if no active words
         const activeSubtitle = subtitles.find(
           sub => currentTimeMs >= sub.t0 && currentTimeMs <= sub.t1
         );
         setCurrentSubtitle(activeSubtitle?.text || '');
+      } else {
+        setCurrentSubtitle('');
       }
 
       // Schedule next frame
@@ -153,7 +191,7 @@ export default function RythmoOverlay({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [videoRef, cues, windowMs, laneHeight, laneGap, totalHeight, subtitles]);
+  }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight, subtitles]);
 
   return (
     <>
