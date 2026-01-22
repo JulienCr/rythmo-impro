@@ -16,6 +16,45 @@ import {
   type StateUpdate,
 } from '@/lib/websocket/types';
 
+interface VideoPaths {
+  videoSrc: string;
+  tracksUrl: string;
+}
+
+/**
+ * Derive tracks URL from video path by replacing the extension with .json
+ */
+function deriveTracksUrl(videoPath: string): string {
+  const videoFilename = videoPath.split('/').pop() || '';
+  const basename = videoFilename.replace(/\.[^.]+$/, '');
+  return `/api/out/final-json/${basename}.json`;
+}
+
+/**
+ * Derive video and tracks paths from WebSocket state or query parameters.
+ * WebSocket state takes priority over query parameters.
+ */
+function deriveVideoPaths(
+  wsVideoSrc: string,
+  wsTracksUrl: string,
+  videoParam: string | null,
+  tracksParam: string | null
+): VideoPaths {
+  // WebSocket command has set the video
+  if (wsVideoSrc && wsTracksUrl) {
+    return { videoSrc: wsVideoSrc, tracksUrl: wsTracksUrl };
+  }
+
+  // Fall back to query parameters
+  if (videoParam) {
+    const tracksUrl = tracksParam || deriveTracksUrl(videoParam);
+    return { videoSrc: videoParam, tracksUrl };
+  }
+
+  // No video loaded
+  return { videoSrc: '', tracksUrl: '' };
+}
+
 function FcpxmlOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -92,35 +131,16 @@ function FcpxmlOverlayContent() {
     lastStateUpdateRef.current = now;
   }, [connected, send]);
 
-  // Get query parameters
+  // Derive video/tracks paths: WebSocket state takes priority over query parameters
   const videoParam = searchParams.get('video');
   const tracksParam = searchParams.get('tracks');
 
-  // Derive paths: WebSocket state takes priority over query parameters
-  let videoSrc: string;
-  let tracksUrl: string;
-
-  if (wsVideoSrc && wsTracksUrl) {
-    // WebSocket command has set the video
-    videoSrc = wsVideoSrc;
-    tracksUrl = wsTracksUrl;
-  } else if (videoParam) {
-    // Fall back to query parameters
-    videoSrc = videoParam;
-    // If tracks param provided, use it; otherwise derive from video basename
-    if (tracksParam) {
-      tracksUrl = tracksParam;
-    } else {
-      // Extract basename from video path
-      const videoFilename = videoParam.split('/').pop() || '';
-      const basename = videoFilename.replace(/\.[^.]+$/, ''); // Remove extension
-      tracksUrl = `/api/out/final-json/${basename}.json`;
-    }
-  } else {
-    // No video loaded - show nothing (transparent)
-    videoSrc = '';
-    tracksUrl = '';
-  }
+  const { videoSrc, tracksUrl } = deriveVideoPaths(
+    wsVideoSrc,
+    wsTracksUrl,
+    videoParam,
+    tracksParam
+  );
 
   // Load tracks on mount or URL change
   useEffect(() => {
@@ -181,39 +201,48 @@ function FcpxmlOverlayContent() {
     };
   }, [sendStateUpdate, connected]);
 
-  // Extract video name from URL
-  const videoName = videoSrc
-    ? decodeURIComponent(videoSrc.split('/').pop()?.replace(/\.[^.]+$/, '') || 'Vidéo inconnue')
-    : 'Vidéo inconnue';
+  // Extract video name from URL for display
+  function extractVideoName(src: string): string {
+    if (!src) return 'Vidéo inconnue';
+    const filename = src.split('/').pop() || '';
+    const basename = filename.replace(/\.[^.]+$/, '');
+    return decodeURIComponent(basename) || 'Vidéo inconnue';
+  }
+  const videoName = extractVideoName(videoSrc);
 
   return (
-    <div className="relative w-full h-screen bg-transparent flex flex-col overflow-hidden">
-      {/* Always render video, hide if no source */}
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        className={videoSrc ? "w-full h-auto" : "hidden"}
-        playsInline
-      />
-
-      {/* Overlay - only shown when video is loaded */}
-      {videoSrc && visualizationData && !loading && !error && (
-        <FcpxmlOverlay
-          videoRef={videoRef}
-          visualizationData={visualizationData}
-          windowMs={6000}
-          laneHeight={32}
-          laneGap={1}
+    <div className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
+      {/* 16:9 aspect ratio container */}
+      <div className="relative w-full" style={{ aspectRatio: '16/9', maxHeight: '100vh' }}>
+        {/* Video fills the 16:9 container */}
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          className={videoSrc ? "absolute inset-0 w-full h-full object-contain" : "hidden"}
+          playsInline
         />
-      )}
 
-      {/* Intro panel - shown initially when data is loaded, hidden on play */}
-      {showIntro && visualizationData && (
-        <IntroPanel
-          visualizationData={visualizationData}
-          videoName={videoName}
-        />
-      )}
+        {/* Overlay - positioned at bottom, overlaying the video */}
+        {videoSrc && visualizationData && !loading && !error && (
+          <div className="absolute bottom-0 left-0 right-0 z-10">
+            <FcpxmlOverlay
+              videoRef={videoRef}
+              visualizationData={visualizationData}
+              windowMs={6000}
+              laneHeight={32}
+              laneGap={1}
+            />
+          </div>
+        )}
+
+        {/* Intro panel - shown initially when data is loaded, hidden on play */}
+        {showIntro && visualizationData && (
+          <IntroPanel
+            visualizationData={visualizationData}
+            videoName={videoName}
+          />
+        )}
+      </div>
     </div>
   );
 }

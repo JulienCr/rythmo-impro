@@ -44,7 +44,7 @@ import {
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = parseInt(process.env.PORT || '3006', 10);
 
 // ============================================================================
 // Next.js Setup
@@ -159,22 +159,12 @@ function broadcastToType(
   const serialized = serializeMessage(message);
 
   for (const [id, client] of clients.entries()) {
-    if (client.type === type && id !== excludeClientId) {
-      if (client.ws.readyState === WebSocket.OPEN) {
-        client.ws.send(serialized);
-      }
-    }
-  }
-}
+    const shouldSend =
+      client.type === type &&
+      id !== excludeClientId &&
+      client.ws.readyState === WebSocket.OPEN;
 
-/**
- * Broadcast message to all clients
- */
-function broadcastToAll(message: WebSocketMessage, excludeClientId?: string): void {
-  const serialized = serializeMessage(message);
-
-  for (const [id, client] of clients.entries()) {
-    if (id !== excludeClientId && client.ws.readyState === WebSocket.OPEN) {
+    if (shouldSend) {
       client.ws.send(serialized);
     }
   }
@@ -310,16 +300,14 @@ app.prepare().then(() => {
 
   // Start listening
   server.listen(port, () => {
+    const httpUrl = `http://${hostname}:${port}`;
+    const wsUrl = `ws://${hostname}:${port}/ws`;
+    const envLabel = dev ? 'development' : 'production';
+
     console.log(`
-╭────────────────────────────────────────────────────╮
-│                                                    │
-│  Server ready on http://${hostname}:${port}          │
-│  WebSocket ready on ws://${hostname}:${port}/ws      │
-│                                                    │
-│  Environment: ${dev ? 'development' : 'production'}                       │
-│  Press Ctrl+C to stop                              │
-│                                                    │
-╰────────────────────────────────────────────────────╯
+  Server ready on ${httpUrl}
+  WebSocket ready on ${wsUrl}
+  Environment: ${envLabel}
     `);
   });
 });
