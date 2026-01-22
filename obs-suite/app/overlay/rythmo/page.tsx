@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
 import RythmoOverlay from '@/components/RythmoOverlay';
 import IntroPanel from '@/components/IntroPanel';
+import Countdown from '@/components/Countdown';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
 import { useWebSocket } from '@/hooks/useWebSocket';
@@ -75,6 +76,8 @@ function RythmoOverlayContent() {
   const [wsVideoSrc, setWsVideoSrc] = useState<string>('');
   const [wsTracksUrl, setWsTracksUrl] = useState<string>('');
   const [showIntro, setShowIntro] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [prerollStartTime, setPrerollStartTime] = useState<number | null>(null);
   const lastStateUpdateRef = useRef<number>(0);
   const clientIdRef = useRef<string>(generateClientId());
 
@@ -94,9 +97,13 @@ function RythmoOverlayContent() {
         console.log('[WS] Play command');
         // Hide intro panel when play command is received
         setShowIntro(false);
-        videoRef.current?.play().catch(err => {
-          console.warn('[WS] Play failed:', err);
-        });
+
+        // Reset video to start and show countdown
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.pause();
+        }
+        setShowCountdown(true);
       }
 
       // Handle pause command
@@ -213,6 +220,21 @@ function RythmoOverlayContent() {
 
   const videoName = extractVideoName(videoSrc);
 
+  // Handle countdown completion - start preroll
+  const handleCountdownComplete = useCallback(() => {
+    setShowCountdown(false);
+    // Start preroll (rythmo band scrolls before video starts)
+    setPrerollStartTime(Date.now());
+  }, []);
+
+  // Handle preroll completion - start video playback
+  const handlePrerollComplete = useCallback(() => {
+    setPrerollStartTime(null);
+    videoRef.current?.play().catch(err => {
+      console.warn('[Preroll] Play failed:', err);
+    });
+  }, []);
+
   return (
     <div className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
       {/* 16:9 aspect ratio container */}
@@ -234,6 +256,8 @@ function RythmoOverlayContent() {
               windowMs={6000}
               laneHeight={32}
               laneGap={1}
+              prerollStartTime={prerollStartTime}
+              onPrerollComplete={handlePrerollComplete}
             />
           </div>
         )}
@@ -244,6 +268,11 @@ function RythmoOverlayContent() {
             visualizationData={visualizationData}
             videoName={videoName}
           />
+        )}
+
+        {/* Countdown before video playback */}
+        {showCountdown && (
+          <Countdown onComplete={handleCountdownComplete} />
         )}
       </div>
     </div>

@@ -9,6 +9,8 @@ interface RythmoOverlayProps {
   windowMs?: number;      // Default: 6000 (±3s rolling window)
   laneHeight?: number;    // Default: 32px (visible bars)
   laneGap?: number;       // Default: 1px (minimal gap)
+  prerollStartTime?: number | null; // Timestamp (Date.now()) when preroll started
+  onPrerollComplete?: () => void;   // Called when preroll finishes
 }
 
 export default function RythmoOverlay({
@@ -17,8 +19,11 @@ export default function RythmoOverlay({
   windowMs = 6000,
   laneHeight = 32,
   laneGap = 1,
+  prerollStartTime = null,
+  onPrerollComplete,
 }: RythmoOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const prerollCompleteCalledRef = useRef(false);
 
   // Calculate number of lanes needed
   const numLanes = visualizationData.tracks.length;
@@ -55,6 +60,20 @@ export default function RythmoOverlay({
     };
   }, [videoRef, numLanes, laneHeight, laneGap, totalHeight]);
 
+  // Calculate preroll duration to ensure 3 seconds before first band
+  const bufferMs = 3000; // Required buffer before first segment
+  const earliestSegmentTime = visualizationData.segments.length > 0
+    ? Math.min(...visualizationData.segments.map(s => s.t0))
+    : bufferMs;
+  const prerollDurationMs = Math.max(0, bufferMs - earliestSegmentTime);
+
+  // Reset preroll complete flag when preroll starts
+  useEffect(() => {
+    if (prerollStartTime !== null) {
+      prerollCompleteCalledRef.current = false;
+    }
+  }, [prerollStartTime]);
+
   // Animation loop for rendering segments
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -74,7 +93,24 @@ export default function RythmoOverlay({
     function render(): void {
       if (!canvas || !video || !ctx) return;
 
-      const currentTimeMs = video.currentTime * 1000;
+      // Calculate current time based on preroll or video playback
+      let currentTimeMs: number;
+
+      if (prerollStartTime !== null) {
+        // During preroll: time goes from -prerollDuration to 0
+        const elapsed = Date.now() - prerollStartTime;
+        currentTimeMs = elapsed - prerollDurationMs;
+
+        // Check if preroll is complete (reached time 0)
+        if (currentTimeMs >= 0 && !prerollCompleteCalledRef.current) {
+          prerollCompleteCalledRef.current = true;
+          onPrerollComplete?.();
+        }
+      } else {
+        // Normal playback: use video time
+        currentTimeMs = video.currentTime * 1000;
+      }
+
       const windowStart = currentTimeMs - timeBeforeMs;
       const windowEnd = currentTimeMs + timeAfterMs;
 
@@ -154,7 +190,7 @@ export default function RythmoOverlay({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight]);
+  }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight, prerollStartTime, prerollDurationMs, onPrerollComplete]);
 
   return (
     <canvas
