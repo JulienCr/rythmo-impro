@@ -71,9 +71,17 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
     }
   }
 
+  // Auto-enable force mode if any selected video is already processed
+  const hasProcessedVideos = selectedVideos.some(v => !v.isNew);
+  const effectiveForce = options.force || hasProcessedVideos;
+
+  if (hasProcessedVideos && !options.force) {
+    console.log(colors.info('Mode --force activé automatiquement (vidéos déjà traitées sélectionnées)\n'));
+  }
+
   // Configure diarization options
   let diarizationOpts: DiarizationOptions = {
-    force: options.force,
+    force: effectiveForce,
   };
 
   if (!options.all && !options.vocalsOnly) {
@@ -89,8 +97,8 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
     }
   }
 
-  // Process videos
-  await processVideos(selectedVideos, diarizationOpts, options);
+  // Process videos with effective force mode
+  await processVideos(selectedVideos, diarizationOpts, { ...options, force: effectiveForce });
 }
 
 /**
