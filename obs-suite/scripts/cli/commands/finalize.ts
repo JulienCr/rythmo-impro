@@ -2,15 +2,12 @@
  * Finalize command - Convert corrected XML files to JSON
  */
 
-import React from 'react';
-import { render } from 'ink';
 import chalk from 'chalk';
-import { confirm } from '@inquirer/prompts';
 
 import { findXmlFiles, convertXmlToJson, type XmlFileStatus, type ConversionResult } from '../lib/xml.js';
-import { XmlMultiSelect } from '../components/XmlMultiSelect.js';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
+import { checkboxWithEscape, confirmWithEscape, isCancelError } from '../utils/prompts.js';
 
 interface FinalizeCommandOptions {
   force?: boolean;
@@ -60,14 +57,16 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
   for (const file of selectedFiles) {
     const promptOverwrite = async () => {
       try {
-        return await confirm({
+        return await confirmWithEscape({
           message: `${file.filename.replace('.xml', '.json')} existe déjà. Écraser ?`,
           default: false,
         });
-      } catch {
-        // Annulé par l'utilisateur (Ctrl+C)
-        console.log(colors.warning('\n\n⚠ Annulé par l\'utilisateur'));
-        process.exit(0);
+      } catch (err) {
+        if (isCancelError(err)) {
+          // Annulé par l'utilisateur (Escape ou Ctrl+C)
+          throw err; // Propagate to return to main menu
+        }
+        throw err;
       }
     };
 
@@ -115,32 +114,42 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
 }
 
 /**
- * Interactive XML file selection using Ink
+ * Interactive XML file selection using inquirer checkbox
  */
 async function selectXmlFiles(files: XmlFileStatus[]): Promise<XmlFileStatus[]> {
-  // Small delay to let terminal settle after inquirer prompt
-  // This prevents leftover input from being captured by Ink
-  await new Promise(resolve => setTimeout(resolve, 50));
+  const newFiles = files.filter(f => !f.hasJson);
+  const convertedFiles = files.filter(f => f.hasJson);
 
-  return new Promise((resolve) => {
-    let result: XmlFileStatus[] = [];
+  // Build choices with separators
+  const choices: Array<{ name: string; value: string; checked: boolean } | { type: 'separator'; separator: string }> = [];
 
-    const { unmount, waitUntilExit } = render(
-      <XmlMultiSelect
-        files={files}
-        onSubmit={(selected) => {
-          result = selected;
-          unmount();
-        }}
-        onCancel={() => {
-          result = [];
-          unmount();
-        }}
-      />
-    );
+  if (newFiles.length > 0) {
+    choices.push({ type: 'separator', separator: chalk.dim('─── À CONVERTIR ───────────────────────────') });
+    for (const f of newFiles) {
+      choices.push({
+        name: chalk.green(f.filename),
+        value: f.filename,
+        checked: true, // Pre-select files without JSON
+      });
+    }
+  }
 
-    waitUntilExit().then(() => {
-      resolve(result);
-    });
+  if (convertedFiles.length > 0) {
+    choices.push({ type: 'separator', separator: chalk.dim('─── DÉJÀ CONVERTIS ────────────────────────') });
+    for (const f of convertedFiles) {
+      choices.push({
+        name: chalk.gray(`${f.filename}  ✓`),
+        value: f.filename,
+        checked: false,
+      });
+    }
+  }
+
+  const selected = await checkboxWithEscape({
+    message: 'Sélectionnez les fichiers XML à convertir :',
+    choices: choices as Parameters<typeof checkboxWithEscape>[0]['choices'],
+    pageSize: 15,
   });
+
+  return files.filter(f => (selected as string[]).includes(f.filename));
 }

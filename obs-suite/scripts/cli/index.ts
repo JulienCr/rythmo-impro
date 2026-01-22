@@ -10,7 +10,6 @@
  */
 
 import { Command } from 'commander';
-import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 
 import { processCommand } from './commands/process.js';
@@ -18,6 +17,7 @@ import { finalizeCommand } from './commands/finalize.js';
 import { statusCommand } from './commands/status.js';
 import { findXmlFiles } from './lib/xml.js';
 import { colors } from './utils/colors.js';
+import { selectWithEscape, inputWithEscape, isCancelError } from './utils/prompts.js';
 
 const program = new Command();
 
@@ -205,56 +205,122 @@ program.action(async () => {
 });
 
 /**
- * Interactive wizard for main menu
+ * Wait for user to press Enter to continue
+ * Returns true if cancelled (Escape pressed)
+ */
+async function pressEnterToContinue(): Promise<boolean> {
+  try {
+    await inputWithEscape({ message: 'Appuyez sur Entrée pour continuer...' });
+    return false;
+  } catch (err) {
+    if (isCancelError(err)) {
+      return true;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Interactive wizard for main menu with persistent loop
+ * Double Escape on main menu = quit
  */
 async function interactiveWizard(): Promise<void> {
-  console.log(chalk.bold.blue('\n┌─────────────────────────────────────────────────┐'));
-  console.log(chalk.bold.blue('│') + chalk.bold('  Bienvenue dans Rythmo CLI                      ') + chalk.bold.blue('│'));
-  console.log(chalk.bold.blue('└─────────────────────────────────────────────────┘\n'));
+  let escapeCount = 0;
 
-  // Check for pending XML files
-  const xmlFiles = findXmlFiles();
-  const pendingXml = xmlFiles.filter(f => !f.hasJson).length;
+  while (true) {
+    console.clear();
+    console.log(chalk.bold.blue('\n┌─────────────────────────────────────────────────┐'));
+    console.log(chalk.bold.blue('│') + chalk.bold('  Bienvenue dans Rythmo CLI                      ') + chalk.bold.blue('│'));
+    console.log(chalk.bold.blue('└─────────────────────────────────────────────────┘\n'));
 
-  const choices = [
-    {
-      name: 'Traiter des vidéos (étape 1)',
-      value: 'process' as const,
-    },
-    {
-      name: pendingXml > 0
-        ? `Finaliser les XML corrigés (étape 2) [${pendingXml}]`
-        : 'Finaliser les XML corrigés (étape 2)',
-      value: 'finalize' as const,
-    },
-    {
-      name: 'Voir le statut',
-      value: 'status' as const,
-    },
-    {
-      name: 'Quitter',
-      value: 'exit' as const,
-    },
-  ];
+    // Show escape hint if first escape was pressed
+    if (escapeCount === 1) {
+      console.log(chalk.yellow('  ⚠ Appuyez encore sur Échap pour quitter\n'));
+    }
 
-  const action = await select({
-    message: 'Que voulez-vous faire ?',
-    choices,
-  });
+    // Check for pending XML files
+    const xmlFiles = findXmlFiles();
+    const pendingXml = xmlFiles.filter(f => !f.hasJson).length;
 
-  switch (action) {
-    case 'process':
-      await processCommand({});
-      break;
-    case 'finalize':
-      await finalizeCommand({});
-      break;
-    case 'status':
-      await statusCommand();
-      break;
-    case 'exit':
-      console.log(colors.dim('\nAu revoir!\n'));
-      break;
+    const choices = [
+      {
+        name: 'Traiter des vidéos (étape 1)',
+        value: 'process' as const,
+      },
+      {
+        name: pendingXml > 0
+          ? `Finaliser les XML corrigés (étape 2) [${pendingXml}]`
+          : 'Finaliser les XML corrigés (étape 2)',
+        value: 'finalize' as const,
+      },
+      {
+        name: 'Voir le statut',
+        value: 'status' as const,
+      },
+      {
+        name: 'Quitter',
+        value: 'exit' as const,
+      },
+    ];
+
+    let action: 'process' | 'finalize' | 'status' | 'exit';
+
+    try {
+      action = await selectWithEscape({
+        message: 'Que voulez-vous faire ?',
+        choices,
+      });
+      // Reset escape count on successful selection
+      escapeCount = 0;
+    } catch (err) {
+      if (isCancelError(err)) {
+        escapeCount++;
+        if (escapeCount >= 2) {
+          console.log(colors.dim('\nAu revoir!\n'));
+          return;
+        }
+        // First escape: continue to show warning
+        continue;
+      }
+      throw err;
+    }
+
+    switch (action) {
+      case 'process':
+        try {
+          await processCommand({});
+          await pressEnterToContinue();
+        } catch (err) {
+          if (isCancelError(err)) {
+            // Escape pressed in command, return to main menu
+            continue;
+          }
+          throw err;
+        }
+        break;
+      case 'finalize':
+        try {
+          await finalizeCommand({});
+          await pressEnterToContinue();
+        } catch (err) {
+          if (isCancelError(err)) {
+            // Escape pressed in command, return to main menu
+            continue;
+          }
+          throw err;
+        }
+        break;
+      case 'status':
+        await statusCommand();
+        const cancelled = await pressEnterToContinue();
+        if (cancelled) {
+          continue;
+        }
+        break;
+      case 'exit':
+        console.log(colors.dim('\nAu revoir!\n'));
+        return; // Exit the loop
+    }
   }
 }
 

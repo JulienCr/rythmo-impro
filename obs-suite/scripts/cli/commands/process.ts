@@ -2,10 +2,7 @@
  * Process command - Video diarization and processing pipeline
  */
 
-import React from 'react';
-import { render } from 'ink';
 import chalk from 'chalk';
-import { confirm, select, input } from '@inquirer/prompts';
 import { existsSync } from 'fs';
 
 import { getAllVideoStatuses, getOutputPaths, type VideoStatus } from '../lib/videos.js';
@@ -13,10 +10,15 @@ import { runDiarization, type DiarizationOptions } from '../lib/diarization.js';
 import { generateXml } from '../lib/xml.js';
 import { generateThumbnail } from '../lib/thumbnails.js';
 import { removeVocals } from '../lib/vocals.js';
-import { VideoMultiSelect } from '../components/VideoMultiSelect.js';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
-import type { ProcessOptions, DiarizationConfig } from '../schemas/config.js';
+import {
+  selectWithEscape,
+  inputWithEscape,
+  checkboxWithEscape,
+  confirmWithEscape,
+} from '../utils/prompts.js';
+import type { DiarizationConfig } from '../schemas/config.js';
 
 interface ProcessCommandOptions {
   force?: boolean;
@@ -76,7 +78,7 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
 
   if (!options.all && !options.vocalsOnly) {
     // Interactive configuration
-    const useAdvanced = await confirm({
+    const useAdvanced = await confirmWithEscape({
       message: 'Configurer les options de diarisation ?',
       default: false,
     });
@@ -92,34 +94,44 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
 }
 
 /**
- * Interactive video selection using Ink
+ * Interactive video selection using inquirer checkbox
  */
 async function selectVideos(videos: VideoStatus[]): Promise<VideoStatus[]> {
-  // Small delay to let terminal settle after inquirer prompt
-  // This prevents leftover input from being captured by Ink
-  await new Promise(resolve => setTimeout(resolve, 50));
+  const newVideos = videos.filter(v => v.isNew);
+  const processedVideos = videos.filter(v => !v.isNew);
 
-  return new Promise((resolve) => {
-    let result: VideoStatus[] = [];
+  // Build choices with separators
+  const choices: Array<{ name: string; value: string; checked: boolean } | { type: 'separator'; separator: string }> = [];
 
-    const { unmount, waitUntilExit } = render(
-      <VideoMultiSelect
-        videos={videos}
-        onSubmit={(selected) => {
-          result = selected;
-          unmount();
-        }}
-        onCancel={() => {
-          result = [];
-          unmount();
-        }}
-      />
-    );
+  if (newVideos.length > 0) {
+    choices.push({ type: 'separator', separator: chalk.dim('─── NOUVEAUX ───────────────────────────────') });
+    for (const v of newVideos) {
+      choices.push({
+        name: chalk.green(v.filename),
+        value: v.filename,
+        checked: true, // Pre-select new videos
+      });
+    }
+  }
 
-    waitUntilExit().then(() => {
-      resolve(result);
-    });
+  if (processedVideos.length > 0) {
+    choices.push({ type: 'separator', separator: chalk.dim('─── DÉJÀ TRAITÉS ───────────────────────────') });
+    for (const v of processedVideos) {
+      choices.push({
+        name: chalk.gray(`${v.filename}  ✓`),
+        value: v.filename,
+        checked: false,
+      });
+    }
+  }
+
+  const selected = await checkboxWithEscape({
+    message: 'Sélectionnez les vidéos à traiter :',
+    choices: choices as Parameters<typeof checkboxWithEscape>[0]['choices'],
+    pageSize: 15,
   });
+
+  return videos.filter(v => (selected as string[]).includes(v.filename));
 }
 
 /**
@@ -128,7 +140,7 @@ async function selectVideos(videos: VideoStatus[]): Promise<VideoStatus[]> {
 async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
   const config: Partial<DiarizationConfig> = {};
 
-  const model = await select({
+  const model = await selectWithEscape({
     message: 'Modèle Whisper :',
     choices: [
       { name: 'large-v3 (défaut, meilleure précision, plus lent)', value: 'large-v3' as const },
@@ -143,7 +155,7 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
     config.model = model;
   }
 
-  const language = await select({
+  const language = await selectWithEscape({
     message: 'Langue :',
     choices: [
       { name: 'Détection automatique', value: 'auto' as const },
@@ -157,13 +169,13 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
     config.language = language;
   }
 
-  const useSpeakerConstraints = await confirm({
+  const useSpeakerConstraints = await confirmWithEscape({
     message: 'Définir des contraintes sur le nombre de locuteurs ?',
     default: false,
   });
 
   if (useSpeakerConstraints) {
-    const minSpeakers = await input({
+    const minSpeakers = await inputWithEscape({
       message: 'Nombre minimum de locuteurs :',
       default: '2',
       validate: (val) => {
@@ -172,7 +184,7 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
       },
     });
 
-    const maxSpeakers = await input({
+    const maxSpeakers = await inputWithEscape({
       message: 'Nombre maximum de locuteurs :',
       default: '4',
       validate: (val) => {
