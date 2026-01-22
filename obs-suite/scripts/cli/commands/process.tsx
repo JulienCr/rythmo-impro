@@ -29,42 +29,42 @@ interface ProcessCommandOptions {
  * Run the process command
  */
 export async function processCommand(options: ProcessCommandOptions): Promise<void> {
-  // Validate incompatible flags
+  // Valider les options incompatibles
   if (options.vocalsOnly && options.skipVocalRemoval) {
-    throw new Error('Cannot use --vocals-only and --skip-vocal-removal together');
+    throw new Error('Impossible d\'utiliser --vocals-only et --skip-vocal-removal ensemble');
   }
 
-  // Verify diarizer script exists
+  // Vérifier que le script de diarisation existe
   if (!existsSync(paths.diarizerScript)) {
     throw new Error(
-      `Diarization script not found: ${paths.diarizerScript}\n` +
-      `Please ensure the diarizer setup is complete.`
+      `Script de diarisation introuvable : ${paths.diarizerScript}\n` +
+      `Veuillez vous assurer que la configuration du diariseur est complète.`
     );
   }
 
-  console.log(colors.title('\n🎥 Video Processing Pipeline\n'));
+  console.log(colors.title('\n🎥 Pipeline de traitement vidéo\n'));
 
   // Get all video statuses
   const allVideos = getAllVideoStatuses();
 
   if (allVideos.length === 0) {
-    throw new Error(`No video files found in ${paths.inDir}`);
+    throw new Error(`Aucun fichier vidéo trouvé dans ${paths.inDir}`);
   }
 
-  console.log(colors.info(`Found ${allVideos.length} video file(s)\n`));
+  console.log(colors.info(`${allVideos.length} fichier(s) vidéo trouvé(s)\n`));
 
   let selectedVideos: VideoStatus[];
 
   if (options.all) {
     // Process all videos without selection
     selectedVideos = allVideos;
-    console.log(colors.dim(`Processing all ${allVideos.length} videos\n`));
+    console.log(colors.dim(`Traitement de toutes les ${allVideos.length} vidéos\n`));
   } else {
     // Interactive multi-select
     selectedVideos = await selectVideos(allVideos);
 
     if (selectedVideos.length === 0) {
-      console.log(colors.warning('\nNo videos selected. Exiting.\n'));
+      console.log(colors.warning('\nAucune vidéo sélectionnée. Fin.\n'));
       return;
     }
   }
@@ -77,7 +77,7 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
   if (!options.all && !options.vocalsOnly) {
     // Interactive configuration
     const useAdvanced = await confirm({
-      message: 'Configure diarization options?',
+      message: 'Configurer les options de diarisation ?',
       default: false,
     });
 
@@ -95,22 +95,30 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
  * Interactive video selection using Ink
  */
 async function selectVideos(videos: VideoStatus[]): Promise<VideoStatus[]> {
+  // Small delay to let terminal settle after inquirer prompt
+  // This prevents leftover input from being captured by Ink
+  await new Promise(resolve => setTimeout(resolve, 50));
+
   return new Promise((resolve) => {
+    let result: VideoStatus[] = [];
+
     const { unmount, waitUntilExit } = render(
       <VideoMultiSelect
         videos={videos}
         onSubmit={(selected) => {
+          result = selected;
           unmount();
-          resolve(selected);
         }}
         onCancel={() => {
+          result = [];
           unmount();
-          resolve([]);
         }}
       />
     );
 
-    waitUntilExit();
+    waitUntilExit().then(() => {
+      resolve(result);
+    });
   });
 }
 
@@ -121,12 +129,12 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
   const config: Partial<DiarizationConfig> = {};
 
   const model = await select({
-    message: 'Whisper model:',
+    message: 'Modèle Whisper :',
     choices: [
-      { name: 'large-v3 (default, best accuracy, slowest)', value: 'large-v3' as const },
-      { name: 'medium (balanced)', value: 'medium' as const },
-      { name: 'small (fast, lower accuracy)', value: 'small' as const },
-      { name: 'base (very fast, basic accuracy)', value: 'base' as const },
+      { name: 'large-v3 (défaut, meilleure précision, plus lent)', value: 'large-v3' as const },
+      { name: 'medium (équilibré)', value: 'medium' as const },
+      { name: 'small (rapide, précision réduite)', value: 'small' as const },
+      { name: 'base (très rapide, précision basique)', value: 'base' as const },
     ],
     default: 'large-v3',
   });
@@ -136,11 +144,11 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
   }
 
   const language = await select({
-    message: 'Language:',
+    message: 'Langue :',
     choices: [
-      { name: 'Auto-detect', value: 'auto' as const },
-      { name: 'French', value: 'fr' as const },
-      { name: 'English', value: 'en' as const },
+      { name: 'Détection automatique', value: 'auto' as const },
+      { name: 'Français', value: 'fr' as const },
+      { name: 'Anglais', value: 'en' as const },
     ],
     default: 'auto',
   });
@@ -150,26 +158,26 @@ async function configureDiarization(): Promise<Partial<DiarizationConfig>> {
   }
 
   const useSpeakerConstraints = await confirm({
-    message: 'Set speaker count constraints?',
+    message: 'Définir des contraintes sur le nombre de locuteurs ?',
     default: false,
   });
 
   if (useSpeakerConstraints) {
     const minSpeakers = await input({
-      message: 'Minimum speakers:',
+      message: 'Nombre minimum de locuteurs :',
       default: '2',
       validate: (val) => {
         const num = parseInt(val, 10);
-        return num > 0 ? true : 'Must be positive';
+        return num > 0 ? true : 'Doit être positif';
       },
     });
 
     const maxSpeakers = await input({
-      message: 'Maximum speakers:',
+      message: 'Nombre maximum de locuteurs :',
       default: '4',
       validate: (val) => {
         const num = parseInt(val, 10);
-        return num >= parseInt(minSpeakers, 10) ? true : 'Must be >= min speakers';
+        return num >= parseInt(minSpeakers, 10) ? true : 'Doit être >= nombre minimum';
       },
     });
 
@@ -199,12 +207,12 @@ async function processVideos(
 
   // Skip diarization, FCP XML, and thumbnails if --vocals-only is set
   if (!options.vocalsOnly) {
-    // Step 1: Run diarization
-    console.log(chalk.bold('\n📊 Step 1: Diarization\n'));
+    // Étape 1 : Diarisation
+    console.log(chalk.bold('\n📊 Étape 1 : Diarisation\n'));
     runDiarization(videoFilenames, diarizationOpts);
 
-    // Step 2: Generate FCP XML for each video
-    console.log(chalk.bold('\n🎬 Step 2: FCP XML Generation\n'));
+    // Étape 2 : Génération FCP XML
+    console.log(chalk.bold('\n🎬 Étape 2 : Génération FCP XML\n'));
 
     for (const video of videos) {
       const outputPaths = getOutputPaths(video.filename);
@@ -216,8 +224,8 @@ async function processVideos(
       }
     }
 
-    // Step 3: Generate thumbnails for each video
-    console.log(chalk.bold('\n🖼️  Step 3: Thumbnail Generation\n'));
+    // Étape 3 : Génération des miniatures
+    console.log(chalk.bold('\n🖼️  Étape 3 : Génération des miniatures\n'));
 
     for (const video of videos) {
       const outputPaths = getOutputPaths(video.filename);
@@ -229,12 +237,12 @@ async function processVideos(
       }
     }
   } else {
-    console.log(colors.dim('\n⏭ Skipping diarization, FCP XML, and thumbnails (--vocals-only flag)\n'));
+    console.log(colors.dim('\n⏭ Diarisation, FCP XML et miniatures ignorés (option --vocals-only)\n'));
   }
 
-  // Step 4: Remove vocals
+  // Étape 4 : Suppression des voix
   if (!options.skipVocalRemoval) {
-    console.log(chalk.bold('\n🎵 Step 4: Vocal Removal\n'));
+    console.log(chalk.bold('\n🎵 Étape 4 : Suppression des voix\n'));
 
     for (const video of videos) {
       const outputPaths = getOutputPaths(video.filename);
@@ -246,34 +254,34 @@ async function processVideos(
       }
     }
   } else {
-    console.log(colors.dim('\n⏭ Skipping vocal removal (--skip-vocal-removal flag)\n'));
+    console.log(colors.dim('\n⏭ Suppression des voix ignorée (option --skip-vocal-removal)\n'));
   }
 
-  // Final summary
-  console.log(colors.success('\n✅ Processing complete!\n'));
-  console.log(chalk.bold('Summary:'));
-  console.log(`  Videos processed: ${videos.length}`);
+  // Résumé final
+  console.log(colors.success('\n✅ Traitement terminé !\n'));
+  console.log(chalk.bold('Résumé :'));
+  console.log(`  Vidéos traitées : ${videos.length}`);
 
   if (!options.vocalsOnly) {
-    console.log(`  FCP XML generated: ${generatedCount}`);
+    console.log(`  FCP XML générés : ${generatedCount}`);
     if (skippedCount > 0) {
-      console.log(colors.dim(`  FCP XML skipped: ${skippedCount}`));
+      console.log(colors.dim(`  FCP XML ignorés : ${skippedCount}`));
     }
-    console.log(`  Thumbnails generated: ${thumbsGeneratedCount}`);
+    console.log(`  Miniatures générées : ${thumbsGeneratedCount}`);
     if (thumbsSkippedCount > 0) {
-      console.log(colors.dim(`  Thumbnails skipped: ${thumbsSkippedCount}`));
+      console.log(colors.dim(`  Miniatures ignorées : ${thumbsSkippedCount}`));
     }
   }
 
   if (!options.skipVocalRemoval) {
-    console.log(`  Vocals removed: ${vocalsRemovedCount}`);
+    console.log(`  Voix supprimées : ${vocalsRemovedCount}`);
     if (vocalsSkippedCount > 0) {
-      console.log(colors.dim(`  Vocals skipped: ${vocalsSkippedCount}`));
+      console.log(colors.dim(`  Suppressions ignorées : ${vocalsSkippedCount}`));
     }
   }
 
   console.log();
-  console.log(chalk.bold('Output directory:'));
+  console.log(chalk.bold('Répertoire de sortie :'));
   console.log(colors.info(`  ${paths.outDir}`));
   console.log();
 }

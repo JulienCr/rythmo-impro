@@ -27,16 +27,16 @@ export function runDiarization(
     throw new Error(`Diarization script not found: ${paths.diarizerScript}`);
   }
 
-  // Build command arguments
+  // Build command arguments (quote paths for special characters)
   const args = [
     paths.diarizerScript,
-    '--input-dir', paths.inDir,
-    '--output-dir', paths.outDir,
+    '--input-dir', `"${paths.inDir}"`,
+    '--output-dir', `"${paths.outDir}"`,
   ];
 
   // If processing a single video, add --input parameter
   if (videoFiles.length === 1) {
-    args.push('--input', videoFiles[0]);
+    args.push('--input', `"${videoFiles[0]}"`);
   }
 
   // Add model (default: large-v3)

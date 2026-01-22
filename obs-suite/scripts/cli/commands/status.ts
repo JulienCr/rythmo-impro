@@ -37,19 +37,24 @@ export async function statusCommand(): Promise<void> {
   console.log(chalk.dim('  ' + '─'.repeat(maxNameLen + 2 + 8 * 4)));
 
   // Rows
+  const COL_WIDTH = 8;
+  const formatStatus = (ok: boolean): string => {
+    // Pad first, then colorize (ANSI codes don't count toward visual width)
+    const padded = (ok ? '✓' : '✗').padEnd(COL_WIDTH);
+    return ok ? chalk.green(padded) : chalk.red(padded);
+  };
+
   for (const video of videos) {
     const name = video.isNew
       ? colors.newVideo(video.filename.padEnd(maxNameLen + 2))
       : colors.processedVideo(video.filename.padEnd(maxNameLen + 2));
 
-    const diar = video.hasDiarization ? colors.checkmark : colors.cross;
-    const xml = video.hasXml ? colors.checkmark : colors.cross;
-    const thumb = video.hasThumbnail ? colors.checkmark : colors.cross;
-    const final = video.hasFinalVideo ? colors.checkmark : colors.cross;
+    const diar = formatStatus(video.hasDiarization);
+    const xml = formatStatus(video.hasXml);
+    const thumb = formatStatus(video.hasThumbnail);
+    const final = formatStatus(video.hasFinalVideo);
 
-    console.log(
-      `  ${name}${diar.padEnd(8)}${xml.padEnd(8)}${thumb.padEnd(8)}${final}`
-    );
+    console.log(`  ${name}${diar}${xml}${thumb}${final}`);
   }
 
   // Summary

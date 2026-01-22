@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Box, Text, useInput, useApp } from 'ink';
+import { Box, Text, useInput } from 'ink';
 import type { VideoStatus } from '../lib/videos.js';
 
 interface VideoMultiSelectProps {
@@ -13,7 +13,6 @@ interface VideoMultiSelectProps {
 }
 
 export function VideoMultiSelect({ videos, onSubmit, onCancel }: VideoMultiSelectProps) {
-  const { exit } = useApp();
   const [cursor, setCursor] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(() => {
     // Pre-select all new videos
@@ -65,7 +64,6 @@ export function VideoMultiSelect({ videos, onSubmit, onCancel }: VideoMultiSelec
   useInput((input, key) => {
     if (key.escape || (input === 'q')) {
       onCancel();
-      exit();
       return;
     }
 
@@ -111,6 +109,7 @@ export function VideoMultiSelect({ videos, onSubmit, onCancel }: VideoMultiSelec
   });
 
   // Ensure cursor starts on first video item
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => {
     if (items[cursor]?.type === 'section') {
       const firstVideoIdx = items.findIndex(i => i.type === 'video');

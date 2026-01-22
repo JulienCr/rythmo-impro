@@ -21,35 +21,35 @@ interface FinalizeCommandOptions {
  * Run the finalize command
  */
 export async function finalizeCommand(options: FinalizeCommandOptions): Promise<void> {
-  console.log(colors.title('\n🎬 Finalize Corrected XML Files\n'));
+  console.log(colors.title('\n🎬 Finalisation des fichiers XML corrigés\n'));
 
   if (options.force) {
-    console.log(colors.warning('⚡ Force mode enabled - will overwrite existing files\n'));
+    console.log(colors.warning('⚡ Mode forcé activé - les fichiers existants seront écrasés\n'));
   }
 
   // Find all XML files
   const xmlFiles = findXmlFiles();
 
   if (xmlFiles.length === 0) {
-    console.log(colors.warning(`No XML files found in ${paths.finalXmlDir}\n`));
-    console.log(colors.dim('Place corrected XML files in this directory to convert them to JSON.\n'));
+    console.log(colors.warning(`Aucun fichier XML trouvé dans ${paths.finalXmlDir}\n`));
+    console.log(colors.dim('Placez les fichiers XML corrigés dans ce répertoire pour les convertir en JSON.\n'));
     return;
   }
 
-  console.log(colors.info(`Found ${xmlFiles.length} XML file(s)\n`));
+  console.log(colors.info(`${xmlFiles.length} fichier(s) XML trouvé(s)\n`));
 
   let selectedFiles: XmlFileStatus[];
 
   if (options.all) {
-    // Process all files without selection
+    // Traiter tous les fichiers sans sélection
     selectedFiles = xmlFiles;
-    console.log(colors.dim(`Processing all ${xmlFiles.length} files\n`));
+    console.log(colors.dim(`Traitement de tous les ${xmlFiles.length} fichiers\n`));
   } else {
     // Interactive multi-select
     selectedFiles = await selectXmlFiles(xmlFiles);
 
     if (selectedFiles.length === 0) {
-      console.log(colors.warning('\nNo files selected. Exiting.\n'));
+      console.log(colors.warning('\nAucun fichier sélectionné. Fin.\n'));
       return;
     }
   }
@@ -61,12 +61,12 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
     const promptOverwrite = async () => {
       try {
         return await confirm({
-          message: `${file.filename.replace('.xml', '.json')} already exists. Overwrite?`,
+          message: `${file.filename.replace('.xml', '.json')} existe déjà. Écraser ?`,
           default: false,
         });
       } catch {
-        // User cancelled (Ctrl+C)
-        console.log(colors.warning('\n\n⚠ Cancelled by user'));
+        // Annulé par l'utilisateur (Ctrl+C)
+        console.log(colors.warning('\n\n⚠ Annulé par l\'utilisateur'));
         process.exit(0);
       }
     };
@@ -79,27 +79,27 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
     results.push(result);
   }
 
-  // Show summary
-  console.log(colors.success('\n✅ Finalization complete!\n'));
+  // Afficher le résumé
+  console.log(colors.success('\n✅ Finalisation terminée !\n'));
 
   const convertedCount = results.filter(r => r.status === 'converted').length;
   const skippedCount = results.filter(r => r.status === 'skipped').length;
   const errorCount = results.filter(r => r.status === 'error').length;
 
-  console.log(chalk.bold('Summary:'));
-  console.log(`  Total files: ${selectedFiles.length}`);
-  console.log(colors.success(`  Converted: ${convertedCount}`));
+  console.log(chalk.bold('Résumé :'));
+  console.log(`  Total fichiers : ${selectedFiles.length}`);
+  console.log(colors.success(`  Convertis : ${convertedCount}`));
   if (skippedCount > 0) {
-    console.log(colors.dim(`  Skipped: ${skippedCount}`));
+    console.log(colors.dim(`  Ignorés : ${skippedCount}`));
   }
   if (errorCount > 0) {
-    console.log(colors.error(`  Errors: ${errorCount}`));
+    console.log(colors.error(`  Erreurs : ${errorCount}`));
   }
   console.log();
 
-  // Show errors if any
+  // Afficher les erreurs si présentes
   if (errorCount > 0) {
-    console.log(chalk.bold.red('Errors:\n'));
+    console.log(chalk.bold.red('Erreurs :\n'));
     results
       .filter(r => r.status === 'error')
       .forEach(r => {
@@ -109,7 +109,7 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
     console.log();
   }
 
-  console.log(chalk.bold('Output directory:'));
+  console.log(chalk.bold('Répertoire de sortie :'));
   console.log(colors.info(`  ${paths.finalJsonDir}`));
   console.log();
 }
@@ -118,21 +118,29 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
  * Interactive XML file selection using Ink
  */
 async function selectXmlFiles(files: XmlFileStatus[]): Promise<XmlFileStatus[]> {
+  // Small delay to let terminal settle after inquirer prompt
+  // This prevents leftover input from being captured by Ink
+  await new Promise(resolve => setTimeout(resolve, 50));
+
   return new Promise((resolve) => {
+    let result: XmlFileStatus[] = [];
+
     const { unmount, waitUntilExit } = render(
       <XmlMultiSelect
         files={files}
         onSubmit={(selected) => {
+          result = selected;
           unmount();
-          resolve(selected);
         }}
         onCancel={() => {
+          result = [];
           unmount();
-          resolve([]);
         }}
       />
     );
 
-    waitUntilExit();
+    waitUntilExit().then(() => {
+      resolve(result);
+    });
   });
 }

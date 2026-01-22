@@ -55,6 +55,16 @@ function deriveVideoPaths(
   return { videoSrc: '', tracksUrl: '' };
 }
 
+/**
+ * Extract video name from URL for display
+ */
+function extractVideoName(src: string): string {
+  if (!src) return 'Vidéo inconnue';
+  const filename = src.split('/').pop() || '';
+  const basename = filename.replace(/\.[^.]+$/, '');
+  return decodeURIComponent(basename) || 'Vidéo inconnue';
+}
+
 function FcpxmlOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -201,13 +211,6 @@ function FcpxmlOverlayContent() {
     };
   }, [sendStateUpdate, connected]);
 
-  // Extract video name from URL for display
-  function extractVideoName(src: string): string {
-    if (!src) return 'Vidéo inconnue';
-    const filename = src.split('/').pop() || '';
-    const basename = filename.replace(/\.[^.]+$/, '');
-    return decodeURIComponent(basename) || 'Vidéo inconnue';
-  }
   const videoName = extractVideoName(videoSrc);
 
   return (

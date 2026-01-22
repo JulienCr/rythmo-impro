@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Box, Text, useInput, useApp } from 'ink';
+import { Box, Text, useInput } from 'ink';
 import type { XmlFileStatus } from '../lib/xml.js';
 
 interface XmlMultiSelectProps {
@@ -13,7 +13,6 @@ interface XmlMultiSelectProps {
 }
 
 export function XmlMultiSelect({ files, onSubmit, onCancel }: XmlMultiSelectProps) {
-  const { exit } = useApp();
   const [cursor, setCursor] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(() => {
     // Pre-select all files without JSON
@@ -63,7 +62,6 @@ export function XmlMultiSelect({ files, onSubmit, onCancel }: XmlMultiSelectProp
   useInput((input, key) => {
     if (key.escape || input === 'q') {
       onCancel();
-      exit();
       return;
     }
 
@@ -107,6 +105,7 @@ export function XmlMultiSelect({ files, onSubmit, onCancel }: XmlMultiSelectProp
   });
 
   // Ensure cursor starts on first file item
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => {
     if (items[cursor]?.type === 'section') {
       const firstFileIdx = items.findIndex(i => i.type === 'file');
