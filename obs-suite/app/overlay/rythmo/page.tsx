@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
-import FcpxmlOverlay from '@/components/FcpxmlOverlay';
+import RythmoOverlay from '@/components/RythmoOverlay';
 import IntroPanel from '@/components/IntroPanel';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
@@ -65,7 +65,7 @@ function extractVideoName(src: string): string {
   return decodeURIComponent(basename) || 'Vidéo inconnue';
 }
 
-function FcpxmlOverlayContent() {
+function RythmoOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -228,7 +228,7 @@ function FcpxmlOverlayContent() {
         {/* Overlay - positioned at bottom, overlaying the video */}
         {videoSrc && visualizationData && !loading && !error && (
           <div className="absolute bottom-0 left-0 right-0 z-10">
-            <FcpxmlOverlay
+            <RythmoOverlay
               videoRef={videoRef}
               visualizationData={visualizationData}
               windowMs={6000}
@@ -250,14 +250,14 @@ function FcpxmlOverlayContent() {
   );
 }
 
-export default function FcpxmlOverlayPage() {
+export default function RythmoOverlayPage() {
   return (
     <Suspense fallback={
       <div className="w-screen h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl">Chargement...</div>
       </div>
     }>
-      <FcpxmlOverlayContent />
+      <RythmoOverlayContent />
     </Suspense>
   );
 }

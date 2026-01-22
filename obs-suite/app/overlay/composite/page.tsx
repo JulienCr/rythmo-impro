@@ -31,7 +31,7 @@ import {
   type StateUpdate,
 } from '@/lib/websocket/types';
 import { CharacterInfo } from '@/components/CharacterInfo';
-import FcpxmlOverlay from '@/components/FcpxmlOverlay';
+import RythmoOverlay from '@/components/RythmoOverlay';
 
 function CompositeOverlayContent() {
   const searchParams = useSearchParams();
@@ -272,7 +272,7 @@ function CompositeOverlayContent() {
           {/* Bottom Section: Bande Rythmo */}
           <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center">
             {visualizationData && !loading && !error && (
-              <FcpxmlOverlay
+              <RythmoOverlay
                 videoRef={video1Ref}
                 visualizationData={visualizationData}
                 windowMs={6000}
