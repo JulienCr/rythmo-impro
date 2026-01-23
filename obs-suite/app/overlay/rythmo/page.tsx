@@ -78,6 +78,7 @@ function RythmoOverlayContent() {
   const [showIntro, setShowIntro] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [prerollStartTime, setPrerollStartTime] = useState<number | null>(null);
+  const [videoTitle, setVideoTitle] = useState<string | null>(null);
   const lastStateUpdateRef = useRef<number>(0);
   const clientIdRef = useRef<string>(generateClientId());
 
@@ -169,11 +170,26 @@ function RythmoOverlayContent() {
 
     setLoading(true);
     setError(null);
+    setVideoTitle(null);
 
     const loadData = async () => {
+      // Extract basename from video URL for metadata fetch
+      const videoFilename = videoSrc.split('/').pop() || '';
+      const basename = videoFilename.replace(/\.[^.]+$/, '');
+
+      // Fetch tracks and metadata in parallel
+      const tracksPromise = loadTracksFromUrl(tracksUrl);
+      const metaPromise = fetch(`/api/out/final-json/${basename}/meta`)
+        .then(res => res.ok ? res.json() : null)
+        .catch(() => null);
+
       try {
-        const vizData = await loadTracksFromUrl(tracksUrl);
+        const [vizData, metaData] = await Promise.all([tracksPromise, metaPromise]);
         setVisualizationData(vizData);
+        // Set custom video title if present in metadata
+        if (metaData?.videoTitle) {
+          setVideoTitle(metaData.videoTitle);
+        }
         setLoading(false);
         // Show intro panel when data is loaded
         setShowIntro(true);
@@ -266,7 +282,7 @@ function RythmoOverlayContent() {
         {showIntro && visualizationData && (
           <IntroPanel
             visualizationData={visualizationData}
-            videoName={videoName}
+            videoName={videoTitle || videoName}
           />
         )}
 

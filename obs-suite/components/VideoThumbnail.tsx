@@ -7,14 +7,19 @@
  * - Thumbnail image
  * - Character count
  * - Video duration
- * - Click to load video
+ * - Editable title (click to edit)
+ * - Click on image to load video
  */
+
+import { useState, useRef, useEffect } from 'react';
 
 export interface VideoThumbnailProps {
   basename: string;
   characterCount?: number;
   duration?: number;  // in seconds
+  videoTitle?: string;
   onClick?: () => void;
+  onTitleChange?: (newTitle: string) => void;
   selected?: boolean;
 }
 
@@ -31,14 +36,55 @@ export function VideoThumbnail({
   basename,
   characterCount,
   duration,
+  videoTitle,
   onClick,
+  onTitleChange,
   selected = false,
 }: VideoThumbnailProps) {
   const thumbnailUrl = `/api/out/thumbs/${basename}.jpg`;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus input when entering edit mode
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const startEditing = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setEditedTitle(videoTitle || basename);
+    setIsEditing(true);
+  };
+
+  const saveTitle = () => {
+    const trimmedTitle = editedTitle.trim();
+    if (trimmedTitle && trimmedTitle !== (videoTitle || basename) && onTitleChange) {
+      onTitleChange(trimmedTitle);
+    }
+    setIsEditing(false);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveTitle();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEditing();
+    }
+  };
 
   return (
-    <button
-      onClick={onClick}
+    <div
       className={`
         group relative overflow-hidden rounded-lg border-2 transition-all
         ${selected
@@ -47,8 +93,11 @@ export function VideoThumbnail({
         }
       `}
     >
-      {/* Thumbnail image */}
-      <div className="aspect-video w-full overflow-hidden bg-gray-800">
+      {/* Thumbnail image - clickable to select video */}
+      <button
+        onClick={onClick}
+        className="aspect-video w-full overflow-hidden bg-gray-800"
+      >
         <img
           src={thumbnailUrl}
           alt={basename}
@@ -59,13 +108,32 @@ export function VideoThumbnail({
             e.currentTarget.style.display = 'none';
           }}
         />
-      </div>
+      </button>
 
       {/* Metadata overlay */}
       <div className="bg-gray-900 p-2">
-        {/* Filename */}
-        <div className="mb-1 truncate text-sm font-medium text-gray-200">
-          {basename}
+        {/* Title or Filename - editable */}
+        <div className="mb-1">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={saveTitle}
+              className="w-full bg-transparent border-b border-blue-500 outline-none text-sm font-medium text-gray-200"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <div
+              onClick={startEditing}
+              className="truncate text-sm font-medium text-gray-200 cursor-pointer hover:text-white"
+              title="Cliquer pour modifier le titre"
+            >
+              {videoTitle || basename}
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -128,6 +196,6 @@ export function VideoThumbnail({
           </svg>
         </div>
       )}
-    </button>
+    </div>
   );
 }

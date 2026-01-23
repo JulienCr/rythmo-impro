@@ -6,7 +6,7 @@
  * Main interface for browsing videos and remotely controlling playback
  *
  * Features:
- * - Video grid with thumbnails
+ * - Video grid with thumbnails (editable titles)
  * - Video selection
  * - Remote controls (play/pause/seek)
  * - Character info display
@@ -114,17 +114,22 @@ export default function ControllerPage() {
   };
 
   /**
-   * Fetch metadata for a video (character count, duration)
+   * Fetch metadata for a video (character count, duration, custom title)
    */
   const fetchVideoMetadata = async (basename: string): Promise<VideoMetadata> => {
     try {
-      const res = await fetch(`/api/out/final-json/${basename}.json`);
-      if (!res.ok) {
+      // Fetch tracks JSON and meta JSON in parallel
+      const [tracksRes, metaRes] = await Promise.all([
+        fetch(`/api/out/final-json/${basename}.json`),
+        fetch(`/api/out/final-json/${basename}/meta`).catch(() => null),
+      ]);
+
+      if (!tracksRes.ok) {
         // No tracks data available
         return { basename };
       }
 
-      const tracks: CharacterTracksData = await res.json();
+      const tracks: CharacterTracksData = await tracksRes.json();
 
       // Calculate duration (max end time across all segments)
       const duration = Math.max(
@@ -132,10 +137,18 @@ export default function ControllerPage() {
         0
       );
 
+      // Get custom title from meta if available
+      let videoTitle: string | undefined;
+      if (metaRes?.ok) {
+        const meta = await metaRes.json();
+        videoTitle = meta.videoTitle || undefined;
+      }
+
       return {
         basename,
         characterCount: tracks.tracks.length,
         duration,
+        videoTitle,
       };
     } catch (err) {
       console.error(`Error fetching metadata for ${basename}:`, err);
@@ -186,6 +199,44 @@ export default function ControllerPage() {
   };
 
   /**
+   * Handle title change from thumbnail
+   */
+  const handleTitleChange = useCallback(async (basename: string, newTitle: string) => {
+    try {
+      const res = await fetch(`/api/out/final-json/${basename}/meta`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoTitle: newTitle }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to save title');
+      }
+
+      // Update videos array
+      setVideos((prev) =>
+        prev.map((v) => (v.basename === basename ? { ...v, videoTitle: newTitle } : v))
+      );
+    } catch (err) {
+      console.error(`Error saving title for ${basename}:`, err);
+    }
+  }, []);
+
+  /**
+   * Get display title for selected video
+   * Returns { title, hasCustomTitle } to know if we should show .mp4 suffix
+   */
+  const getSelectedVideoInfo = () => {
+    if (!selectedVideo) return null;
+    const video = videos.find((v) => v.basename === selectedVideo);
+    const hasCustomTitle = !!video?.videoTitle;
+    return {
+      title: video?.videoTitle || selectedVideo,
+      hasCustomTitle,
+    };
+  };
+
+  /**
    * Send play command
    */
   const handlePlay = useCallback(() => {
@@ -224,6 +275,9 @@ export default function ControllerPage() {
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle shortcuts when typing in an input
+      if (document.activeElement?.tagName === 'INPUT') return;
+
       // Space bar: toggle play/pause
       if (e.code === 'Space' || e.key === ' ') {
         // Prevent scrolling
@@ -288,6 +342,7 @@ export default function ControllerPage() {
               videos={videos}
               selectedVideo={selectedVideo || undefined}
               onVideoSelect={handleVideoSelect}
+              onTitleChange={handleTitleChange}
             />
           )}
         </div>
@@ -319,7 +374,8 @@ export default function ControllerPage() {
               {selectedVideo ? (
                 <div>
                   <p className="truncate text-sm font-medium text-gray-200">
-                    {selectedVideo}.mp4
+                    {getSelectedVideoInfo()?.title}
+                    {!getSelectedVideoInfo()?.hasCustomTitle && '.mp4'}
                   </p>
                   <p className="text-xs text-gray-500">En lecture</p>
                 </div>
