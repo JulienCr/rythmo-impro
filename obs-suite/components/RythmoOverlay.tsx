@@ -44,6 +44,7 @@ export default function RythmoOverlay({
       canvas.width = videoWidth;
       canvas.height = totalHeight;
       canvas.style.height = `${totalHeight * scale}px`;
+      canvas.style.width = `${video.clientWidth}px`;
     }
 
     video.addEventListener('loadedmetadata', updateCanvasSize);

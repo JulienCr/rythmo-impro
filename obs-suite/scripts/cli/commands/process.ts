@@ -73,9 +73,9 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
 
   // Auto-enable force mode if any selected video is already processed
   const hasProcessedVideos = selectedVideos.some(v => !v.isNew);
-  const effectiveForce = options.force || hasProcessedVideos;
+  const effectiveForce = options.force || (!options.all && hasProcessedVideos);
 
-  if (hasProcessedVideos && !options.force) {
+  if (hasProcessedVideos && !options.force && !options.all) {
     console.log(colors.info('Mode --force activé automatiquement (vidéos déjà traitées sélectionnées)\n'));
   }
 
