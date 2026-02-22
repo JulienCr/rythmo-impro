@@ -38,7 +38,9 @@ export interface FcpxmlTrack {
 export interface FcpxmlGeneratorItem {
   name?: string;
   start?: number;  // Frame number
-  end?: number;    // Frame number
+  end?: number;    // Frame number (-1 means unset in FCP XML)
+  in?: number;     // In-point frame number
+  out?: number;    // Out-point frame number
   effect?: {
     parameter?: FcpxmlParameter | FcpxmlParameter[];
   };

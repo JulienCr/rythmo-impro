@@ -108,16 +108,27 @@ function extractCharacterTracks(parsed: FcpxmlDocument, fps: number): CharacterT
     const segments: TimeSegment[] = [];
 
     for (const item of generatorItems) {
-      const start = item.start ?? 0;
-      const end = item.end ?? 0;
+      let start = item.start ?? 0;
+      let end = item.end ?? 0;
+      const clipDuration = (item.in != null && item.out != null && item.out > item.in)
+        ? item.out - item.in
+        : null;
+
+      // FCP XML uses -1 to mean "unset" - compute from in/out points
+      if (start < 0 && clipDuration != null) {
+        start = end - clipDuration;
+      }
+      if (end <= 0 && clipDuration != null) {
+        end = start + clipDuration;
+      }
 
       // Validate frame numbers
       if (end <= start) {
         throw new Error(`Invalid segment at frames ${start}-${end} (track ${trackName}): end must be greater than start`);
       }
 
-      // Convert frames to seconds
-      const startSec = framesToSeconds(start, fps);
+      // Convert frames to seconds, clamp negative starts to 0
+      const startSec = Math.max(0, framesToSeconds(start, fps));
       const endSec = framesToSeconds(end, fps);
 
       segments.push({ start: startSec, end: endSec });
