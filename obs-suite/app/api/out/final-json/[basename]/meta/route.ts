@@ -55,43 +55,33 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ basename: string }> }
 ) {
+  const { basename } = await params;
+
+  if (!isValidBasename(basename)) {
+    return NextResponse.json({ error: 'Invalid basename' }, { status: 400 });
+  }
+
   try {
-    const { basename } = await params;
-
-    // Validate basename
-    if (!isValidBasename(basename)) {
-      return NextResponse.json(
-        { error: 'Invalid basename' },
-        { status: 400 }
-      );
-    }
-
     const metaFilePath = getMetaFilePath(basename);
 
-    try {
-      const content = await readFile(metaFilePath, 'utf-8');
-      const meta = JSON.parse(content);
-
-      // Validate the loaded data
-      if (!validateVideoMeta(meta)) {
-        console.warn(`Invalid meta file for ${basename}, returning empty object`);
-        return NextResponse.json({});
-      }
-
-      return NextResponse.json(meta);
-    } catch (err) {
-      // File doesn't exist - return empty object
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-        return NextResponse.json({});
-      }
+    const content = await readFile(metaFilePath, 'utf-8').catch((err) => {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
       throw err;
+    });
+
+    if (content === null) {
+      return NextResponse.json({});
     }
+
+    const meta = JSON.parse(content);
+    if (!validateVideoMeta(meta)) {
+      console.warn(`Invalid meta file for ${basename}, returning empty object`);
+      return NextResponse.json({});
+    }
+    return NextResponse.json(meta);
   } catch (err) {
     console.error('Error reading meta file:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -103,47 +93,32 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ basename: string }> }
 ) {
+  const { basename } = await params;
+
+  if (!isValidBasename(basename)) {
+    return NextResponse.json({ error: 'Invalid basename' }, { status: 400 });
+  }
+
   try {
-    const { basename } = await params;
-
-    // Validate basename
-    if (!isValidBasename(basename)) {
-      return NextResponse.json(
-        { error: 'Invalid basename' },
-        { status: 400 }
-      );
-    }
-
-    // Parse request body
     const body = await request.json();
 
-    // Validate the videoTitle field
     if (body.videoTitle !== undefined && typeof body.videoTitle !== 'string') {
-      return NextResponse.json(
-        { error: 'videoTitle must be a string' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'videoTitle must be a string' }, { status: 400 });
     }
 
-    // Build the metadata object
+    const metaFilePath = getMetaFilePath(basename);
+
     const meta: VideoMeta = {
       version: 1,
       videoTitle: body.videoTitle,
     };
 
-    // Ensure directory exists
     await mkdir(FINAL_JSON_DIR, { recursive: true });
-
-    // Write the file
-    const metaFilePath = getMetaFilePath(basename);
     await writeFile(metaFilePath, JSON.stringify(meta, null, 2), 'utf-8');
 
     return NextResponse.json(meta);
   } catch (err) {
     console.error('Error writing meta file:', err);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

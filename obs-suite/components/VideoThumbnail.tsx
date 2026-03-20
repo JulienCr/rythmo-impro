@@ -41,7 +41,9 @@ export function VideoThumbnail({
   onTitleChange,
   selected = false,
 }: VideoThumbnailProps) {
-  const thumbnailUrl = `/api/out/thumbs/${basename}.jpg`;
+  const thumbnailExtensions = ['jpg', 'png', 'webp'];
+  const [thumbExtIndex, setThumbExtIndex] = useState(0);
+  const thumbnailUrl = `/api/out/thumbs/${basename}.${thumbnailExtensions[thumbExtIndex]}`;
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -104,8 +106,12 @@ export function VideoThumbnail({
           loading="lazy"
           className="h-full w-full object-cover transition-transform group-hover:scale-105"
           onError={(e) => {
-            // Fallback if thumbnail doesn't exist
-            e.currentTarget.style.display = 'none';
+            // Try next extension, hide if all exhausted
+            if (thumbExtIndex < thumbnailExtensions.length - 1) {
+              setThumbExtIndex(thumbExtIndex + 1);
+            } else {
+              e.currentTarget.style.display = 'none';
+            }
           }}
         />
       </button>

@@ -217,42 +217,6 @@ export interface GenerateFcpxmlOptions {
 /**
  * Runtime validation for CliJsonData
  */
-// ============================================================================
-// Layer 5: Video Metadata (custom titles, etc.)
-// ============================================================================
-
-/**
- * Video metadata stored in {basename}.meta.json
- * Used for custom video titles and other user-configurable metadata
- */
-export interface VideoMeta {
-  version: number;
-  videoTitle?: string;
-}
-
-/**
- * Runtime validation for VideoMeta
- */
-export function validateVideoMeta(data: unknown): data is VideoMeta {
-  if (!data || typeof data !== 'object') {
-    return false;
-  }
-
-  const d = data as Partial<VideoMeta>;
-
-  // Version check (accept version 1)
-  if (typeof d.version !== 'number' || d.version !== 1) {
-    return false;
-  }
-
-  // videoTitle is optional but must be a string if present
-  if (d.videoTitle !== undefined && typeof d.videoTitle !== 'string') {
-    return false;
-  }
-
-  return true;
-}
-
 export function validateCliJsonData(data: unknown): data is CliJsonData {
   if (!data || typeof data !== 'object') {
     throw new Error('Invalid CLI JSON: not an object');
@@ -286,6 +250,42 @@ export function validateCliJsonData(data: unknown): data is CliJsonData {
     if (typeof seg.text !== 'string') {
       throw new Error(`Invalid segment at index ${i}: text must be a string`);
     }
+  }
+
+  return true;
+}
+
+// ============================================================================
+// Layer 5: Video Metadata (custom titles, etc.)
+// ============================================================================
+
+/**
+ * Video metadata stored in {basename}.meta.json
+ * Used for custom video titles and other user-configurable metadata
+ */
+export interface VideoMeta {
+  version: number;
+  videoTitle?: string;
+}
+
+/**
+ * Runtime validation for VideoMeta
+ */
+export function validateVideoMeta(data: unknown): data is VideoMeta {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const d = data as Partial<VideoMeta>;
+
+  // Version check (accept version 1)
+  if (typeof d.version !== 'number' || d.version !== 1) {
+    return false;
+  }
+
+  // videoTitle is optional but must be a string if present
+  if (d.videoTitle !== undefined && typeof d.videoTitle !== 'string') {
+    return false;
   }
 
   return true;
