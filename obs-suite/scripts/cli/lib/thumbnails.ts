@@ -3,7 +3,7 @@
  */
 
 import { existsSync, mkdirSync } from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { join } from 'path';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
@@ -40,8 +40,10 @@ export function generateThumbnail(
     }
 
     // Detect video duration
-    const durationCmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`;
-    const durationStr = execSync(durationCmd, { encoding: 'utf-8' }).trim();
+    const durationStr = execFileSync('ffprobe', [
+      '-v', 'error', '-show_entries', 'format=duration',
+      '-of', 'default=noprint_wrappers=1:nokey=1', videoPath,
+    ], { encoding: 'utf-8' }).trim();
     const duration = parseFloat(durationStr);
 
     if (isNaN(duration) || duration <= 0) {
@@ -50,9 +52,11 @@ export function generateThumbnail(
 
     // Extract middle frame (duration / 2)
     const middleTime = duration / 2;
-    const ffmpegCmd = `ffmpeg -ss ${middleTime} -i "${videoPath}" -frames:v 1 -vf scale=320:-1 -q:v 5 "${outputPaths.thumbnail}" -y`;
-
-    execSync(ffmpegCmd, { stdio: 'pipe' });
+    execFileSync('ffmpeg', [
+      '-ss', String(middleTime), '-i', videoPath,
+      '-frames:v', '1', '-vf', 'scale=320:-1', '-q:v', '5',
+      outputPaths.thumbnail, '-y',
+    ], { stdio: 'pipe' });
 
     return true;
   } catch (err) {

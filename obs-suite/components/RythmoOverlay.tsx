@@ -30,6 +30,8 @@ function truncateTextToFit(
   return lo > 0 ? text.slice(0, lo) + '\u2026' : null;
 }
 
+const BUFFER_MS = 3000; // Required buffer before first segment
+
 interface RythmoOverlayProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   visualizationData: CharacterVisualizationData;
@@ -51,6 +53,8 @@ export default function RythmoOverlay({
 }: RythmoOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const prerollCompleteCalledRef = useRef(false);
+  const onPrerollCompleteRef = useRef(onPrerollComplete);
+  onPrerollCompleteRef.current = onPrerollComplete;
 
   // Calculate number of lanes needed
   const numLanes = visualizationData.tracks.length;
@@ -89,13 +93,12 @@ export default function RythmoOverlay({
   }, [videoRef, numLanes, laneHeight, laneGap, totalHeight]);
 
   // Calculate preroll duration to ensure 3 seconds before first band
-  const bufferMs = 3000; // Required buffer before first segment
   const prerollDurationMs = useMemo(() => {
     const earliestSegmentTime = visualizationData.segments.reduce(
       (min, s) => Math.min(min, s.t0),
-      bufferMs
+      BUFFER_MS
     );
-    return Math.max(0, bufferMs - earliestSegmentTime);
+    return Math.max(0, BUFFER_MS - earliestSegmentTime);
   }, [visualizationData]);
 
   // Animation loop for rendering segments
@@ -137,7 +140,7 @@ export default function RythmoOverlay({
         // Check if preroll is complete (reached time 0)
         if (currentTimeMs >= 0 && !prerollCompleteCalledRef.current) {
           prerollCompleteCalledRef.current = true;
-          onPrerollComplete?.();
+          onPrerollCompleteRef.current?.();
         }
       } else {
         // Normal playback: use video time
@@ -247,7 +250,7 @@ export default function RythmoOverlay({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight, prerollStartTime, prerollDurationMs, onPrerollComplete]);
+  }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight, prerollStartTime, prerollDurationMs]);
 
   return (
     <canvas

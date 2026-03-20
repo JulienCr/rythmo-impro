@@ -3,7 +3,7 @@
  */
 
 import { existsSync, mkdirSync } from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { join } from 'path';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
@@ -46,22 +46,19 @@ export function removeVocals(
       mkdirSync(paths.finalVidsDir, { recursive: true });
     }
 
-    // Build command
-    const cmd = [
-      paths.vocalRemovalScript,
-      '--input', `"${videoPath}"`,
-      '--output', `"${outputPaths.finalVideo}"`,
-      '--model', '"MDX23C-InstVoc HQ"',
+    // Build command arguments as an array (safe from shell injection)
+    const args = [
+      '--input', videoPath,
+      '--output', outputPaths.finalVideo,
+      '--model', 'MDX23C-InstVoc HQ',
     ];
 
     if (force) {
-      cmd.push('--force');
+      args.push('--force');
     }
 
-    const command = cmd.join(' ');
-
     // Run vocal removal (with progress output)
-    execSync(command, { stdio: 'inherit' });
+    execFileSync(paths.vocalRemovalScript, args, { stdio: 'inherit' });
 
     return true;
   } catch (err) {

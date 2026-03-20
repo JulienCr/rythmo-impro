@@ -36,8 +36,8 @@ export async function processCommand(options: ProcessCommandOptions): Promise<vo
     throw new Error('Impossible d\'utiliser --vocals-only et --skip-vocal-removal ensemble');
   }
 
-  // Vérifier que le script de diarisation existe
-  if (!existsSync(paths.diarizerScript)) {
+  // Vérifier que le script de diarisation existe (sauf en mode vocals-only)
+  if (!options.vocalsOnly && !existsSync(paths.diarizerScript)) {
     throw new Error(
       `Script de diarisation introuvable : ${paths.diarizerScript}\n` +
       `Veuillez vous assurer que la configuration du diariseur est complète.`

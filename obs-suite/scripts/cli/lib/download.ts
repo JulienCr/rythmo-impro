@@ -2,7 +2,7 @@
  * Video download using yt-dlp
  */
 
-import { execSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join, basename } from 'path';
 import { paths } from '../utils/paths.js';
