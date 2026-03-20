@@ -4,12 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**rythmo-impro** is a speaker diarization system that processes video files to identify who speaks when (without identity recognition). It consists of:
+**rythmo-impro** is a speaker diarization system that processes video files to produce highly precise speaker timelines for short films and animated clips. The goal is to identify exactly when each character is speaking, while preserving short silences, pauses, and overlaps so the rhythm and prosody of the original performance remain visible.
 
-1. **Dockerized Python service** (`/diarizer/`) - Uses WhisperX + pyannote to perform speaker diarization and output word-level detailed JSON data
+These timelines are used in a **live improvisational dubbing setup**, where actors invent new dialogue in real time while following the speaking patterns of the scene. Because of this, **temporal accuracy and fine-grained segmentation matter more than speed or heavy smoothing**. The system must detect brief inter-word gaps, preserve natural pauses, and make overlapping speech visible.
+
+It consists of:
+
+1. **Python diarization service** (`/diarizer/`) - Uses WhisperX + pyannote to perform speaker diarization and output word-level detailed JSON data
 2. **Next.js overlay application** (`/obs-suite/`) - *(Legacy)* Renders video with a fixed-lane "bande rythmo" visualization for OBS browser sources
 
 The system takes video files as input and outputs detailed transcription with word-level timestamps, suitable for:
+- Live improvisational dubbing (primary use case)
 - CLI audio player playback with synchronized transcripts
 - Theatrical improvisation rehearsal analysis
 - Subtitle generation
@@ -22,7 +27,8 @@ The system takes video files as input and outputs detailed transcription with wo
 **Location**: `/diarizer/`
 
 - **Entry point**: `main.py` - CLI that accepts video input and outputs multiple JSON formats + SRT subtitles
-- **Technology**: WhisperX with pyannote.audio for speaker diarization
+- **Configuration**: `config.toml` - Single source of truth for all model names, tuning defaults, memory requirements, and compute settings. CLI arguments override config values when specified.
+- **Technology**: WhisperX with pyannote.audio (`pyannote/speaker-diarization-community-1`) for speaker diarization
 - **Authentication**: Requires `HF_TOKEN` environment variable (Hugging Face) for pyannote models
 - **Input/Output**: Mounted volumes at `/in` (video files) and `/out` (JSON + SRT output)
 

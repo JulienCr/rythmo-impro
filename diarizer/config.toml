@@ -1,0 +1,54 @@
+# rythmo-impro diarization pipeline configuration
+# CLI arguments override these values when specified.
+
+[whisper]
+model = "large-v3"
+language = "auto"
+compute_type_gpu = "float16"
+compute_type_cpu = "int8"
+batch_size_gpu = 16
+batch_size_cpu = 4
+
+[whisper.memory_gb]
+tiny = 1.0
+base = 1.5
+small = 2.5
+medium = 5.0
+large = 10.0
+"large-v2" = 10.0
+"large-v3" = 10.0
+
+[diarization]
+model = "pyannote/speaker-diarization-community-1"
+memory_gb = 2.0
+alignment_memory_gb = 1.0
+
+[segments]
+silence_threshold = 0.3
+merge_gap = 0.1
+min_duration = 0.2
+min_word_confidence = 0.3
+
+[vad]
+enabled = false
+# Uses pyannote/segmentation-3.0 (~17ms resolution, overlap-aware)
+segmentation_model = "pyannote/segmentation-3.0"
+# Onset/offset hysteresis thresholds (higher onset = fewer false positives)
+onset = 0.5
+offset = 0.5
+# Post-processing: remove speech regions shorter than this (seconds, 0.0 = keep all)
+min_duration_on = 0.0
+# Post-processing: fill non-speech gaps shorter than this (seconds, 0.0 = keep all gaps)
+min_duration_off = 0.0
+
+[vocal_removal]
+model = "MDX23C-InstVoc HQ"
+normalization_threshold = 0.9
+output_format = "wav"
+output_stem = "Instrumental"
+audio_codec = "aac"
+audio_bitrate = "192k"
+
+[vocal_removal.model_map]
+"MDX23C-InstVoc HQ" = "MDX23C-8KFFT-InstVoc_HQ.ckpt"
+"MDX23C-InstVoc HQ 2" = "MDX23C-8KFFT-InstVoc_HQ_2.ckpt"
