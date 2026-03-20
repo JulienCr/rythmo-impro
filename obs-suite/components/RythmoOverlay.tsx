@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, RefObject } from 'react';
+import { useEffect, useMemo, useRef, RefObject } from 'react';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
 
 /**
@@ -27,8 +27,7 @@ function truncateTextToFit(
     }
   }
 
-  const result = lo > 0 ? text.slice(0, lo) + '\u2026' : null;
-  return result && ctx.measureText(result).width <= availableWidth ? result : null;
+  return lo > 0 ? text.slice(0, lo) + '\u2026' : null;
 }
 
 interface RythmoOverlayProps {
@@ -91,18 +90,13 @@ export default function RythmoOverlay({
 
   // Calculate preroll duration to ensure 3 seconds before first band
   const bufferMs = 3000; // Required buffer before first segment
-  const earliestSegmentTime = visualizationData.segments.reduce(
-    (min, s) => Math.min(min, s.t0),
-    bufferMs
-  );
-  const prerollDurationMs = Math.max(0, bufferMs - earliestSegmentTime);
-
-  // Reset preroll complete flag when preroll starts
-  useEffect(() => {
-    if (prerollStartTime !== null) {
-      prerollCompleteCalledRef.current = false;
-    }
-  }, [prerollStartTime]);
+  const prerollDurationMs = useMemo(() => {
+    const earliestSegmentTime = visualizationData.segments.reduce(
+      (min, s) => Math.min(min, s.t0),
+      bufferMs
+    );
+    return Math.max(0, bufferMs - earliestSegmentTime);
+  }, [visualizationData]);
 
   // Animation loop for rendering segments
   useEffect(() => {
@@ -113,10 +107,19 @@ export default function RythmoOverlay({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Reset preroll flag when this effect (re)starts
+    prerollCompleteCalledRef.current = false;
+
     // Playhead at 1/5 from left (show more of what's coming)
     const timeBeforeMs = windowMs * 0.2;
     const timeAfterMs = windowMs * 0.8;
     const playheadRatio = 0.2;
+
+    // Pre-compute fonts (constant during playback)
+    const segmentFontSize = Math.round(laneHeight * 0.6);
+    const segmentFont = `bold ${segmentFontSize}px sans-serif`;
+    const timerFontSize = Math.round(laneHeight * 0.5);
+    const timerFont = `bold ${timerFontSize}px sans-serif`;
 
     let animationFrameId: number;
 
@@ -149,6 +152,11 @@ export default function RythmoOverlay({
       ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Set segment text style once before the loop
+      ctx.font = segmentFont;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'left';
+
       // Draw visible segments (sorted, so early break is possible)
       for (const segment of visualizationData.segments) {
         if (segment.t0 > windowEnd) break;
@@ -167,11 +175,6 @@ export default function RythmoOverlay({
         // Draw character name if bar is wide enough
         const minWidthForText = 50;
         if (width >= minWidthForText) {
-          const fontSize = Math.round(laneHeight * 0.6);
-          ctx.font = `bold ${fontSize}px sans-serif`;
-          ctx.textBaseline = 'middle';
-          ctx.textAlign = 'left';
-
           const padding = 8;
           const displayText = truncateTextToFit(ctx, segment.trackName, width - padding * 2);
 
@@ -214,8 +217,7 @@ export default function RythmoOverlay({
           timerText = `-${Math.floor(remainingSec)}s`;
         }
 
-        const timerFontSize = Math.round(laneHeight * 0.5);
-        ctx.font = `bold ${timerFontSize}px sans-serif`;
+        ctx.font = timerFont;
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'right';
 

@@ -257,9 +257,6 @@ function RythmoOverlayContent() {
             <RythmoOverlay
               videoRef={videoRef}
               visualizationData={visualizationData}
-              windowMs={6000}
-              laneHeight={32}
-              laneGap={1}
               prerollStartTime={prerollStartTime}
               onPrerollComplete={handlePrerollComplete}
             />

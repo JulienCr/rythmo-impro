@@ -61,14 +61,15 @@ export function downloadVideo(options: DownloadOptions): string {
   }
 
   // Use yt-dlp to get the filename it would produce
-  try {
-    const result = spawnSync(
-      'yt-dlp',
-      ['--print', 'filename', '--merge-output-format', 'mp4', '-o', outputTemplate, options.url],
-      { encoding: 'utf-8', cwd: paths.inDir }
-    );
-    return (result.stdout as string).trim();
-  } catch {
+  const result = spawnSync(
+    'yt-dlp',
+    ['--print', 'filename', '--merge-output-format', 'mp4', '-o', outputTemplate, options.url],
+    { encoding: 'utf-8', cwd: paths.inDir }
+  );
+  const filename = (result.stdout as string).trim();
+  if (!filename || result.status !== 0) {
+    console.warn(colors.warning('  Impossible de déterminer le nom du fichier téléchargé'));
     return paths.inDir;
   }
+  return filename;
 }

@@ -29,15 +29,11 @@ const FINAL_JSON_DIR = join(PROJECT_ROOT, 'out', 'final-json');
  * Validate basename to prevent path traversal
  */
 function isValidBasename(basename: string): boolean {
-  // Must not contain path separators or be empty
-  if (!basename || basename.includes('/') || basename.includes('\\') || basename.includes('..')) {
+  // Allowlist: alphanumeric, hyphens, underscores, single dots (no consecutive dots)
+  if (!basename || basename.length > 255) {
     return false;
   }
-  // Must be a reasonable filename
-  if (basename.length > 255) {
-    return false;
-  }
-  return true;
+  return /^[a-zA-Z0-9_\-][a-zA-Z0-9_\-\.]*$/.test(basename) && !basename.includes('..');
 }
 
 /**

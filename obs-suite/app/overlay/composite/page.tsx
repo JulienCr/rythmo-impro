@@ -270,9 +270,6 @@ function CompositeOverlayContent() {
               <RythmoOverlay
                 videoRef={video1Ref}
                 visualizationData={visualizationData}
-                windowMs={6000}
-                laneHeight={32}
-                laneGap={1}
               />
             )}
           </div>

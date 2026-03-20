@@ -3,7 +3,7 @@
  */
 
 import { existsSync } from 'fs';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
 import type { DiarizationConfig } from '../schemas/config.js';
@@ -27,16 +27,15 @@ export function runDiarization(
     throw new Error(`Diarization script not found: ${paths.diarizerScript}`);
   }
 
-  // Build command arguments (quote paths for special characters)
+  // Build command arguments as an array (safe from shell injection)
   const args = [
-    paths.diarizerScript,
-    '--input-dir', `"${paths.inDir}"`,
-    '--output-dir', `"${paths.outDir}"`,
+    '--input-dir', paths.inDir,
+    '--output-dir', paths.outDir,
   ];
 
   // If processing a single video, add --input parameter
   if (videoFiles.length === 1) {
-    args.push('--input', `"${videoFiles[0]}"`);
+    args.push('--input', videoFiles[0]);
   }
 
   // Add model (default: large-v3)
@@ -61,12 +60,10 @@ export function runDiarization(
     args.push('--language', options.language);
   }
 
-  const command = args.join(' ');
-
-  console.log(colors.dim(`Running: ${command}\n`));
+  console.log(colors.dim(`Running: ${paths.diarizerScript} ${args.join(' ')}\n`));
 
   try {
-    execSync(command, { stdio: 'inherit' });
+    execFileSync(paths.diarizerScript, args, { stdio: 'inherit' });
     console.log(colors.success('\n✓ Diarization completed successfully\n'));
   } catch (err) {
     throw new Error(`Diarization failed: ${err instanceof Error ? err.message : String(err)}`);

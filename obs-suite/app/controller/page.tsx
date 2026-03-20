@@ -13,7 +13,7 @@
  * - WebSocket communication with display clients
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { VideoGrid } from '../../components/VideoGrid';
 import type { VideoMetadata } from '../../components/VideoGrid';
 import { VideoFilters } from '../../components/VideoFilters';
@@ -35,7 +35,7 @@ export default function ControllerPage() {
   const [videos, setVideos] = useState<VideoMetadata[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [videoState, setVideoState] = useState<VideoState | null>(null);
-  const [characterTracks, setCharacterTracks] = useState<CharacterTracksData | null>(null);
+  const tracksCache = useRef<Map<string, CharacterTracksData>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [characterCountFilter, setCharacterCountFilter] = useState<Set<number>>(new Set());
@@ -147,6 +147,9 @@ export default function ControllerPage() {
         videoTitle = meta.videoTitle || undefined;
       }
 
+      // Cache the full tracks data for later use
+      tracksCache.current.set(basename, tracks);
+
       return {
         basename,
         characterCount: tracks.tracks.length,
@@ -167,9 +170,6 @@ export default function ControllerPage() {
     (basename: string) => {
       setSelectedVideo(basename);
 
-      // Load character tracks
-      loadCharacterTracks(basename);
-
       // Send load_video command via WebSocket
       const loadCommand: Omit<LoadVideoCommand, 'timestamp'> = {
         type: 'load_video',
@@ -182,25 +182,6 @@ export default function ControllerPage() {
     },
     [send]
   );
-
-  /**
-   * Load character tracks for selected video
-   */
-  const loadCharacterTracks = async (basename: string) => {
-    try {
-      const res = await fetch(`/api/out/final-json/${basename}.json`);
-      if (!res.ok) {
-        setCharacterTracks(null);
-        return;
-      }
-
-      const tracks: CharacterTracksData = await res.json();
-      setCharacterTracks(tracks);
-    } catch (err) {
-      console.error(`Error loading tracks for ${basename}:`, err);
-      setCharacterTracks(null);
-    }
-  };
 
   /**
    * Handle title change from thumbnail
@@ -225,6 +206,9 @@ export default function ControllerPage() {
       console.error(`Error saving title for ${basename}:`, err);
     }
   }, []);
+
+  // Derive character tracks from cached data (no re-fetch needed)
+  const characterTracks = selectedVideo ? tracksCache.current.get(selectedVideo) ?? null : null;
 
   const selectedVideoInfo = useMemo(() => {
     if (!selectedVideo) return null;
@@ -287,12 +271,12 @@ export default function ControllerPage() {
   }, [videoState?.playing, handlePlay, handlePause]);
 
   const filteredVideos = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     return videos.filter((v) => {
       if (characterCountFilter.size > 0 && v.characterCount !== undefined) {
         if (!characterCountFilter.has(v.characterCount)) return false;
       }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+      if (q) {
         const titleMatch = (v.videoTitle || v.basename).toLowerCase().includes(q);
         const nameMatch = v.characterNames?.some((n) => n.toLowerCase().includes(q)) ?? false;
         if (!titleMatch && !nameMatch) return false;

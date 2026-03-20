@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface CountdownProps {
   onComplete: () => void;
@@ -14,6 +14,8 @@ const STEP_DURATION_MS = 1000; // 1 second per step
 export default function Countdown({ onComplete }: CountdownProps) {
   const [currentStep, setCurrentStep] = useState<CountdownStep>('3');
   const [animating, setAnimating] = useState(true);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     let stepIndex = 0;
@@ -30,7 +32,7 @@ export default function Countdown({ onComplete }: CountdownProps) {
         }, 50);
       } else {
         setCurrentStep(null);
-        onComplete();
+        onCompleteRef.current();
       }
     };
 
@@ -40,7 +42,7 @@ export default function Countdown({ onComplete }: CountdownProps) {
       clearInterval(timer);
       if (pendingTimeout) clearTimeout(pendingTimeout);
     };
-  }, [onComplete]);
+  }, []);
 
   if (!currentStep) return null;
 

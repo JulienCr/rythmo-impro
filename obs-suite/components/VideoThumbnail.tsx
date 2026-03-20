@@ -46,6 +46,9 @@ export function VideoThumbnail({
   const [thumbExtIndex, setThumbExtIndex] = useState(0);
   const thumbnailUrl = `/api/out/thumbs/${basename}.${THUMBNAIL_EXTENSIONS[thumbExtIndex]}`;
   const [isEditing, setIsEditing] = useState(false);
+
+  // Reset thumbnail extension index when basename changes (component reuse)
+  useEffect(() => { setThumbExtIndex(0); }, [basename]);
   const [editedTitle, setEditedTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -133,13 +136,14 @@ export function VideoThumbnail({
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <div
+            <button
+              type="button"
               onClick={startEditing}
-              className="truncate text-sm font-medium text-gray-200 cursor-pointer hover:text-white"
+              className="w-full truncate text-left text-sm font-medium text-gray-200 cursor-pointer hover:text-white bg-transparent border-none p-0"
               title="Cliquer pour modifier le titre"
             >
               {videoTitle || basename}
-            </div>
+            </button>
           )}
         </div>
 
