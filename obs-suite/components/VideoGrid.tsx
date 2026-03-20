@@ -11,6 +11,7 @@ import { VideoThumbnail } from './VideoThumbnail';
 export interface VideoMetadata {
   basename: string;
   characterCount?: number;
+  characterNames?: string[];
   duration?: number;
   videoTitle?: string;
 }

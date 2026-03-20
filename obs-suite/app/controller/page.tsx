@@ -13,9 +13,10 @@
  * - WebSocket communication with display clients
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { VideoGrid } from '../../components/VideoGrid';
 import type { VideoMetadata } from '../../components/VideoGrid';
+import { VideoFilters } from '../../components/VideoFilters';
 import { RemoteControls } from '../../components/RemoteControls';
 import { CharacterInfo } from '../../components/CharacterInfo';
 import { useWebSocket } from '../../hooks/useWebSocket';
@@ -37,6 +38,8 @@ export default function ControllerPage() {
   const [characterTracks, setCharacterTracks] = useState<CharacterTracksData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [characterCountFilter, setCharacterCountFilter] = useState<Set<number>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
 
   // WebSocket connection
   const { connected, send } = useWebSocket({
@@ -147,6 +150,7 @@ export default function ControllerPage() {
       return {
         basename,
         characterCount: tracks.tracks.length,
+        characterNames: tracks.tracks.map((t) => t.name),
         duration,
         videoTitle,
       };
@@ -224,9 +228,8 @@ export default function ControllerPage() {
 
   /**
    * Get display title for selected video
-   * Returns { title, hasCustomTitle } to know if we should show .mp4 suffix
    */
-  const getSelectedVideoInfo = () => {
+  const selectedVideoInfo = (() => {
     if (!selectedVideo) return null;
     const video = videos.find((v) => v.basename === selectedVideo);
     const hasCustomTitle = !!video?.videoTitle;
@@ -234,26 +237,20 @@ export default function ControllerPage() {
       title: video?.videoTitle || selectedVideo,
       hasCustomTitle,
     };
-  };
+  })();
 
   /**
    * Send play command
    */
   const handlePlay = useCallback(() => {
-    const playCommand: Omit<PlayCommand, 'timestamp'> = {
-      type: 'play',
-    };
-    send(playCommand);
+    send({ type: 'play' } as Omit<PlayCommand, 'timestamp'>);
   }, [send]);
 
   /**
    * Send pause command
    */
   const handlePause = useCallback(() => {
-    const pauseCommand: Omit<PauseCommand, 'timestamp'> = {
-      type: 'pause',
-    };
-    send(pauseCommand);
+    send({ type: 'pause' } as Omit<PauseCommand, 'timestamp'>);
   }, [send]);
 
   /**
@@ -261,11 +258,7 @@ export default function ControllerPage() {
    */
   const handleSeek = useCallback(
     (time: number) => {
-      const seekCommand: Omit<SeekCommand, 'timestamp'> = {
-        type: 'seek',
-        time,
-      };
-      send(seekCommand);
+      send({ type: 'seek', time } as Omit<SeekCommand, 'timestamp'>);
     },
     [send]
   );
@@ -296,6 +289,21 @@ export default function ControllerPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [videoState?.playing, handlePlay, handlePause]);
 
+  const filteredVideos = useMemo(() => {
+    return videos.filter((v) => {
+      if (characterCountFilter.size > 0 && v.characterCount !== undefined) {
+        if (!characterCountFilter.has(v.characterCount)) return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const titleMatch = (v.videoTitle || v.basename).toLowerCase().includes(q);
+        const nameMatch = v.characterNames?.some((n) => n.toLowerCase().includes(q)) ?? false;
+        if (!titleMatch && !nameMatch) return false;
+      }
+      return true;
+    });
+  }, [videos, characterCountFilter, searchQuery]);
+
   return (
     <div className="min-h-screen bg-gray-950 pb-32">
       <div className="mx-auto max-w-7xl space-y-6 p-6">
@@ -325,6 +333,19 @@ export default function ControllerPage() {
         <div>
           <h2 className="mb-4 text-xl font-semibold text-white">Bibliothèque vidéo</h2>
 
+          {!loading && !error && videos.length > 0 && (
+            <div className="mb-4">
+              <VideoFilters
+                videos={videos}
+                characterCountFilter={characterCountFilter}
+                searchQuery={searchQuery}
+                onCharacterCountFilterChange={setCharacterCountFilter}
+                onSearchQueryChange={setSearchQuery}
+                filteredCount={filteredVideos.length}
+              />
+            </div>
+          )}
+
           {loading && (
             <div className="flex h-64 items-center justify-center rounded-lg border border-gray-700 bg-gray-900">
               <p className="text-gray-400">Chargement des vidéos...</p>
@@ -339,7 +360,7 @@ export default function ControllerPage() {
 
           {!loading && !error && (
             <VideoGrid
-              videos={videos}
+              videos={filteredVideos}
               selectedVideo={selectedVideo || undefined}
               onVideoSelect={handleVideoSelect}
               onTitleChange={handleTitleChange}
@@ -371,11 +392,11 @@ export default function ControllerPage() {
           <div className="flex items-center gap-4">
             {/* Currently Playing Info */}
             <div className="flex-shrink-0" style={{ width: '250px' }}>
-              {selectedVideo ? (
+              {selectedVideoInfo ? (
                 <div>
                   <p className="truncate text-sm font-medium text-gray-200">
-                    {getSelectedVideoInfo()?.title}
-                    {!getSelectedVideoInfo()?.hasCustomTitle && '.mp4'}
+                    {selectedVideoInfo.title}
+                    {!selectedVideoInfo.hasCustomTitle && '.mp4'}
                   </p>
                   <p className="text-xs text-gray-500">En lecture</p>
                 </div>
