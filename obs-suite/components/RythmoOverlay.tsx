@@ -3,6 +3,28 @@
 import { useEffect, useRef, RefObject } from 'react';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
 
+/**
+ * Truncate text to fit within a given pixel width, appending ellipsis if needed.
+ * Returns null if even a single character with ellipsis exceeds the available width.
+ */
+function truncateTextToFit(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  availableWidth: number
+): string | null {
+  if (ctx.measureText(text).width <= availableWidth) {
+    return text;
+  }
+
+  let truncated = text;
+  while (truncated.length > 1 && ctx.measureText(truncated + '\u2026').width > availableWidth) {
+    truncated = truncated.slice(0, -1);
+  }
+
+  const result = truncated.length < text.length ? truncated + '\u2026' : truncated;
+  return ctx.measureText(result).width <= availableWidth ? result : null;
+}
+
 interface RythmoOverlayProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   visualizationData: CharacterVisualizationData;
@@ -144,23 +166,9 @@ export default function RythmoOverlay({
           ctx.textAlign = 'left';
 
           const padding = 8;
-          const availableWidth = width - padding * 2;
-          let displayText = segment.trackName;
+          const displayText = truncateTextToFit(ctx, segment.trackName, width - padding * 2);
 
-          // Truncate text if needed
-          let textWidth = ctx.measureText(displayText).width;
-          if (textWidth > availableWidth) {
-            while (displayText.length > 1 && textWidth > availableWidth) {
-              displayText = displayText.slice(0, -1);
-              textWidth = ctx.measureText(displayText + '…').width;
-            }
-            if (displayText.length < segment.trackName.length) {
-              displayText += '…';
-            }
-          }
-
-          // Draw if text fits
-          if (ctx.measureText(displayText).width <= availableWidth) {
+          if (displayText) {
             const textX = xStart + padding;
             const textY = y + laneHeight / 2;
 
@@ -182,6 +190,45 @@ export default function RythmoOverlay({
       ctx.moveTo(playheadX, 0);
       ctx.lineTo(playheadX, totalHeight);
       ctx.stroke();
+
+      // Draw remaining time timer
+      const videoDuration = video.duration;
+      if (videoDuration && !isNaN(videoDuration) && videoDuration > 0) {
+        const remainingSec = prerollStartTime !== null
+          ? videoDuration
+          : videoDuration - video.currentTime;
+
+        let timerText: string;
+        if (remainingSec >= 60) {
+          const minutes = Math.floor(remainingSec / 60);
+          const seconds = Math.floor(remainingSec % 60);
+          timerText = `-${minutes}:${String(seconds).padStart(2, '0')}`;
+        } else {
+          timerText = `-${Math.floor(remainingSec)}s`;
+        }
+
+        const timerFontSize = Math.round(laneHeight * 0.5);
+        ctx.font = `bold ${timerFontSize}px sans-serif`;
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'right';
+
+        const timerPadX = 6;
+        const timerPadY = 3;
+        const timerX = canvas.width - 12;
+        const timerY = totalHeight / 2;
+        const timerWidth = ctx.measureText(timerText).width;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(
+          timerX - timerWidth - timerPadX,
+          timerY - timerFontSize / 2 - timerPadY,
+          timerWidth + timerPadX * 2,
+          timerFontSize + timerPadY * 2
+        );
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fillText(timerText, timerX, timerY);
+      }
 
       animationFrameId = requestAnimationFrame(render);
     }

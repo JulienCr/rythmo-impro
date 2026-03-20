@@ -23,12 +23,18 @@ interface VideoPaths {
 }
 
 /**
+ * Extract the basename (filename without extension) from a URL or path
+ */
+function extractBasename(src: string): string {
+  const filename = src.split('/').pop() || '';
+  return filename.replace(/\.[^.]+$/, '');
+}
+
+/**
  * Derive tracks URL from video path by replacing the extension with .json
  */
 function deriveTracksUrl(videoPath: string): string {
-  const videoFilename = videoPath.split('/').pop() || '';
-  const basename = videoFilename.replace(/\.[^.]+$/, '');
-  return `/api/out/final-json/${basename}.json`;
+  return `/api/out/final-json/${extractBasename(videoPath)}.json`;
 }
 
 /**
@@ -61,9 +67,7 @@ function deriveVideoPaths(
  */
 function extractVideoName(src: string): string {
   if (!src) return 'Vidéo inconnue';
-  const filename = src.split('/').pop() || '';
-  const basename = filename.replace(/\.[^.]+$/, '');
-  return decodeURIComponent(basename) || 'Vidéo inconnue';
+  return decodeURIComponent(extractBasename(src)) || 'Vidéo inconnue';
 }
 
 function RythmoOverlayContent() {
@@ -173,9 +177,7 @@ function RythmoOverlayContent() {
     setVideoTitle(null);
 
     const loadData = async () => {
-      // Extract basename from video URL for metadata fetch
-      const videoFilename = videoSrc.split('/').pop() || '';
-      const basename = videoFilename.replace(/\.[^.]+$/, '');
+      const basename = extractBasename(videoSrc);
 
       // Fetch tracks and metadata in parallel
       const tracksPromise = loadTracksFromUrl(tracksUrl);
