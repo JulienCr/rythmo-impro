@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import type { VideoMetadata } from './VideoGrid';
 
 interface VideoFiltersProps {
@@ -19,14 +20,14 @@ export function VideoFilters({
   onSearchQueryChange,
   filteredCount,
 }: VideoFiltersProps) {
-  // Get sorted distinct character counts from all videos
-  const availableCounts = [
-    ...new Set(
+  const availableCounts = useMemo(() =>
+    [...new Set(
       videos
         .map((v) => v.characterCount)
         .filter((c): c is number => c !== undefined)
-    ),
-  ].sort((a, b) => a - b);
+    )].sort((a, b) => a - b),
+    [videos]
+  );
 
   const toggleCount = (count: number) => {
     const next = new Set(characterCountFilter);

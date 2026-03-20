@@ -16,13 +16,19 @@ function truncateTextToFit(
     return text;
   }
 
-  let truncated = text;
-  while (truncated.length > 1 && ctx.measureText(truncated + '\u2026').width > availableWidth) {
-    truncated = truncated.slice(0, -1);
+  let lo = 0;
+  let hi = text.length - 1;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (ctx.measureText(text.slice(0, mid) + '\u2026').width <= availableWidth) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
   }
 
-  const result = truncated.length < text.length ? truncated + '\u2026' : truncated;
-  return ctx.measureText(result).width <= availableWidth ? result : null;
+  const result = lo > 0 ? text.slice(0, lo) + '\u2026' : null;
+  return result && ctx.measureText(result).width <= availableWidth ? result : null;
 }
 
 interface RythmoOverlayProps {
@@ -85,9 +91,10 @@ export default function RythmoOverlay({
 
   // Calculate preroll duration to ensure 3 seconds before first band
   const bufferMs = 3000; // Required buffer before first segment
-  const earliestSegmentTime = visualizationData.segments.length > 0
-    ? Math.min(...visualizationData.segments.map(s => s.t0))
-    : bufferMs;
+  const earliestSegmentTime = visualizationData.segments.reduce(
+    (min, s) => Math.min(min, s.t0),
+    bufferMs
+  );
   const prerollDurationMs = Math.max(0, bufferMs - earliestSegmentTime);
 
   // Reset preroll complete flag when preroll starts

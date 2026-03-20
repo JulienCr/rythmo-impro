@@ -32,6 +32,8 @@ function formatDuration(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+const THUMBNAIL_EXTENSIONS = ['jpg', 'png', 'webp'];
+
 export function VideoThumbnail({
   basename,
   characterCount,
@@ -41,9 +43,8 @@ export function VideoThumbnail({
   onTitleChange,
   selected = false,
 }: VideoThumbnailProps) {
-  const thumbnailExtensions = ['jpg', 'png', 'webp'];
   const [thumbExtIndex, setThumbExtIndex] = useState(0);
-  const thumbnailUrl = `/api/out/thumbs/${basename}.${thumbnailExtensions[thumbExtIndex]}`;
+  const thumbnailUrl = `/api/out/thumbs/${basename}.${THUMBNAIL_EXTENSIONS[thumbExtIndex]}`;
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -107,7 +108,7 @@ export function VideoThumbnail({
           className="h-full w-full object-cover transition-transform group-hover:scale-105"
           onError={(e) => {
             // Try next extension, hide if all exhausted
-            if (thumbExtIndex < thumbnailExtensions.length - 1) {
+            if (thumbExtIndex < THUMBNAIL_EXTENSIONS.length - 1) {
               setThumbExtIndex(thumbExtIndex + 1);
             } else {
               e.currentTarget.style.display = 'none';

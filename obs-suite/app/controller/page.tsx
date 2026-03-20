@@ -226,10 +226,7 @@ export default function ControllerPage() {
     }
   }, []);
 
-  /**
-   * Get display title for selected video
-   */
-  const selectedVideoInfo = (() => {
+  const selectedVideoInfo = useMemo(() => {
     if (!selectedVideo) return null;
     const video = videos.find((v) => v.basename === selectedVideo);
     const hasCustomTitle = !!video?.videoTitle;
@@ -237,7 +234,7 @@ export default function ControllerPage() {
       title: video?.videoTitle || selectedVideo,
       hasCustomTitle,
     };
-  })();
+  }, [selectedVideo, videos]);
 
   /**
    * Send play command

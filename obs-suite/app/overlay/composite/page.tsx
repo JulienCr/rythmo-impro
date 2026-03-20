@@ -21,6 +21,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
+import { extractBasename, deriveTracksUrl } from '@/lib/urlUtils';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import {
   isLoadVideoCommand,
@@ -123,13 +124,7 @@ function CompositeOverlayContent() {
   } else if (video1Param) {
     video1Src = video1Param;
     video2Src = video2Param || '';
-    if (tracksParam) {
-      tracksUrl = tracksParam;
-    } else {
-      const videoFilename = video1Param.split('/').pop() || '';
-      const basename = videoFilename.replace(/\.[^.]+$/, '');
-      tracksUrl = `/api/out/final-json/${basename}.json`;
-    }
+    tracksUrl = tracksParam || deriveTracksUrl(video1Param);
   } else {
     video1Src = '';
     video2Src = '';

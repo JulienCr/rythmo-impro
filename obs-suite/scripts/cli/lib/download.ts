@@ -2,7 +2,7 @@
  * Video download using yt-dlp
  */
 
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join, basename } from 'path';
 import { paths } from '../utils/paths.js';
@@ -34,14 +34,9 @@ export function downloadVideo(options: DownloadOptions): string {
   }
 
   const args = [
-    'yt-dlp',
-    // Merge into mp4
     '--merge-output-format', 'mp4',
-    // Output template
     '-o', outputTemplate,
-    // No overwrite unless forced
     ...(options.force ? [] : ['--no-overwrites']),
-    // URL
     options.url,
   ];
 
@@ -49,10 +44,13 @@ export function downloadVideo(options: DownloadOptions): string {
   console.log(colors.dim(`  Destination : ${paths.inDir}/\n`));
 
   try {
-    execSync(args.map(a => `"${a}"`).join(' '), {
+    const result = spawnSync('yt-dlp', args, {
       stdio: 'inherit',
       cwd: paths.inDir,
     });
+    if (result.status !== 0) {
+      throw new Error(`Exit code ${result.status}`);
+    }
   } catch {
     throw new Error(`Échec du téléchargement de : ${options.url}`);
   }
@@ -64,13 +62,13 @@ export function downloadVideo(options: DownloadOptions): string {
 
   // Use yt-dlp to get the filename it would produce
   try {
-    const result = execSync(
-      `yt-dlp --print filename --merge-output-format mp4 -o "${outputTemplate}" "${options.url}"`,
+    const result = spawnSync(
+      'yt-dlp',
+      ['--print', 'filename', '--merge-output-format', 'mp4', '-o', outputTemplate, options.url],
       { encoding: 'utf-8', cwd: paths.inDir }
-    ).trim();
-    return result;
+    );
+    return (result.stdout as string).trim();
   } catch {
-    // Fallback: can't determine filename, just return the dir
     return paths.inDir;
   }
 }

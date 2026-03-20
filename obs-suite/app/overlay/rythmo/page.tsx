@@ -7,6 +7,7 @@ import IntroPanel from '@/components/IntroPanel';
 import Countdown from '@/components/Countdown';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
+import { extractBasename, deriveTracksUrl } from '@/lib/urlUtils';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import {
   isLoadVideoCommand,
@@ -20,21 +21,6 @@ import {
 interface VideoPaths {
   videoSrc: string;
   tracksUrl: string;
-}
-
-/**
- * Extract the basename (filename without extension) from a URL or path
- */
-function extractBasename(src: string): string {
-  const filename = src.split('/').pop() || '';
-  return filename.replace(/\.[^.]+$/, '');
-}
-
-/**
- * Derive tracks URL from video path by replacing the extension with .json
- */
-function deriveTracksUrl(videoPath: string): string {
-  return `/api/out/final-json/${extractBasename(videoPath)}.json`;
 }
 
 /**

@@ -17,19 +17,18 @@ export default function Countdown({ onComplete }: CountdownProps) {
 
   useEffect(() => {
     let stepIndex = 0;
+    let pendingTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const advanceStep = () => {
       stepIndex++;
       if (stepIndex < STEPS.length) {
-        // Trigger re-animation by toggling
         setAnimating(false);
-        // Small delay to reset animation
-        setTimeout(() => {
+        pendingTimeout = setTimeout(() => {
+          pendingTimeout = null;
           setCurrentStep(STEPS[stepIndex]);
           setAnimating(true);
         }, 50);
       } else {
-        // Countdown complete
         setCurrentStep(null);
         onComplete();
       }
@@ -37,7 +36,10 @@ export default function Countdown({ onComplete }: CountdownProps) {
 
     const timer = setInterval(advanceStep, STEP_DURATION_MS);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      if (pendingTimeout) clearTimeout(pendingTimeout);
+    };
   }, [onComplete]);
 
   if (!currentStep) return null;
