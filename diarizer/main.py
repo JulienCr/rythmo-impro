@@ -367,7 +367,7 @@ class ModelManager:
         logger.info(f"Loading speaker diarization model...")
         self.diarize_model = DiarizationPipeline(
             model_name=diarization_model_name,
-            use_auth_token=self.hf_token,
+            token=self.hf_token,
             device=self.device
         )
         logger.info(f"   ✓ Diarization ready")
@@ -600,7 +600,7 @@ def run_diarization(
             logger.info(f"      (Loading pyannote models - this may take a minute)")
             diarize_model = DiarizationPipeline(
                 model_name=diarization_model_name,
-                use_auth_token=hf_token,
+                token=hf_token,
                 device=device
             )
         else:
@@ -1004,7 +1004,7 @@ def apply_vad_trimming(
     try:
         vad_pipeline = VoiceActivityDetectionPipeline(
             segmentation=seg_model,
-            use_auth_token=hf_token,
+            token=hf_token,
         )
         # Set hyper-parameters (no optimization, use directly)
         vad_pipeline.onset = onset

@@ -49,8 +49,8 @@ echo "📦 Upgrading pip..."
 pip install --upgrade pip
 
 # Install dependencies from requirements.txt
-# (includes PyTorch with CUDA 12.1 support)
-echo "📦 Installing Python dependencies (including PyTorch with CUDA 12.1)..."
+# (includes PyTorch with CUDA 12.8 support)
+echo "📦 Installing Python dependencies (including PyTorch with CUDA)..."
 pip install -r requirements.txt
 
 # Check for .env file
