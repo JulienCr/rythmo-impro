@@ -253,13 +253,20 @@ def assign_lanes(segments: List[Dict]) -> Tuple[Dict[str, int], List[Dict]]:
     return lane_map, speakers
 
 
+# Pre-extract config sections once at module level
+WHISPER_CFG = CONFIG.get("whisper", {})
+DIARIZATION_CFG = CONFIG.get("diarization", {})
+SEGMENTS_CFG = CONFIG.get("segments", {})
+VAD_CFG = CONFIG.get("vad", {})
+
 # Memory requirements for Whisper models (in GB) — from config.toml
-MODEL_MEMORY_REQUIREMENTS = CONFIG.get("whisper", {}).get("memory_gb", {
+MODEL_MEMORY_REQUIREMENTS = WHISPER_CFG.get("memory_gb", {
     'tiny': 1.0, 'base': 1.5, 'small': 2.5, 'medium': 5.0,
     'large': 10.0, 'large-v2': 10.0, 'large-v3': 10.0,
 })
-DIARIZATION_MEMORY_GB = CONFIG.get("diarization", {}).get("memory_gb", 2.0)
-ALIGNMENT_MEMORY_GB = CONFIG.get("diarization", {}).get("alignment_memory_gb", 1.0)
+DIARIZATION_MEMORY_GB = DIARIZATION_CFG.get("memory_gb", 2.0)
+ALIGNMENT_MEMORY_GB = DIARIZATION_CFG.get("alignment_memory_gb", 1.0)
+DIARIZATION_MODEL_NAME = DIARIZATION_CFG.get("model")
 
 
 class ModelManager:
@@ -342,7 +349,7 @@ class ModelManager:
         required_gb = MODEL_MEMORY_REQUIREMENTS.get(self.model_size, 10.0)
         self._check_available_memory(required_gb)
 
-        whisper_cfg = CONFIG.get("whisper", {})
+        whisper_cfg = WHISPER_CFG
         compute_type = (whisper_cfg.get("compute_type_gpu", "float16")
                         if self.device == "cuda"
                         else whisper_cfg.get("compute_type_cpu", "int8"))
@@ -363,7 +370,7 @@ class ModelManager:
         # Check memory before loading
         self._check_available_memory(DIARIZATION_MEMORY_GB)
 
-        diarization_model_name = CONFIG.get("diarization", {}).get("model")
+        diarization_model_name = DIARIZATION_MODEL_NAME
         logger.info(f"Loading speaker diarization model...")
         self.diarize_model = DiarizationPipeline(
             model_name=diarization_model_name,
@@ -528,7 +535,7 @@ def run_diarization(
 
     try:
         # Load Whisper model (or use pre-loaded)
-        whisper_cfg = CONFIG.get("whisper", {})
+        whisper_cfg = WHISPER_CFG
 
         if whisper_model is None:
             compute_type = (whisper_cfg.get("compute_type_gpu", "float16")
@@ -596,7 +603,7 @@ def run_diarization(
         # Diarize (use pre-loaded if available)
         logger.info(f"[5/6] Running speaker diarization...")
         if diarize_model is None:
-            diarization_model_name = CONFIG.get("diarization", {}).get("model")
+            diarization_model_name = DIARIZATION_MODEL_NAME
             logger.info(f"      (Loading pyannote models - this may take a minute)")
             diarize_model = DiarizationPipeline(
                 model_name=diarization_model_name,
@@ -677,10 +684,10 @@ def run_diarization(
 
 def extract_segments(
     diarization_result: Dict,
-    silence_threshold_sec: float = 0.3,
-    merge_gap_sec: float = 0.1,
-    min_duration_sec: float = 0.2,
-    min_word_confidence: float = 0.3
+    silence_threshold_sec: float = 0.5,
+    merge_gap_sec: float = 0.05,
+    min_duration_sec: float = 0.1,
+    min_word_confidence: float = 0.15
 ) -> List[Dict]:
     """
     Extract refined speaker segments using word-level timestamps.
@@ -995,8 +1002,7 @@ def apply_vad_trimming(
     """
     from pyannote.audio.pipelines import VoiceActivityDetection as VoiceActivityDetectionPipeline
 
-    vad_cfg = CONFIG.get("vad", {})
-    seg_model = vad_cfg.get("segmentation_model", "pyannote/segmentation-3.0")
+    seg_model = VAD_CFG.get("segmentation_model", "pyannote/segmentation-3.0")
     hf_token = os.environ.get('HF_TOKEN')
 
     logger.info(f"Loading pyannote VAD model ({seg_model})...")
@@ -1034,50 +1040,58 @@ def apply_vad_trimming(
 
         logger.info(f"Trimming {total_words} words against speech timeline...")
 
+        # Collect all words across segments and sort by start time so the
+        # running-pointer optimisation works even with overlapping speakers.
+        all_words = [w for seg in segments for w in seg.get('words', [])]
+        all_words.sort(key=lambda w: w['start'])
+
+        # Maintain a pointer into speech_timeline to avoid re-scanning
+        # regions that end before the current word (O(words + regions) total).
+        region_hint = 0
+        num_regions = len(speech_timeline)
+
         def find_last_speech_end(word_start: float, word_end: float) -> Optional[float]:
             """Find the end of the last speech region overlapping [word_start, word_end]."""
+            nonlocal region_hint
+            # Advance hint past regions that end before this word starts
+            while region_hint < num_regions and speech_timeline[region_hint][1] <= word_start:
+                region_hint += 1
             last_end = None
-            for s_start, s_end in speech_timeline:
+            for i in range(region_hint, num_regions):
+                s_start, s_end = speech_timeline[i]
                 if s_start >= word_end:
                     break  # Past the word, no more overlaps
                 if s_end > word_start:
-                    # This speech region overlaps the word span
                     last_end = min(s_end, word_end)
             return last_end
 
-        # Process each word
-        for segment in segments:
-            words = segment.get('words', [])
-            if not words:
+        for word in all_words:
+            word_duration = word['end'] - word['start']
+            if word_duration < 0.05:
+                continue  # Skip very short words
+
+            speech_end = find_last_speech_end(word['start'], word['end'])
+
+            if speech_end is None:
+                # Word falls entirely outside speech — leave unchanged
                 continue
 
-            for word in words:
-                word_duration = word['end'] - word['start']
-                if word_duration < 0.05:
-                    continue  # Skip very short words
+            original_end = word['end']
+            # Add a small buffer (17ms ≈ one pyannote frame)
+            new_end = min(speech_end + 0.017, original_end)
+            # Safety: ensure end > start + 30ms
+            new_end = max(word['start'] + 0.03, new_end)
 
-                speech_end = find_last_speech_end(word['start'], word['end'])
+            if original_end - new_end > 0.01:
+                trim_amount_ms = (original_end - new_end) * 1000
+                word['end'] = new_end
+                trimmed_count += 1
+                total_trim_ms += trim_amount_ms
 
-                if speech_end is None:
-                    # Word falls entirely outside speech — leave unchanged
-                    continue
-
-                original_end = word['end']
-                # Add a small buffer (17ms ≈ one pyannote frame)
-                new_end = min(speech_end + 0.017, original_end)
-                # Safety: ensure end > start + 30ms
-                new_end = max(word['start'] + 0.03, new_end)
-
-                if original_end - new_end > 0.01:
-                    trim_amount_ms = (original_end - new_end) * 1000
-                    word['end'] = new_end
-                    trimmed_count += 1
-                    total_trim_ms += trim_amount_ms
-
-                    logger.debug(
-                        f"Trimmed word '{word.get('word', '?')}' by {trim_amount_ms:.0f}ms "
-                        f"({original_end:.3f}s → {new_end:.3f}s)"
-                    )
+                logger.debug(
+                    f"Trimmed word '{word.get('word', '?')}' by {trim_amount_ms:.0f}ms "
+                    f"({original_end:.3f}s → {new_end:.3f}s)"
+                )
 
         # Update segment boundaries based on trimmed words
         for segment in segments:
@@ -1392,14 +1406,14 @@ def process_video(
     device: str,
     min_speakers: int = None,
     max_speakers: int = None,
-    silence_threshold_sec: float = 0.3,
-    merge_gap_sec: float = 0.1,
-    min_duration_sec: float = 0.2,
-    min_word_confidence: float = 0.3,
+    silence_threshold_sec: float = 0.5,
+    merge_gap_sec: float = 0.05,
+    min_duration_sec: float = 0.1,
+    min_word_confidence: float = 0.15,
     clustering_threshold: float = None,
     enable_vad_trimming: bool = False,
-    vad_onset: float = 0.5,
-    vad_offset: float = 0.5,
+    vad_onset: float = 0.4,
+    vad_offset: float = 0.35,
     vad_min_duration_on: float = 0.0,
     vad_min_duration_off: float = 0.0,
     model_manager: Optional['ModelManager'] = None
@@ -1688,28 +1702,28 @@ def main():
     args = parser.parse_args()
 
     # Resolve CLI args vs config.toml defaults (CLI takes precedence)
-    whisper_cfg = CONFIG.get("whisper", {})
-    segments_cfg = CONFIG.get("segments", {})
-    vad_cfg = CONFIG.get("vad", {})
+    whisper_cfg = WHISPER_CFG
+    segments_cfg = SEGMENTS_CFG
+    vad_cfg = VAD_CFG
 
     if args.model is None:
         args.model = whisper_cfg.get("model", "large-v3")
     if args.language is None:
         args.language = whisper_cfg.get("language", "auto")
     if args.silence_threshold is None:
-        args.silence_threshold = segments_cfg.get("silence_threshold", 0.3)
+        args.silence_threshold = segments_cfg.get("silence_threshold", 0.5)
     if args.merge_gap is None:
-        args.merge_gap = segments_cfg.get("merge_gap", 0.1)
+        args.merge_gap = segments_cfg.get("merge_gap", 0.05)
     if args.min_duration is None:
-        args.min_duration = segments_cfg.get("min_duration", 0.2)
+        args.min_duration = segments_cfg.get("min_duration", 0.1)
     if args.min_word_confidence is None:
-        args.min_word_confidence = segments_cfg.get("min_word_confidence", 0.3)
+        args.min_word_confidence = segments_cfg.get("min_word_confidence", 0.15)
     if args.enable_vad_trimming is None:
         args.enable_vad_trimming = vad_cfg.get("enabled", False)
     if args.vad_onset is None:
-        args.vad_onset = vad_cfg.get("onset", 0.5)
+        args.vad_onset = vad_cfg.get("onset", 0.4)
     if args.vad_offset is None:
-        args.vad_offset = vad_cfg.get("offset", 0.5)
+        args.vad_offset = vad_cfg.get("offset", 0.35)
     if args.vad_min_duration_on is None:
         args.vad_min_duration_on = vad_cfg.get("min_duration_on", 0.0)
     if args.vad_min_duration_off is None:

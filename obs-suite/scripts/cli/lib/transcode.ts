@@ -149,9 +149,13 @@ export async function ensureCompatible(filePath: string): Promise<string> {
     });
     console.log(colors.dim(`    100%`));
 
-    // Replace original with transcoded file
-    await unlink(filePath);
+    // Replace original with transcoded file.
+    // On Linux/macOS, rename atomically overwrites the target if it exists,
+    // so we rename first to avoid a window where neither file exists.
     await rename(tempPath, finalPath);
+    if (filePath !== finalPath) {
+      await unlink(filePath);
+    }
   } catch (err) {
     // Clean up temp file if it was created
     await unlink(tempPath).catch(() => {});

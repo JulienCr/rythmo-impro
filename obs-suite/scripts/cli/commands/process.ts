@@ -254,7 +254,18 @@ async function processVideos(
         }
       } catch (err) {
         console.error(colors.error(`  ✗ ${video.filename} — échec : ${err instanceof Error ? err.message : String(err)}`));
+        // Mark for removal so downstream steps don't process an incompatible file
+        videos[i] = null as any;
       }
+    }
+
+    // Remove videos that failed normalization
+    const failedCount = videos.filter(v => v === null).length;
+    for (let i = videos.length - 1; i >= 0; i--) {
+      if (videos[i] === null) videos.splice(i, 1);
+    }
+    if (failedCount > 0) {
+      console.error(colors.error(`  ${failedCount} vidéo(s) ignorée(s) suite à l'échec de normalisation`));
     }
 
     // Update videoFilenames after potential renames
