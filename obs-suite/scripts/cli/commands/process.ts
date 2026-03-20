@@ -218,12 +218,14 @@ async function processVideos(
 ): Promise<void> {
   const videoFilenames = videos.map(v => v.filename);
 
-  let generatedCount = 0;
-  let skippedCount = 0;
-  let thumbsGeneratedCount = 0;
-  let thumbsSkippedCount = 0;
-  let vocalsRemovedCount = 0;
-  let vocalsSkippedCount = 0;
+  const stats = {
+    xmlGenerated: 0,
+    xmlSkipped: 0,
+    thumbsGenerated: 0,
+    thumbsSkipped: 0,
+    vocalsRemoved: 0,
+    vocalsSkipped: 0,
+  };
 
   // Skip diarization, FCP XML, and thumbnails if --vocals-only is set
   if (!options.vocalsOnly) {
@@ -238,9 +240,9 @@ async function processVideos(
       const outputPaths = getOutputPaths(video.filename);
       const generated = generateXml(video.filename, outputPaths, options.force || false);
       if (generated) {
-        generatedCount++;
+        stats.xmlGenerated++;
       } else {
-        skippedCount++;
+        stats.xmlSkipped++;
       }
     }
 
@@ -251,9 +253,9 @@ async function processVideos(
       const outputPaths = getOutputPaths(video.filename);
       const generated = generateThumbnail(video.filename, outputPaths, options.force || false);
       if (generated) {
-        thumbsGeneratedCount++;
+        stats.thumbsGenerated++;
       } else {
-        thumbsSkippedCount++;
+        stats.thumbsSkipped++;
       }
     }
   } else {
@@ -268,9 +270,9 @@ async function processVideos(
       const outputPaths = getOutputPaths(video.filename);
       const generated = removeVocals(video.filename, outputPaths, options.force || false);
       if (generated) {
-        vocalsRemovedCount++;
+        stats.vocalsRemoved++;
       } else {
-        vocalsSkippedCount++;
+        stats.vocalsSkipped++;
       }
     }
   } else {
@@ -283,20 +285,20 @@ async function processVideos(
   console.log(`  Vidéos traitées : ${videos.length}`);
 
   if (!options.vocalsOnly) {
-    console.log(`  FCP XML générés : ${generatedCount}`);
-    if (skippedCount > 0) {
-      console.log(colors.dim(`  FCP XML ignorés : ${skippedCount}`));
+    console.log(`  FCP XML générés : ${stats.xmlGenerated}`);
+    if (stats.xmlSkipped > 0) {
+      console.log(colors.dim(`  FCP XML ignorés : ${stats.xmlSkipped}`));
     }
-    console.log(`  Miniatures générées : ${thumbsGeneratedCount}`);
-    if (thumbsSkippedCount > 0) {
-      console.log(colors.dim(`  Miniatures ignorées : ${thumbsSkippedCount}`));
+    console.log(`  Miniatures générées : ${stats.thumbsGenerated}`);
+    if (stats.thumbsSkipped > 0) {
+      console.log(colors.dim(`  Miniatures ignorées : ${stats.thumbsSkipped}`));
     }
   }
 
   if (!options.skipVocalRemoval) {
-    console.log(`  Voix supprimées : ${vocalsRemovedCount}`);
-    if (vocalsSkippedCount > 0) {
-      console.log(colors.dim(`  Suppressions ignorées : ${vocalsSkippedCount}`));
+    console.log(`  Voix supprimées : ${stats.vocalsRemoved}`);
+    if (stats.vocalsSkipped > 0) {
+      console.log(colors.dim(`  Suppressions ignorées : ${stats.vocalsSkipped}`));
     }
   }
 

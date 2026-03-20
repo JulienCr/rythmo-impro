@@ -14,6 +14,7 @@ import chalk from 'chalk';
 
 import { processCommand } from './commands/process.js';
 import { finalizeCommand } from './commands/finalize.js';
+import { downloadCommand } from './commands/download.js';
 import { statusCommand } from './commands/status.js';
 import { findXmlFiles } from './lib/xml.js';
 import { colors } from './utils/colors.js';
@@ -163,6 +164,40 @@ ${chalk.bold('INPUT/OUTPUT:')}
     }
   });
 
+// Download command
+program
+  .command('download')
+  .description(`Download videos using yt-dlp (YouTube, etc.)
+
+  Downloads a video from a URL and saves it to the input directory (in/).
+  Supports any source supported by yt-dlp (YouTube, Vimeo, etc.).`)
+  .argument('[url]', 'URL of the video to download')
+  .option('-o, --output <filename>', 'Custom output filename (e.g. my-video.mp4)')
+  .option('-f, --force', 'Overwrite existing files')
+  .addHelpText('after', `
+${chalk.bold('EXAMPLES:')}
+  ${chalk.dim('# Interactive mode')}
+  ${chalk.green('pnpm rythmo download')}
+
+  ${chalk.dim('# Download a YouTube video')}
+  ${chalk.green('pnpm rythmo download https://www.youtube.com/watch?v=...')}
+
+  ${chalk.dim('# Download with a custom filename')}
+  ${chalk.green('pnpm rythmo download https://... -o my-video.mp4')}
+
+${chalk.bold('SUPPORTED SOURCES:')}
+  YouTube, Vimeo, Dailymotion, and 1000+ sites supported by yt-dlp.
+  See: ${chalk.cyan('https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md')}
+`)
+  .action(async (url, options) => {
+    try {
+      await downloadCommand({ ...options, url });
+    } catch (err) {
+      console.error(colors.error(`\n Error: ${err instanceof Error ? err.message : String(err)}\n`));
+      process.exit(1);
+    }
+  });
+
 // Status command
 program
   .command('status')
@@ -244,6 +279,10 @@ async function interactiveWizard(): Promise<void> {
 
     const choices = [
       {
+        name: 'Télécharger une vidéo (YouTube, etc.)',
+        value: 'download' as const,
+      },
+      {
         name: 'Traiter des vidéos (étape 1)',
         value: 'process' as const,
       },
@@ -263,7 +302,7 @@ async function interactiveWizard(): Promise<void> {
       },
     ];
 
-    let action: 'process' | 'finalize' | 'status' | 'exit';
+    let action: 'download' | 'process' | 'finalize' | 'status' | 'exit';
 
     try {
       action = await selectWithEscape({
@@ -286,6 +325,17 @@ async function interactiveWizard(): Promise<void> {
     }
 
     switch (action) {
+      case 'download':
+        try {
+          await downloadCommand({});
+          await pressEnterToContinue();
+        } catch (err) {
+          if (isCancelError(err)) {
+            continue;
+          }
+          throw err;
+        }
+        break;
       case 'process':
         try {
           await processCommand({});

@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import { findXmlFiles, convertXmlToJson, type XmlFileStatus, type ConversionResult } from '../lib/xml.js';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
-import { checkboxWithEscape, confirmWithEscape, isCancelError } from '../utils/prompts.js';
+import { checkboxWithEscape, confirmWithEscape } from '../utils/prompts.js';
 
 interface FinalizeCommandOptions {
   force?: boolean;
@@ -55,20 +55,10 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
   const results: ConversionResult[] = [];
 
   for (const file of selectedFiles) {
-    const promptOverwrite = async () => {
-      try {
-        return await confirmWithEscape({
-          message: `${file.filename.replace('.xml', '.json')} existe déjà. Écraser ?`,
-          default: false,
-        });
-      } catch (err) {
-        if (isCancelError(err)) {
-          // Annulé par l'utilisateur (Escape ou Ctrl+C)
-          throw err; // Propagate to return to main menu
-        }
-        throw err;
-      }
-    };
+    const promptOverwrite = () => confirmWithEscape({
+      message: `${file.filename.replace('.xml', '.json')} existe déjà. Écraser ?`,
+      default: false,
+    });
 
     const result = await convertXmlToJson(
       file,
@@ -78,33 +68,35 @@ export async function finalizeCommand(options: FinalizeCommandOptions): Promise<
     results.push(result);
   }
 
+  // Tally results in a single pass
+  const counts = { converted: 0, skipped: 0, error: 0 };
+  const errors: ConversionResult[] = [];
+  for (const r of results) {
+    counts[r.status]++;
+    if (r.status === 'error') errors.push(r);
+  }
+
   // Afficher le résumé
   console.log(colors.success('\n✅ Finalisation terminée !\n'));
 
-  const convertedCount = results.filter(r => r.status === 'converted').length;
-  const skippedCount = results.filter(r => r.status === 'skipped').length;
-  const errorCount = results.filter(r => r.status === 'error').length;
-
   console.log(chalk.bold('Résumé :'));
   console.log(`  Total fichiers : ${selectedFiles.length}`);
-  console.log(colors.success(`  Convertis : ${convertedCount}`));
-  if (skippedCount > 0) {
-    console.log(colors.dim(`  Ignorés : ${skippedCount}`));
+  console.log(colors.success(`  Convertis : ${counts.converted}`));
+  if (counts.skipped > 0) {
+    console.log(colors.dim(`  Ignorés : ${counts.skipped}`));
   }
-  if (errorCount > 0) {
-    console.log(colors.error(`  Erreurs : ${errorCount}`));
+  if (counts.error > 0) {
+    console.log(colors.error(`  Erreurs : ${counts.error}`));
   }
   console.log();
 
   // Afficher les erreurs si présentes
-  if (errorCount > 0) {
+  if (errors.length > 0) {
     console.log(chalk.bold.red('Erreurs :\n'));
-    results
-      .filter(r => r.status === 'error')
-      .forEach(r => {
-        console.log(colors.error(`  ✗ ${r.xmlFile}`));
-        console.log(colors.dim(`    ${r.error}`));
-      });
+    for (const r of errors) {
+      console.log(colors.error(`  ✗ ${r.xmlFile}`));
+      console.log(colors.dim(`    ${r.error}`));
+    }
     console.log();
   }
 

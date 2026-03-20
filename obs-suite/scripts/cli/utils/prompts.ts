@@ -56,18 +56,21 @@ function createEscapeController(): { controller: AbortController; cleanup: () =>
 }
 
 /**
- * Wrapper for select prompt with Escape key support
+ * Run an @inquirer/prompts function with Escape key cancellation support.
+ * Wraps the prompt with an AbortController that fires on Escape,
+ * converting the abort into an EscapeCancelledError.
  */
-export async function selectWithEscape<T>(options: Parameters<typeof select<T>>[0]): Promise<T> {
+async function withEscape<T, O extends object>(
+  promptFn: (options: O & { signal?: AbortSignal }) => Promise<T>,
+  options: O,
+): Promise<T> {
   const { controller, cleanup } = createEscapeController();
 
   try {
-    const result = await select({
+    return await promptFn({
       ...options,
-      // @ts-expect-error - signal is supported but types may be outdated
       signal: controller.signal,
-    });
-    return result;
+    } as O & { signal: AbortSignal });
   } catch (err) {
     if (controller.signal.aborted) {
       throw new EscapeCancelledError();
@@ -76,73 +79,32 @@ export async function selectWithEscape<T>(options: Parameters<typeof select<T>>[
   } finally {
     cleanup();
   }
+}
+
+/**
+ * Wrapper for select prompt with Escape key support
+ */
+export async function selectWithEscape<T>(options: Parameters<typeof select<T>>[0]): Promise<T> {
+  return withEscape(select, options);
 }
 
 /**
  * Wrapper for input prompt with Escape key support
  */
 export async function inputWithEscape(options: Parameters<typeof input>[0]): Promise<string> {
-  const { controller, cleanup } = createEscapeController();
-
-  try {
-    const result = await input({
-      ...options,
-      // @ts-expect-error - signal is supported but types may be outdated
-      signal: controller.signal,
-    });
-    return result;
-  } catch (err) {
-    if (controller.signal.aborted) {
-      throw new EscapeCancelledError();
-    }
-    throw err;
-  } finally {
-    cleanup();
-  }
+  return withEscape(input, options);
 }
 
 /**
  * Wrapper for checkbox prompt with Escape key support
  */
 export async function checkboxWithEscape<T>(options: Parameters<typeof checkbox<T>>[0]): Promise<T[]> {
-  const { controller, cleanup } = createEscapeController();
-
-  try {
-    const result = await checkbox({
-      ...options,
-      // @ts-expect-error - signal is supported but types may be outdated
-      signal: controller.signal,
-    });
-    return result;
-  } catch (err) {
-    if (controller.signal.aborted) {
-      throw new EscapeCancelledError();
-    }
-    throw err;
-  } finally {
-    cleanup();
-  }
+  return withEscape(checkbox, options);
 }
 
 /**
  * Wrapper for confirm prompt with Escape key support
  */
 export async function confirmWithEscape(options: Parameters<typeof confirm>[0]): Promise<boolean> {
-  const { controller, cleanup } = createEscapeController();
-
-  try {
-    const result = await confirm({
-      ...options,
-      // @ts-expect-error - signal is supported but types may be outdated
-      signal: controller.signal,
-    });
-    return result;
-  } catch (err) {
-    if (controller.signal.aborted) {
-      throw new EscapeCancelledError();
-    }
-    throw err;
-  } finally {
-    cleanup();
-  }
+  return withEscape(confirm, options);
 }
