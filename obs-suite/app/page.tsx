@@ -15,7 +15,7 @@ export default function Home() {
             Contrôleur
           </Link>
           <Link
-            href="/overlay"
+            href="/overlay/rythmo"
             className="flex h-14 w-48 items-center justify-center rounded-lg bg-green-600 px-6 text-lg font-medium text-white transition-colors hover:bg-green-700"
           >
             Incrustation

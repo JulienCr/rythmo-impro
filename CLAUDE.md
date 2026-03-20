@@ -335,7 +335,7 @@ pnpm start
 
 - Uses `<canvas>` overlay on top of `<video>` element (absolute positioning)
 - Updates via `requestAnimationFrame` loop synced to `video.currentTime`
-- **Rolling window**: Default ±3s around current playback time
+- **Rolling window**: Default 6s window with playhead at 20% from left (1.2s before, 4.8s after)
 - Draws bars for segments intersecting the window
 - Each speaker always appears in their assigned lane (simultaneous speech = multiple bars)
 - Canvas must resize to match video dimensions (`videoWidth`/`videoHeight`)
@@ -343,9 +343,9 @@ pnpm start
 ### Visualization Parameters
 
 Default values (configurable via props):
-- `windowMs`: 6000 (±3 seconds)
-- `laneHeight`: 20 pixels
-- `laneGap`: 8 pixels
+- `windowMs`: 6000 (playhead at 20%, showing 1.2s before and 4.8s after)
+- `laneHeight`: 32 pixels
+- `laneGap`: 1 pixel
 
 ### OBS Integration
 

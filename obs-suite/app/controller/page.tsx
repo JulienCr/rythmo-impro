@@ -6,16 +6,17 @@
  * Main interface for browsing videos and remotely controlling playback
  *
  * Features:
- * - Video grid with thumbnails
+ * - Video grid with thumbnails (editable titles)
  * - Video selection
  * - Remote controls (play/pause/seek)
  * - Character info display
  * - WebSocket communication with display clients
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { VideoGrid } from '../../components/VideoGrid';
 import type { VideoMetadata } from '../../components/VideoGrid';
+import { VideoFilters } from '../../components/VideoFilters';
 import { RemoteControls } from '../../components/RemoteControls';
 import { CharacterInfo } from '../../components/CharacterInfo';
 import { useWebSocket } from '../../hooks/useWebSocket';
@@ -34,9 +35,11 @@ export default function ControllerPage() {
   const [videos, setVideos] = useState<VideoMetadata[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [videoState, setVideoState] = useState<VideoState | null>(null);
-  const [characterTracks, setCharacterTracks] = useState<CharacterTracksData | null>(null);
+  const tracksCache = useRef<Map<string, CharacterTracksData>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [characterCountFilter, setCharacterCountFilter] = useState<Set<number>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
 
   // WebSocket connection
   const { connected, send } = useWebSocket({
@@ -114,17 +117,22 @@ export default function ControllerPage() {
   };
 
   /**
-   * Fetch metadata for a video (character count, duration)
+   * Fetch metadata for a video (character count, duration, custom title)
    */
   const fetchVideoMetadata = async (basename: string): Promise<VideoMetadata> => {
     try {
-      const res = await fetch(`/api/out/final-json/${basename}.json`);
-      if (!res.ok) {
+      // Fetch tracks JSON and meta JSON in parallel
+      const [tracksRes, metaRes] = await Promise.all([
+        fetch(`/api/out/final-json/${basename}.json`),
+        fetch(`/api/out/final-json/${basename}/meta`).catch(() => null),
+      ]);
+
+      if (!tracksRes.ok) {
         // No tracks data available
         return { basename };
       }
 
-      const tracks: CharacterTracksData = await res.json();
+      const tracks: CharacterTracksData = await tracksRes.json();
 
       // Calculate duration (max end time across all segments)
       const duration = Math.max(
@@ -132,10 +140,22 @@ export default function ControllerPage() {
         0
       );
 
+      // Get custom title from meta if available
+      let videoTitle: string | undefined;
+      if (metaRes?.ok) {
+        const meta = await metaRes.json();
+        videoTitle = meta.videoTitle || undefined;
+      }
+
+      // Cache the full tracks data for later use
+      tracksCache.current.set(basename, tracks);
+
       return {
         basename,
         characterCount: tracks.tracks.length,
+        characterNames: tracks.tracks.map((t) => t.name),
         duration,
+        videoTitle,
       };
     } catch (err) {
       console.error(`Error fetching metadata for ${basename}:`, err);
@@ -149,9 +169,6 @@ export default function ControllerPage() {
   const handleVideoSelect = useCallback(
     (basename: string) => {
       setSelectedVideo(basename);
-
-      // Load character tracks
-      loadCharacterTracks(basename);
 
       // Send load_video command via WebSocket
       const loadCommand: Omit<LoadVideoCommand, 'timestamp'> = {
@@ -167,42 +184,54 @@ export default function ControllerPage() {
   );
 
   /**
-   * Load character tracks for selected video
+   * Handle title change from thumbnail
    */
-  const loadCharacterTracks = async (basename: string) => {
+  const handleTitleChange = useCallback(async (basename: string, newTitle: string) => {
     try {
-      const res = await fetch(`/api/out/final-json/${basename}.json`);
+      const res = await fetch(`/api/out/final-json/${basename}/meta`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoTitle: newTitle }),
+      });
+
       if (!res.ok) {
-        setCharacterTracks(null);
-        return;
+        throw new Error('Failed to save title');
       }
 
-      const tracks: CharacterTracksData = await res.json();
-      setCharacterTracks(tracks);
+      // Update videos array
+      setVideos((prev) =>
+        prev.map((v) => (v.basename === basename ? { ...v, videoTitle: newTitle } : v))
+      );
     } catch (err) {
-      console.error(`Error loading tracks for ${basename}:`, err);
-      setCharacterTracks(null);
+      console.error(`Error saving title for ${basename}:`, err);
     }
-  };
+  }, []);
+
+  // Derive character tracks from cached data (no re-fetch needed)
+  const characterTracks = selectedVideo ? tracksCache.current.get(selectedVideo) ?? null : null;
+
+  const selectedVideoInfo = useMemo(() => {
+    if (!selectedVideo) return null;
+    const video = videos.find((v) => v.basename === selectedVideo);
+    const hasCustomTitle = !!video?.videoTitle;
+    return {
+      title: video?.videoTitle || selectedVideo,
+      hasCustomTitle,
+    };
+  }, [selectedVideo, videos]);
 
   /**
    * Send play command
    */
   const handlePlay = useCallback(() => {
-    const playCommand: Omit<PlayCommand, 'timestamp'> = {
-      type: 'play',
-    };
-    send(playCommand);
+    send({ type: 'play' } as Omit<PlayCommand, 'timestamp'>);
   }, [send]);
 
   /**
    * Send pause command
    */
   const handlePause = useCallback(() => {
-    const pauseCommand: Omit<PauseCommand, 'timestamp'> = {
-      type: 'pause',
-    };
-    send(pauseCommand);
+    send({ type: 'pause' } as Omit<PauseCommand, 'timestamp'>);
   }, [send]);
 
   /**
@@ -210,11 +239,7 @@ export default function ControllerPage() {
    */
   const handleSeek = useCallback(
     (time: number) => {
-      const seekCommand: Omit<SeekCommand, 'timestamp'> = {
-        type: 'seek',
-        time,
-      };
-      send(seekCommand);
+      send({ type: 'seek', time } as Omit<SeekCommand, 'timestamp'>);
     },
     [send]
   );
@@ -224,6 +249,9 @@ export default function ControllerPage() {
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle shortcuts when typing in an input
+      if (document.activeElement?.tagName === 'INPUT') return;
+
       // Space bar: toggle play/pause
       if (e.code === 'Space' || e.key === ' ') {
         // Prevent scrolling
@@ -241,6 +269,21 @@ export default function ControllerPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [videoState?.playing, handlePlay, handlePause]);
+
+  const filteredVideos = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return videos.filter((v) => {
+      if (characterCountFilter.size > 0 && v.characterCount !== undefined) {
+        if (!characterCountFilter.has(v.characterCount)) return false;
+      }
+      if (q) {
+        const titleMatch = (v.videoTitle || v.basename).toLowerCase().includes(q);
+        const nameMatch = v.characterNames?.some((n) => n.toLowerCase().includes(q)) ?? false;
+        if (!titleMatch && !nameMatch) return false;
+      }
+      return true;
+    });
+  }, [videos, characterCountFilter, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gray-950 pb-32">
@@ -271,6 +314,19 @@ export default function ControllerPage() {
         <div>
           <h2 className="mb-4 text-xl font-semibold text-white">Bibliothèque vidéo</h2>
 
+          {!loading && !error && videos.length > 0 && (
+            <div className="mb-4">
+              <VideoFilters
+                videos={videos}
+                characterCountFilter={characterCountFilter}
+                searchQuery={searchQuery}
+                onCharacterCountFilterChange={setCharacterCountFilter}
+                onSearchQueryChange={setSearchQuery}
+                filteredCount={filteredVideos.length}
+              />
+            </div>
+          )}
+
           {loading && (
             <div className="flex h-64 items-center justify-center rounded-lg border border-gray-700 bg-gray-900">
               <p className="text-gray-400">Chargement des vidéos...</p>
@@ -285,9 +341,10 @@ export default function ControllerPage() {
 
           {!loading && !error && (
             <VideoGrid
-              videos={videos}
+              videos={filteredVideos}
               selectedVideo={selectedVideo || undefined}
               onVideoSelect={handleVideoSelect}
+              onTitleChange={handleTitleChange}
             />
           )}
         </div>
@@ -316,10 +373,11 @@ export default function ControllerPage() {
           <div className="flex items-center gap-4">
             {/* Currently Playing Info */}
             <div className="flex-shrink-0" style={{ width: '250px' }}>
-              {selectedVideo ? (
+              {selectedVideoInfo ? (
                 <div>
                   <p className="truncate text-sm font-medium text-gray-200">
-                    {selectedVideo}.mp4
+                    {selectedVideoInfo.title}
+                    {!selectedVideoInfo.hasCustomTitle && '.mp4'}
                   </p>
                   <p className="text-xs text-gray-500">En lecture</p>
                 </div>

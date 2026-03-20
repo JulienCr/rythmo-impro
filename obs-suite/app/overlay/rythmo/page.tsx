@@ -2,10 +2,12 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
-import FcpxmlOverlay from '@/components/FcpxmlOverlay';
+import RythmoOverlay from '@/components/RythmoOverlay';
 import IntroPanel from '@/components/IntroPanel';
+import Countdown from '@/components/Countdown';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
+import { extractBasename, deriveTracksUrl } from '@/lib/urlUtils';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import {
   isLoadVideoCommand,
@@ -16,7 +18,45 @@ import {
   type StateUpdate,
 } from '@/lib/websocket/types';
 
-function FcpxmlOverlayContent() {
+interface VideoPaths {
+  videoSrc: string;
+  tracksUrl: string;
+}
+
+/**
+ * Derive video and tracks paths from WebSocket state or query parameters.
+ * WebSocket state takes priority over query parameters.
+ */
+function deriveVideoPaths(
+  wsVideoSrc: string,
+  wsTracksUrl: string,
+  videoParam: string | null,
+  tracksParam: string | null
+): VideoPaths {
+  // WebSocket command has set the video
+  if (wsVideoSrc && wsTracksUrl) {
+    return { videoSrc: wsVideoSrc, tracksUrl: wsTracksUrl };
+  }
+
+  // Fall back to query parameters
+  if (videoParam) {
+    const tracksUrl = tracksParam || deriveTracksUrl(videoParam);
+    return { videoSrc: videoParam, tracksUrl };
+  }
+
+  // No video loaded
+  return { videoSrc: '', tracksUrl: '' };
+}
+
+/**
+ * Extract video name from URL for display
+ */
+function extractVideoName(src: string): string {
+  if (!src) return 'Vidéo inconnue';
+  return decodeURIComponent(extractBasename(src)) || 'Vidéo inconnue';
+}
+
+function RythmoOverlayContent() {
   const searchParams = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -26,6 +66,9 @@ function FcpxmlOverlayContent() {
   const [wsVideoSrc, setWsVideoSrc] = useState<string>('');
   const [wsTracksUrl, setWsTracksUrl] = useState<string>('');
   const [showIntro, setShowIntro] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [prerollStartTime, setPrerollStartTime] = useState<number | null>(null);
+  const [videoTitle, setVideoTitle] = useState<string | null>(null);
   const lastStateUpdateRef = useRef<number>(0);
   const clientIdRef = useRef<string>(generateClientId());
 
@@ -45,9 +88,13 @@ function FcpxmlOverlayContent() {
         console.log('[WS] Play command');
         // Hide intro panel when play command is received
         setShowIntro(false);
-        videoRef.current?.play().catch(err => {
-          console.warn('[WS] Play failed:', err);
-        });
+
+        // Reset video to start and show countdown
+        if (videoRef.current) {
+          videoRef.current.currentTime = 0;
+          videoRef.current.pause();
+        }
+        setShowCountdown(true);
       }
 
       // Handle pause command
@@ -92,35 +139,16 @@ function FcpxmlOverlayContent() {
     lastStateUpdateRef.current = now;
   }, [connected, send]);
 
-  // Get query parameters
+  // Derive video/tracks paths: WebSocket state takes priority over query parameters
   const videoParam = searchParams.get('video');
   const tracksParam = searchParams.get('tracks');
 
-  // Derive paths: WebSocket state takes priority over query parameters
-  let videoSrc: string;
-  let tracksUrl: string;
-
-  if (wsVideoSrc && wsTracksUrl) {
-    // WebSocket command has set the video
-    videoSrc = wsVideoSrc;
-    tracksUrl = wsTracksUrl;
-  } else if (videoParam) {
-    // Fall back to query parameters
-    videoSrc = videoParam;
-    // If tracks param provided, use it; otherwise derive from video basename
-    if (tracksParam) {
-      tracksUrl = tracksParam;
-    } else {
-      // Extract basename from video path
-      const videoFilename = videoParam.split('/').pop() || '';
-      const basename = videoFilename.replace(/\.[^.]+$/, ''); // Remove extension
-      tracksUrl = `/api/out/final-json/${basename}.json`;
-    }
-  } else {
-    // No video loaded - show nothing (transparent)
-    videoSrc = '';
-    tracksUrl = '';
-  }
+  const { videoSrc, tracksUrl } = deriveVideoPaths(
+    wsVideoSrc,
+    wsTracksUrl,
+    videoParam,
+    tracksParam
+  );
 
   // Load tracks on mount or URL change
   useEffect(() => {
@@ -132,11 +160,24 @@ function FcpxmlOverlayContent() {
 
     setLoading(true);
     setError(null);
+    setVideoTitle(null);
 
     const loadData = async () => {
+      const basename = extractBasename(videoSrc);
+
+      // Fetch tracks and metadata in parallel
+      const tracksPromise = loadTracksFromUrl(tracksUrl);
+      const metaPromise = fetch(`/api/out/final-json/${basename}/meta`)
+        .then(res => res.ok ? res.json() : null)
+        .catch(() => null);
+
       try {
-        const vizData = await loadTracksFromUrl(tracksUrl);
+        const [vizData, metaData] = await Promise.all([tracksPromise, metaPromise]);
         setVisualizationData(vizData);
+        // Set custom video title if present in metadata
+        if (metaData?.videoTitle) {
+          setVideoTitle(metaData.videoTitle);
+        }
         setLoading(false);
         // Show intro panel when data is loaded
         setShowIntro(true);
@@ -181,51 +222,72 @@ function FcpxmlOverlayContent() {
     };
   }, [sendStateUpdate, connected]);
 
-  // Extract video name from URL
-  const videoName = videoSrc
-    ? decodeURIComponent(videoSrc.split('/').pop()?.replace(/\.[^.]+$/, '') || 'Vidéo inconnue')
-    : 'Vidéo inconnue';
+  const videoName = extractVideoName(videoSrc);
+
+  // Handle countdown completion - start preroll
+  const handleCountdownComplete = useCallback(() => {
+    setShowCountdown(false);
+    // Start preroll (rythmo band scrolls before video starts)
+    setPrerollStartTime(Date.now());
+  }, []);
+
+  // Handle preroll completion - start video playback
+  const handlePrerollComplete = useCallback(() => {
+    setPrerollStartTime(null);
+    videoRef.current?.play().catch(err => {
+      console.warn('[Preroll] Play failed:', err);
+    });
+  }, []);
 
   return (
-    <div className="relative w-full h-screen bg-transparent flex flex-col overflow-hidden">
-      {/* Always render video, hide if no source */}
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        className={videoSrc ? "w-full h-auto" : "hidden"}
-        playsInline
-      />
-
-      {/* Overlay - only shown when video is loaded */}
-      {videoSrc && visualizationData && !loading && !error && (
-        <FcpxmlOverlay
-          videoRef={videoRef}
-          visualizationData={visualizationData}
-          windowMs={6000}
-          laneHeight={32}
-          laneGap={1}
+    <div className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
+      {/* 16:9 aspect ratio container */}
+      <div className="relative w-full" style={{ aspectRatio: '16/9', maxHeight: '100vh' }}>
+        {/* Video fills the 16:9 container */}
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          className={videoSrc ? "absolute inset-0 w-full h-full object-contain" : "hidden"}
+          playsInline
         />
-      )}
 
-      {/* Intro panel - shown initially when data is loaded, hidden on play */}
-      {showIntro && visualizationData && (
-        <IntroPanel
-          visualizationData={visualizationData}
-          videoName={videoName}
-        />
-      )}
+        {/* Overlay - positioned at bottom, overlaying the video */}
+        {videoSrc && visualizationData && !loading && !error && (
+          <div className="absolute bottom-0 left-0 right-0 z-10">
+            <RythmoOverlay
+              videoRef={videoRef}
+              visualizationData={visualizationData}
+              prerollStartTime={prerollStartTime}
+              onPrerollComplete={handlePrerollComplete}
+            />
+          </div>
+        )}
+
+        {/* Intro panel - shown initially when data is loaded, hidden on play */}
+        {showIntro && visualizationData && (
+          <IntroPanel
+            visualizationData={visualizationData}
+            videoName={videoTitle || videoName}
+          />
+        )}
+
+        {/* Countdown before video playback */}
+        {showCountdown && (
+          <Countdown onComplete={handleCountdownComplete} />
+        )}
+      </div>
     </div>
   );
 }
 
-export default function FcpxmlOverlayPage() {
+export default function RythmoOverlayPage() {
   return (
     <Suspense fallback={
       <div className="w-screen h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl">Chargement...</div>
       </div>
     }>
-      <FcpxmlOverlayContent />
+      <RythmoOverlayContent />
     </Suspense>
   );
 }

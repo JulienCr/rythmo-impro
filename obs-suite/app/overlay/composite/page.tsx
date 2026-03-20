@@ -21,6 +21,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
 import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
+import { extractBasename, deriveTracksUrl } from '@/lib/urlUtils';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import {
   isLoadVideoCommand,
@@ -31,7 +32,7 @@ import {
   type StateUpdate,
 } from '@/lib/websocket/types';
 import { CharacterInfo } from '@/components/CharacterInfo';
-import FcpxmlOverlay from '@/components/FcpxmlOverlay';
+import RythmoOverlay from '@/components/RythmoOverlay';
 
 function CompositeOverlayContent() {
   const searchParams = useSearchParams();
@@ -123,13 +124,7 @@ function CompositeOverlayContent() {
   } else if (video1Param) {
     video1Src = video1Param;
     video2Src = video2Param || '';
-    if (tracksParam) {
-      tracksUrl = tracksParam;
-    } else {
-      const videoFilename = video1Param.split('/').pop() || '';
-      const basename = videoFilename.replace(/\.[^.]+$/, '');
-      tracksUrl = `/api/out/final-json/${basename}.json`;
-    }
+    tracksUrl = tracksParam || deriveTracksUrl(video1Param);
   } else {
     video1Src = '';
     video2Src = '';
@@ -272,12 +267,9 @@ function CompositeOverlayContent() {
           {/* Bottom Section: Bande Rythmo */}
           <div className="flex-1 relative bg-black overflow-hidden flex items-center justify-center">
             {visualizationData && !loading && !error && (
-              <FcpxmlOverlay
+              <RythmoOverlay
                 videoRef={video1Ref}
                 visualizationData={visualizationData}
-                windowMs={6000}
-                laneHeight={32}
-                laneGap={1}
               />
             )}
           </div>
