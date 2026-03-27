@@ -266,6 +266,7 @@ export function validateCliJsonData(data: unknown): data is CliJsonData {
 export interface VideoMeta {
   version: number;
   videoTitle?: string;
+  characterNames?: Record<string, string>;
 }
 
 /**
@@ -286,6 +287,18 @@ export function validateVideoMeta(data: unknown): data is VideoMeta {
   // videoTitle is optional but must be a string if present
   if (d.videoTitle !== undefined && typeof d.videoTitle !== 'string') {
     return false;
+  }
+
+  // characterNames is optional but must be a Record<string, string> if present
+  if (d.characterNames !== undefined) {
+    if (typeof d.characterNames !== 'object' || d.characterNames === null || Array.isArray(d.characterNames)) {
+      return false;
+    }
+    for (const [key, value] of Object.entries(d.characterNames)) {
+      if (typeof key !== 'string' || typeof value !== 'string') {
+        return false;
+      }
+    }
   }
 
   return true;

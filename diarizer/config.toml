@@ -1,0 +1,188 @@
+# rythmo-impro diarization pipeline configuration
+# CLI arguments override these values when specified.
+#
+# Tuning philosophy: preserve the natural flow of speech. Short pauses,
+# hesitations, turn-taking gaps, overlaps, and brief silences all carry
+# prosodic information that reflects rhythm, pacing, and dramatic intent.
+# Temporal fidelity and conversational structure take priority over
+# simplified or overly merged speech regions.
+
+[whisper]
+# Whisper model size for transcription.
+#   Smaller (tiny/base/small) = faster, less accurate.
+#   Larger (large-v3)         = slower, best word-level precision.
+# We use large-v3 because word timestamp accuracy directly affects
+# how well the dubbing timeline matches the original performance.
+model = "large-v3"
+
+# Language hint for Whisper. "auto" lets Whisper detect the language.
+# Setting an explicit language (e.g. "fr") improves accuracy when known,
+# but we default to auto since our clips can be in any language.
+language = "auto"
+
+# Floating-point precision for inference.
+#   GPU: float16 = half-precision, fast and accurate enough for Whisper.
+#   CPU: int8    = quantized, much faster on CPU at minimal quality loss.
+compute_type_gpu = "float16"
+compute_type_cpu = "int8"
+
+# How many audio chunks Whisper processes in parallel.
+#   Higher = faster (more GPU memory). Lower = less memory.
+#   16 on GPU is the WhisperX default; 4 on CPU avoids memory pressure.
+batch_size_gpu = 16
+batch_size_cpu = 4
+
+# Estimated VRAM/RAM required per model size (GB).
+# Used by ModelManager to check available memory before loading.
+[whisper.memory_gb]
+tiny = 1.0
+base = 1.5
+small = 2.5
+medium = 5.0
+large = 10.0
+"large-v2" = 10.0
+"large-v3" = 10.0
+
+[diarization]
+# Pyannote speaker diarization pipeline model.
+# community-1 has better DER than 3.1 and supports exclusive speaker mode.
+model = "pyannote/speaker-diarization-community-1"
+
+# Estimated memory for the diarization pipeline (GB).
+memory_gb = 2.0
+
+# Estimated memory per alignment model, one loaded per detected language (GB).
+alignment_memory_gb = 1.0
+
+
+# ─── Segment quality tuning ───────────────────────────────────────────
+#
+# These parameters control how WhisperX word-level timestamps are grouped
+# into speaker segments. They run AFTER diarization and alignment.
+
+[segments]
+
+# silence_threshold (seconds) — Split a segment when the gap between two
+# consecutive words exceeds this duration.
+#   Lower (0.2–0.4) → splits on short pauses, producing many small segments.
+#   Higher (0.6–1.0) → tolerates longer pauses within a turn.
+# WHY 0.5: Balances two competing needs. Normal inter-word gaps (50–200ms)
+# and micro-hesitations (200–400ms) stay inside one segment, keeping the
+# natural speech flow grouped. But deliberate dramatic pauses (500ms+) —
+# the "beats" of the scene — create a visible break on the timeline that
+# actors can follow. Going higher (0.8) would absorb dramatic pauses into
+# one continuous bar, hiding the breathing of the scene.
+silence_threshold = 0.5
+
+# merge_gap (seconds) — Merge two adjacent segments from the SAME speaker
+# when the gap between them is shorter than this.
+#   Lower (0.0–0.05) → almost no merging, preserves every gap as-is.
+#   Higher (0.5–1.0)  → aggressively merges nearby same-speaker segments.
+# WHY 0.05: We only want to fix diarization artifacts (tiny spurious
+# speaker switches that create false 20–30ms gaps). Anything above 50ms
+# is likely a real conversational gap or turn-taking boundary that actors
+# should see. Merging too aggressively erases the breathing room between
+# lines from the same character.
+merge_gap = 0.05
+
+# min_duration (seconds) — Drop segments shorter than this.
+#   Lower (0.05–0.1) → keeps very brief sounds (gasps, "oui", laughs).
+#   Higher (0.3–0.5) → filters out short noise, losing brief interjections.
+# WHY 0.1: In improv dubbing, a 100ms gasp or a single-word reaction is
+# part of the performance rhythm. Dropping it leaves a hole in the timeline
+# that the actor won't know to fill. We accept some noise to never miss
+# a real interjection.
+min_duration = 0.1
+
+# min_word_confidence (0.0–1.0) — Drop words with Whisper confidence below
+# this threshold.
+#   Lower (0.1–0.2) → keeps uncertain words (mumbles, overlapping speech).
+#   Higher (0.3–0.5) → stricter, drops more words, cleaner transcript.
+# WHY 0.15: For dubbing, the TIMING matters more than the transcript text.
+# A word with 0.2 confidence still marks "someone was speaking here" in the
+# timeline. Dropping it creates a gap that misleads the actor into thinking
+# there was silence. We'd rather show a wrong word than no word.
+min_word_confidence = 0.15
+
+
+# ─── Voice Activity Detection (VAD) ───────────────────────────────────
+#
+# Optional post-processing step that trims word timestamps against a
+# high-resolution speech timeline from pyannote segmentation-3.0.
+# Removes trailing silence that Whisper sometimes adds to word endpoints.
+
+[vad]
+# Whether to run VAD trimming by default. Can be enabled per-run with
+# --enable-vad-trimming. Disabled by default because it adds processing
+# time and may not be needed for all workflows.
+enabled = false
+
+# Pyannote segmentation model for VAD. segmentation-3.0 provides:
+#   - ~17ms frame resolution (finer than a single video frame at 24fps)
+#   - Overlap-aware: detects when two speakers talk simultaneously
+#   - Powerset encoding: 7-class output (silence, 3 solo, 3 overlap pairs)
+segmentation_model = "pyannote/segmentation-3.0"
+
+# onset (0.0–1.0) — Probability threshold to START a speech region.
+#   Lower (0.3–0.4) → catches softer speech beginnings, breaths before words.
+#   Higher (0.5–0.7) → stricter, may miss quiet onsets.
+# WHY 0.4: Film audio often has soft speech starts (whispers, trailing
+# words from a previous shot). We want to catch those rather than clip
+# the beginning of a line, even at the cost of occasional false positives.
+onset = 0.4
+
+# offset (0.0–1.0) — Probability threshold to END a speech region.
+#   Lower (0.2–0.4) → holds detection longer into trailing sounds.
+#   Higher (0.5–0.7) → ends speech sooner, may clip final syllables.
+# WHY 0.35: Speech often fades out gradually (final breaths, dying
+# syllables, resonance). A lower offset lets the detection "hold on"
+# to these trailing sounds rather than cutting them off mid-word.
+# Set below onset to create hysteresis that prevents flickering at
+# speech boundaries.
+offset = 0.35
+
+# min_duration_on (seconds) — Remove speech regions shorter than this.
+#   0.0 → keep ALL detected speech, no matter how short.
+#   0.1+ → filters out very brief detections (potential false positives).
+# WHY 0.0: A 50ms gasp, click, or vocal reaction is meaningful for
+# dubbing rhythm. We never want the VAD to erase something real just
+# because it's short.
+min_duration_on = 0.0
+
+# min_duration_off (seconds) — Fill non-speech gaps shorter than this.
+#   0.0 → preserve ALL gaps, even 20ms silences between words.
+#   0.1+ → smooths over tiny gaps (merges nearby speech into one block).
+# WHY 0.0: Every gap is a visible pause the actors can follow. Filling
+# gaps destroys the micro-timing of conversational rhythm — exactly
+# the information our system exists to preserve.
+min_duration_off = 0.0
+
+
+# ─── Vocal removal ────────────────────────────────────────────────────
+#
+# audio-separator settings for creating instrumental versions of videos.
+# Used to remove the original dialogue track before live dubbing.
+
+[vocal_removal]
+# Model name (user-friendly). Mapped to filename via model_map below.
+model = "MDX23C-InstVoc HQ"
+
+# Peak normalization threshold for the separated audio (0.0–1.0).
+# 0.9 prevents clipping while keeping the output loud.
+normalization_threshold = 0.9
+
+# Intermediate format for the separated audio before remuxing.
+output_format = "wav"
+
+# Which stem to extract. "Instrumental" = everything except vocals.
+output_stem = "Instrumental"
+
+# FFmpeg settings for remuxing the instrumental audio with the video.
+# AAC at 192k is a good balance of quality and file size.
+audio_codec = "aac"
+audio_bitrate = "192k"
+
+# Map user-friendly model names to actual checkpoint filenames.
+[vocal_removal.model_map]
+"MDX23C-InstVoc HQ" = "MDX23C-8KFFT-InstVoc_HQ.ckpt"
+"MDX23C-InstVoc HQ 2" = "MDX23C-8KFFT-InstVoc_HQ_2.ckpt"

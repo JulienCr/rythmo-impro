@@ -58,7 +58,7 @@ export async function downloadCommand(options: DownloadCommandOptions): Promise<
 
   console.log();
 
-  const outputPath = downloadVideo({
+  const outputPath = await downloadVideo({
     url,
     filename,
     force: options.force,

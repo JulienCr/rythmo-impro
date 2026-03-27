@@ -5,11 +5,13 @@
 import chalk from 'chalk';
 import { existsSync } from 'fs';
 
+import { basename } from 'path';
 import { getAllVideoStatuses, getOutputPaths, type VideoStatus } from '../lib/videos.js';
 import { runDiarization, type DiarizationOptions } from '../lib/diarization.js';
 import { generateXml } from '../lib/xml.js';
 import { generateThumbnail } from '../lib/thumbnails.js';
 import { removeVocals } from '../lib/vocals.js';
+import { ensureCompatible } from '../lib/transcode.js';
 import { paths } from '../utils/paths.js';
 import { colors } from '../utils/colors.js';
 import {
@@ -24,6 +26,7 @@ interface ProcessCommandOptions {
   force?: boolean;
   all?: boolean;
   skipVocalRemoval?: boolean;
+  skipNormalize?: boolean;
   vocalsOnly?: boolean;
 }
 
@@ -216,9 +219,9 @@ async function processVideos(
   diarizationOpts: DiarizationOptions,
   options: ProcessCommandOptions
 ): Promise<void> {
-  const videoFilenames = videos.map(v => v.filename);
-
   const stats = {
+    normalized: 0,
+    alreadyCompatible: 0,
     xmlGenerated: 0,
     xmlSkipped: 0,
     thumbsGenerated: 0,
@@ -226,6 +229,53 @@ async function processVideos(
     vocalsRemoved: 0,
     vocalsSkipped: 0,
   };
+
+  // Étape 0 : Normalisation des codecs (H264/AAC/MP4)
+  if (!options.skipNormalize) {
+    console.log(chalk.bold('\n🔄 Étape 0 : Normalisation des vidéos (H264/AAC/MP4)\n'));
+
+    for (let i = 0; i < videos.length; i++) {
+      const video = videos[i];
+      try {
+        const finalPath = await ensureCompatible(video.fullPath);
+
+        if (finalPath !== video.fullPath) {
+          // File was transcoded (possibly with extension change)
+          stats.normalized++;
+          const newFilename = basename(finalPath);
+          // Update the video entry so the rest of the pipeline uses the new filename
+          videos[i] = {
+            ...video,
+            filename: newFilename,
+            fullPath: finalPath,
+          };
+        } else {
+          stats.alreadyCompatible++;
+        }
+      } catch (err) {
+        console.error(colors.error(`  ✗ ${video.filename} — échec : ${err instanceof Error ? err.message : String(err)}`));
+        // Mark for removal so downstream steps don't process an incompatible file
+        videos[i] = null as any;
+      }
+    }
+
+    // Remove videos that failed normalization
+    const failedCount = videos.filter(v => v === null).length;
+    for (let i = videos.length - 1; i >= 0; i--) {
+      if (videos[i] === null) videos.splice(i, 1);
+    }
+    if (failedCount > 0) {
+      console.error(colors.error(`  ${failedCount} vidéo(s) ignorée(s) suite à l'échec de normalisation`));
+    }
+
+    // Update videoFilenames after potential renames
+    console.log(colors.dim(`\n  Résultat : ${stats.normalized} transcodé(s), ${stats.alreadyCompatible} déjà compatible(s)\n`));
+  } else {
+    console.log(colors.dim('\n⏭ Normalisation ignorée (option --skip-normalize)\n'));
+  }
+
+  // Compute filenames after normalize (extensions may have changed)
+  const videoFilenames = videos.map(v => v.filename);
 
   // Skip diarization, FCP XML, and thumbnails if --vocals-only is set
   if (!options.vocalsOnly) {

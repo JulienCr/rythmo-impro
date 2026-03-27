@@ -145,6 +145,7 @@ echo ""
 echo -e "${BLUE}${BOLD}═══ ÉTAPE 2: MODÈLE WHISPER ═══${NC}"
 echo ""
 echo "Le modèle Whisper détermine la qualité de la transcription et de la diarisation."
+echo -e "${YELLOW}(Les valeurs par défaut proviennent de config.toml)${NC}"
 echo ""
 
 # Menu de sélection du modèle
@@ -222,6 +223,7 @@ echo ""
 echo -e "${BLUE}${BOLD}═══ ÉTAPE 5: RÉGLAGES AVANCÉS ═══${NC}"
 echo ""
 echo "Ces paramètres permettent d'affiner la qualité de la segmentation."
+echo -e "${YELLOW}(Les valeurs par défaut proviennent de config.toml)${NC}"
 echo ""
 
 if ask_yes_no "Voulez-vous configurer les paramètres avancés?" "n"; then

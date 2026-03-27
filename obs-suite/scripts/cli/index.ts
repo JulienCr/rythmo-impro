@@ -84,6 +84,7 @@ program
   .option('-f, --force', 'Force regenerate all files (ignore existing outputs)')
   .option('-a, --all', 'Process all videos without interactive selection')
   .option('--skip-vocal-removal', 'Skip the vocal removal step (faster)')
+  .option('--skip-normalize', 'Skip codec normalization step (Step 0)')
   .option('--vocals-only', 'Run ONLY vocal removal (skip steps 1-3)')
   .addHelpText('after', `
 ${chalk.bold('EXAMPLES:')}

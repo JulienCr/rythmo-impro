@@ -4,15 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**rythmo-impro** is a speaker diarization system that processes video files to identify who speaks when (without identity recognition). It consists of:
+**rythmo-impro** is a **live improvisational dubbing system** where actors invent new dialogue in real time while following the speaking patterns of a scene. The core product is a web-based dubbing reader ("bande rythmo") that displays precise speaker timelines synchronized with video playback.
 
-1. **Dockerized Python service** (`/diarizer/`) - Uses WhisperX + pyannote to perform speaker diarization and output word-level detailed JSON data
-2. **Next.js overlay application** (`/obs-suite/`) - *(Legacy)* Renders video with a fixed-lane "bande rythmo" visualization for OBS browser sources
+The system processes video files to produce highly precise speaker timelines for short films and animated clips, identifying exactly when each character is speaking while preserving short silences, pauses, and overlaps so the rhythm and prosody of the original performance remain visible. Because of the live dubbing use case, **temporal accuracy and fine-grained segmentation matter more than speed or heavy smoothing**. The system must detect brief inter-word gaps, preserve natural pauses, and make overlapping speech visible.
 
-The system takes video files as input and outputs detailed transcription with word-level timestamps, suitable for:
+It consists of:
+
+1. **Next.js dubbing reader** (`/obs-suite/`) - The main application. Renders video with a synchronized "bande rythmo" visualization (fixed-lane speaker timeline) for use in OBS browser sources during live dubbing sessions
+2. **Python diarization service** (`/diarizer/`) - Upstream pipeline that uses WhisperX + pyannote to perform speaker diarization and produce the word-level JSON data consumed by the dubbing reader
+
+The diarization output is also usable for:
 - CLI audio player playback with synchronized transcripts
-- Theatrical improvisation rehearsal analysis
-- Subtitle generation
+- Subtitle generation (SRT)
 - Speech analysis and debugging
 
 ## Architecture
@@ -22,7 +25,8 @@ The system takes video files as input and outputs detailed transcription with wo
 **Location**: `/diarizer/`
 
 - **Entry point**: `main.py` - CLI that accepts video input and outputs multiple JSON formats + SRT subtitles
-- **Technology**: WhisperX with pyannote.audio for speaker diarization
+- **Configuration**: `config.toml` - Single source of truth for all model names, tuning defaults, memory requirements, and compute settings. CLI arguments override config values when specified.
+- **Technology**: WhisperX with pyannote.audio (`pyannote/speaker-diarization-community-1`) for speaker diarization
 - **Authentication**: Requires `HF_TOKEN` environment variable (Hugging Face) for pyannote models
 - **Input/Output**: Mounted volumes at `/in` (video files) and `/out` (JSON + SRT output)
 
@@ -311,7 +315,7 @@ cd diarizer
 - Videos without audio tracks are copied as-is (no processing)
 - If GPU memory is insufficient, automatically falls back to CPU processing
 
-### Next.js Application *(Legacy - Not Currently Used)*
+### Next.js Dubbing Reader
 
 ```bash
 # Install dependencies
@@ -326,8 +330,6 @@ pnpm build
 # Run production build
 pnpm start
 ```
-
-**Note**: The overlay application is currently not actively used. The diarization service focuses on generating detailed word-level JSON formats for external tools like CLI audio players.
 
 ## Key Implementation Details
 
