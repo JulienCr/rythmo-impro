@@ -42,12 +42,17 @@ export async function loadTracksFromUrl(url: string): Promise<CharacterVisualiza
  * - Sorts by start time
  */
 export function transformToVisualizationData(
-  tracks: CharacterTracksData
+  tracks: CharacterTracksData,
+  characterNames?: Record<string, string>
 ): CharacterVisualizationData {
-  // Create track map (name → lane index)
+  // Resolve display names: use characterNames mapping if provided, fallback to original
+  const resolveDisplayName = (originalName: string): string =>
+    characterNames?.[originalName] || originalName;
+
+  // Create track map (display name → lane index)
   const trackMap: Record<string, number> = {};
   tracks.tracks.forEach((track, index) => {
-    trackMap[track.name] = index;
+    trackMap[resolveDisplayName(track.name)] = index;
   });
 
   // Flatten segments array
@@ -55,10 +60,11 @@ export function transformToVisualizationData(
 
   for (const [index, track] of tracks.tracks.entries()) {
     const lane = index;
+    const displayName = resolveDisplayName(track.name);
 
     for (const segment of track.segments) {
       segments.push({
-        trackName: track.name,
+        trackName: displayName,
         lane: lane,
         color: track.color,
         t0: Math.floor(segment.start * 1000),  // seconds → milliseconds
@@ -76,8 +82,14 @@ export function transformToVisualizationData(
     : 0;
   const durationSec = durationMs / 1000;
 
+  // Build tracks with display names applied
+  const displayTracks = tracks.tracks.map((track) => ({
+    ...track,
+    name: resolveDisplayName(track.name),
+  }));
+
   return {
-    tracks: tracks.tracks,
+    tracks: displayTracks,
     trackMap,
     segments,
     durationSec,
