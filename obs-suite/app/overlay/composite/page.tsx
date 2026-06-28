@@ -270,6 +270,7 @@ function CompositeOverlayContent() {
               <RythmoOverlay
                 videoRef={video1Ref}
                 visualizationData={visualizationData}
+                timerAnchor="overlay-top-right"
               />
             )}
           </div>

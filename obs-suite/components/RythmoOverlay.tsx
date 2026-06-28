@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, RefObject } from 'react';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
 
 /**
@@ -40,6 +40,10 @@ interface RythmoOverlayProps {
   laneGap?: number;       // Default: 1px (minimal gap)
   prerollStartTime?: number | null; // Timestamp (Date.now()) when preroll started
   onPrerollComplete?: () => void;   // Called when preroll finishes
+  // Where to anchor the big "remaining time" overlay:
+  // - 'above-band' (default): floats just above the band (band sits at frame bottom)
+  // - 'overlay-top-right': inside the band container's top-right (for clipped layouts)
+  timerAnchor?: 'above-band' | 'overlay-top-right';
 }
 
 export default function RythmoOverlay({
@@ -50,11 +54,17 @@ export default function RythmoOverlay({
   laneGap = 1,
   prerollStartTime = null,
   onPrerollComplete,
+  timerAnchor = 'above-band',
 }: RythmoOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const prerollCompleteCalledRef = useRef(false);
   const onPrerollCompleteRef = useRef(onPrerollComplete);
   onPrerollCompleteRef.current = onPrerollComplete;
+
+  // Big "remaining time" overlay — rendered as HTML (see return) so it stays
+  // readable from across the room, independent of the small lane band height.
+  const [timerText, setTimerText] = useState('');
+  const [timerUrgent, setTimerUrgent] = useState(false);
 
   // Calculate number of lanes needed
   const numLanes = visualizationData.tracks.length;
@@ -121,8 +131,6 @@ export default function RythmoOverlay({
     // Pre-compute fonts (constant during playback)
     const segmentFontSize = Math.round(laneHeight * 0.6);
     const segmentFont = `bold ${segmentFontSize}px sans-serif`;
-    const timerFontSize = Math.round(laneHeight * 0.5);
-    const timerFont = `bold ${timerFontSize}px sans-serif`;
 
     let animationFrameId: number;
 
@@ -204,42 +212,26 @@ export default function RythmoOverlay({
       ctx.lineTo(playheadX, totalHeight);
       ctx.stroke();
 
-      // Draw remaining time timer
+      // Compute the big "remaining time" value (drawn as HTML, see return)
       const videoDuration = video.duration;
       if (videoDuration && !isNaN(videoDuration) && videoDuration > 0) {
         const remainingSec = prerollStartTime !== null
           ? videoDuration
-          : videoDuration - video.currentTime;
+          : Math.max(0, videoDuration - video.currentTime);
 
-        let timerText: string;
+        let nextText: string;
         if (remainingSec >= 60) {
           const minutes = Math.floor(remainingSec / 60);
           const seconds = Math.floor(remainingSec % 60);
-          timerText = `-${minutes}:${String(seconds).padStart(2, '0')}`;
+          nextText = `-${minutes}:${String(seconds).padStart(2, '0')}`;
         } else {
-          timerText = `-${Math.floor(remainingSec)}s`;
+          nextText = `-${Math.floor(remainingSec)}s`;
         }
 
-        ctx.font = timerFont;
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'right';
-
-        const timerPadX = 6;
-        const timerPadY = 3;
-        const timerX = canvas.width - 12;
-        const timerY = totalHeight / 2;
-        const timerWidth = ctx.measureText(timerText).width;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-        ctx.fillRect(
-          timerX - timerWidth - timerPadX,
-          timerY - timerFontSize / 2 - timerPadY,
-          timerWidth + timerPadX * 2,
-          timerFontSize + timerPadY * 2
-        );
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.fillText(timerText, timerX, timerY);
+        // Last 10s (only during actual playback) → urgent red highlight
+        const nextUrgent = prerollStartTime === null && remainingSec <= 10;
+        setTimerText((prev) => (prev === nextText ? prev : nextText));
+        setTimerUrgent((prev) => (prev === nextUrgent ? prev : nextUrgent));
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -253,13 +245,45 @@ export default function RythmoOverlay({
   }, [videoRef, visualizationData, windowMs, laneHeight, laneGap, totalHeight, prerollStartTime, prerollDurationMs]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full"
-      style={{
-        imageRendering: 'crisp-edges',
-        pointerEvents: 'none',
-      }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        className="w-full"
+        style={{
+          imageRendering: 'crisp-edges',
+          pointerEvents: 'none',
+        }}
+      />
+      {timerText && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: '1.2vw',
+            // 'above-band' floats above the band; 'overlay-top-right' stays inside
+            // the container (for layouts that clip overflow).
+            ...(timerAnchor === 'overlay-top-right'
+              ? { top: '0.6vw' }
+              : { bottom: 'calc(100% + 0.6vw)' }),
+            padding: '0.18em 0.45em',
+            borderRadius: '0.16em',
+            fontSize: 'clamp(0.7rem, 2.2vw, 3rem)', // scales with the frame, readable in OBS
+            fontWeight: 800,
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+            fontFeatureSettings: '"tnum"',
+            letterSpacing: '0.02em',
+            color: '#FFFFFF',
+            background: timerUrgent ? 'rgba(255, 59, 48, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+            textShadow: '0 2px 10px rgba(0, 0, 0, 0.9)',
+            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5)',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {timerText}
+        </div>
+      )}
+    </>
   );
 }
