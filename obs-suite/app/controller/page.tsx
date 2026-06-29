@@ -36,6 +36,7 @@ export default function ControllerPage() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const tracksCache = useRef<Map<string, CharacterTracksData>>(new Map());
+  const [characterNamesMap, setCharacterNamesMap] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [characterCountFilter, setCharacterCountFilter] = useState<Set<number>>(new Set());
@@ -140,11 +141,14 @@ export default function ControllerPage() {
         0
       );
 
-      // Get custom title from meta if available
+      // Get custom title and character names from meta if available
       let videoTitle: string | undefined;
       if (metaRes?.ok) {
         const meta = await metaRes.json();
         videoTitle = meta.videoTitle || undefined;
+        if (meta.characterNames) {
+          setCharacterNamesMap((prev) => ({ ...prev, [basename]: meta.characterNames }));
+        }
       }
 
       // Cache the full tracks data for later use
@@ -206,6 +210,36 @@ export default function ControllerPage() {
       console.error(`Error saving title for ${basename}:`, err);
     }
   }, []);
+
+  /**
+   * Handle character name change
+   */
+  const handleCharacterNameChange = useCallback(async (speakerId: string, newName: string) => {
+    if (!selectedVideo) return;
+
+    const currentNames = characterNamesMap[selectedVideo] || {};
+    const updatedNames = { ...currentNames };
+
+    if (newName) {
+      updatedNames[speakerId] = newName;
+    } else {
+      delete updatedNames[speakerId];
+    }
+
+    try {
+      const res = await fetch(`/api/out/final-json/${selectedVideo}/meta`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ characterNames: updatedNames }),
+      });
+
+      if (!res.ok) throw new Error('Failed to save character name');
+
+      setCharacterNamesMap((prev) => ({ ...prev, [selectedVideo]: updatedNames }));
+    } catch (err) {
+      console.error(`Error saving character name for ${selectedVideo}:`, err);
+    }
+  }, [selectedVideo, characterNamesMap]);
 
   // Derive character tracks from cached data (no re-fetch needed)
   const characterTracks = selectedVideo ? tracksCache.current.get(selectedVideo) ?? null : null;
@@ -353,7 +387,11 @@ export default function ControllerPage() {
         {selectedVideo && characterTracks && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-white">Personnages</h2>
-            <CharacterInfo tracks={characterTracks} />
+            <CharacterInfo
+              tracks={characterTracks}
+              characterNames={selectedVideo ? characterNamesMap[selectedVideo] : undefined}
+              onNameChange={handleCharacterNameChange}
+            />
           </div>
         )}
 

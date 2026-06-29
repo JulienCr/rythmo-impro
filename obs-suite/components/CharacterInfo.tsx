@@ -4,16 +4,19 @@
  * CharacterInfo Component
  *
  * Displays character/speaker information from the loaded video:
- * - Character names
+ * - Character names (editable)
  * - Colors (visual swatches)
  * - Lane order
  * - Total speaking time
  */
 
+import { useState, useRef, useEffect } from 'react';
 import type { CharacterTracksData, CharacterTrack } from '../lib/fcpxmlTypes';
 
 export interface CharacterInfoProps {
   tracks: CharacterTracksData | CharacterTrack[] | null;
+  characterNames?: Record<string, string>;
+  onNameChange?: (speakerId: string, newName: string) => void;
 }
 
 /**
@@ -40,7 +43,80 @@ function getFirstAppearance(track: CharacterTrack): number {
   return Math.min(...track.segments.map((seg) => seg.start));
 }
 
-export function CharacterInfo({ tracks }: CharacterInfoProps) {
+function EditableName({
+  trackName,
+  displayName,
+  onNameChange,
+}: {
+  trackName: string;
+  displayName: string;
+  onNameChange?: (speakerId: string, newName: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(displayName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setValue(displayName);
+  }, [displayName]);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [editing]);
+
+  const handleSave = () => {
+    setEditing(false);
+    const trimmed = value.trim();
+    // If empty or same as original track name, clear the custom name
+    if (!trimmed || trimmed === trackName) {
+      setValue(trackName);
+      onNameChange?.(trackName, '');
+    } else if (trimmed !== displayName) {
+      onNameChange?.(trackName, trimmed);
+    }
+  };
+
+  if (!onNameChange) {
+    return <span className="flex-1 font-medium text-gray-200">{displayName}</span>;
+  }
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        className="flex-1 rounded bg-gray-800 px-2 py-0.5 text-sm font-medium text-gray-200 outline-none ring-1 ring-blue-500"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleSave();
+          if (e.key === 'Escape') {
+            setValue(displayName);
+            setEditing(false);
+          }
+        }}
+      />
+    );
+  }
+
+  return (
+    <button
+      className="flex-1 cursor-pointer rounded px-2 py-0.5 text-left text-sm font-medium text-gray-200 hover:bg-gray-800"
+      onClick={() => setEditing(true)}
+      title="Cliquez pour renommer"
+    >
+      {displayName}
+      {displayName !== trackName && (
+        <span className="ml-2 text-xs text-gray-500">({trackName})</span>
+      )}
+    </button>
+  );
+}
+
+export function CharacterInfo({ tracks, characterNames, onNameChange }: CharacterInfoProps) {
   // Normalize input to array
   const tracksArray = tracks === null
     ? []
@@ -70,6 +146,7 @@ export function CharacterInfo({ tracks }: CharacterInfoProps) {
       <div className="space-y-2">
         {sortedTracks.map((track, index) => {
           const speakingTime = calculateSpeakingTime(track);
+          const displayName = characterNames?.[track.name] || track.name;
           return (
             <div
               key={track.name}
@@ -87,10 +164,12 @@ export function CharacterInfo({ tracks }: CharacterInfoProps) {
                 {index + 1}.
               </span>
 
-              {/* Character name */}
-              <span className="flex-1 font-medium text-gray-200">
-                {track.name}
-              </span>
+              {/* Character name (editable) */}
+              <EditableName
+                trackName={track.name}
+                displayName={displayName}
+                onNameChange={onNameChange}
+              />
 
               {/* Speaking time */}
               <span className="text-gray-400">

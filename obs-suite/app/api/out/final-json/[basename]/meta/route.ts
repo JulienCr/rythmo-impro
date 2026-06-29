@@ -102,11 +102,32 @@ export async function POST(
       return NextResponse.json({ error: 'videoTitle must be a string' }, { status: 400 });
     }
 
+    if (body.characterNames !== undefined) {
+      if (typeof body.characterNames !== 'object' || body.characterNames === null || Array.isArray(body.characterNames)) {
+        return NextResponse.json({ error: 'characterNames must be an object' }, { status: 400 });
+      }
+      for (const [key, value] of Object.entries(body.characterNames)) {
+        if (typeof key !== 'string' || typeof value !== 'string') {
+          return NextResponse.json({ error: 'characterNames values must be strings' }, { status: 400 });
+        }
+      }
+    }
+
     const metaFilePath = getMetaFilePath(basename);
+
+    // Read existing meta to merge (so PATCH-like behavior)
+    let existingMeta: Partial<VideoMeta> = {};
+    try {
+      const content = await readFile(metaFilePath, 'utf-8');
+      existingMeta = JSON.parse(content);
+    } catch {
+      // File doesn't exist yet, start fresh
+    }
 
     const meta: VideoMeta = {
       version: 1,
-      videoTitle: body.videoTitle,
+      videoTitle: body.videoTitle !== undefined ? body.videoTitle : existingMeta.videoTitle,
+      characterNames: body.characterNames !== undefined ? body.characterNames : existingMeta.characterNames,
     };
 
     await mkdir(FINAL_JSON_DIR, { recursive: true });

@@ -11,7 +11,12 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 import psutil
 import torch
@@ -151,6 +156,20 @@ logging.getLogger('pytorch_lightning').setLevel(logging.ERROR)
 logging.getLogger('lightning.pytorch').setLevel(logging.ERROR)
 
 
+def load_config() -> Dict[str, Any]:
+    """Load pipeline configuration from config.toml next to this script."""
+    config_path = Path(__file__).parent / "config.toml"
+    if not config_path.exists():
+        logger.warning(f"Config file not found at {config_path}, using built-in defaults")
+        return {}
+    with open(config_path, "rb") as f:
+        return tomllib.load(f)
+
+
+# Load configuration once at module level
+CONFIG = load_config()
+
+
 def get_video_duration_ms(video_path: Path) -> int:
     """
     Get video duration in milliseconds using ffprobe.
@@ -234,18 +253,20 @@ def assign_lanes(segments: List[Dict]) -> Tuple[Dict[str, int], List[Dict]]:
     return lane_map, speakers
 
 
-# Memory requirements for Whisper models (in GB)
-MODEL_MEMORY_REQUIREMENTS = {
-    'tiny': 1.0,
-    'base': 1.5,
-    'small': 2.5,
-    'medium': 5.0,
-    'large': 10.0,
-    'large-v2': 10.0,
-    'large-v3': 10.0,
-}
-DIARIZATION_MEMORY_GB = 2.0  # pyannote pipeline
-ALIGNMENT_MEMORY_GB = 1.0     # per language
+# Pre-extract config sections once at module level
+WHISPER_CFG = CONFIG.get("whisper", {})
+DIARIZATION_CFG = CONFIG.get("diarization", {})
+SEGMENTS_CFG = CONFIG.get("segments", {})
+VAD_CFG = CONFIG.get("vad", {})
+
+# Memory requirements for Whisper models (in GB) — from config.toml
+MODEL_MEMORY_REQUIREMENTS = WHISPER_CFG.get("memory_gb", {
+    'tiny': 1.0, 'base': 1.5, 'small': 2.5, 'medium': 5.0,
+    'large': 10.0, 'large-v2': 10.0, 'large-v3': 10.0,
+})
+DIARIZATION_MEMORY_GB = DIARIZATION_CFG.get("memory_gb", 2.0)
+ALIGNMENT_MEMORY_GB = DIARIZATION_CFG.get("alignment_memory_gb", 1.0)
+DIARIZATION_MODEL_NAME = DIARIZATION_CFG.get("model")
 
 
 class ModelManager:
@@ -328,11 +349,15 @@ class ModelManager:
         required_gb = MODEL_MEMORY_REQUIREMENTS.get(self.model_size, 10.0)
         self._check_available_memory(required_gb)
 
+        whisper_cfg = WHISPER_CFG
+        compute_type = (whisper_cfg.get("compute_type_gpu", "float16")
+                        if self.device == "cuda"
+                        else whisper_cfg.get("compute_type_cpu", "int8"))
         logger.info(f"Loading Whisper model ({self.model_size})...")
         self.whisper_model = whisperx.load_model(
             self.model_size,
             self.device,
-            compute_type="float16" if self.device == "cuda" else "int8"
+            compute_type=compute_type
         )
         logger.info(f"   ✓ Whisper ready")
 
@@ -345,9 +370,11 @@ class ModelManager:
         # Check memory before loading
         self._check_available_memory(DIARIZATION_MEMORY_GB)
 
+        diarization_model_name = DIARIZATION_MODEL_NAME
         logger.info(f"Loading speaker diarization model...")
         self.diarize_model = DiarizationPipeline(
-            use_auth_token=self.hf_token,
+            model_name=diarization_model_name,
+            token=self.hf_token,
             device=self.device
         )
         logger.info(f"   ✓ Diarization ready")
@@ -508,13 +535,18 @@ def run_diarization(
 
     try:
         # Load Whisper model (or use pre-loaded)
+        whisper_cfg = WHISPER_CFG
+
         if whisper_model is None:
+            compute_type = (whisper_cfg.get("compute_type_gpu", "float16")
+                            if device == "cuda"
+                            else whisper_cfg.get("compute_type_cpu", "int8"))
             logger.info(f"[1/6] Loading Whisper model '{model_size}' on {device}...")
             logger.info(f"      (This may take a minute on first run)")
             model = whisperx.load_model(
                 model_size,
                 device,
-                compute_type="float16" if device == "cuda" else "int8"
+                compute_type=compute_type
             )
             logger.info(f"      ✓ Model loaded successfully")
         else:
@@ -530,9 +562,12 @@ def run_diarization(
         logger.info(f"[3/6] Transcribing audio...")
         if language == "auto":
             logger.info(f"      (Auto-detecting language - this may take longer)")
+        batch_size = (whisper_cfg.get("batch_size_gpu", 16)
+                      if device == "cuda"
+                      else whisper_cfg.get("batch_size_cpu", 4))
         result = model.transcribe(
             audio,
-            batch_size=16 if device == "cuda" else 4,
+            batch_size=batch_size,
             language=None if language == "auto" else language
         )
         detected_lang = result.get("language", "unknown")
@@ -568,9 +603,11 @@ def run_diarization(
         # Diarize (use pre-loaded if available)
         logger.info(f"[5/6] Running speaker diarization...")
         if diarize_model is None:
+            diarization_model_name = DIARIZATION_MODEL_NAME
             logger.info(f"      (Loading pyannote models - this may take a minute)")
             diarize_model = DiarizationPipeline(
-                use_auth_token=hf_token,
+                model_name=diarization_model_name,
+                token=hf_token,
                 device=device
             )
         else:
@@ -647,10 +684,10 @@ def run_diarization(
 
 def extract_segments(
     diarization_result: Dict,
-    silence_threshold_sec: float = 0.3,
-    merge_gap_sec: float = 0.1,
-    min_duration_sec: float = 0.2,
-    min_word_confidence: float = 0.3
+    silence_threshold_sec: float = 0.5,
+    merge_gap_sec: float = 0.05,
+    min_duration_sec: float = 0.1,
+    min_word_confidence: float = 0.15
 ) -> List[Dict]:
     """
     Extract refined speaker segments using word-level timestamps.
@@ -940,131 +977,121 @@ def _words_to_segment(words: List[Dict], segment_text: str = None) -> Dict:
 def apply_vad_trimming(
     segments: List[Dict],
     audio_path: Path,
-    vad_threshold: float = 0.5,
-    vad_aggressiveness: str = 'medium'
+    onset: float = 0.5,
+    offset: float = 0.5,
+    min_duration_on: float = 0.0,
+    min_duration_off: float = 0.0,
 ) -> List[Dict]:
     """
-    Trim word end timestamps using Silero VAD to remove trailing silence.
+    Trim word timestamps using pyannote segmentation-3.0 VAD.
 
-    For each word:
-    1. Extract audio segment [word.start, word.end]
-    2. Run VAD to find actual speech boundaries
-    3. Trim word.end to last speech frame + small buffer
-    4. Ensure trimmed end >= word.start (avoid invalid timestamps)
+    Runs full-audio VAD once (~17ms frame resolution, overlap-aware),
+    then trims each word's end to the last speech frame within its span.
+    Words that fall entirely outside speech regions are marked low-confidence.
 
     Args:
         segments: List of segment dicts with words arrays
         audio_path: Path to audio/video file
-        vad_threshold: Speech probability threshold (0.0-1.0, default 0.5)
-        vad_aggressiveness: Preset level ('low', 'medium', 'high')
+        onset: Speech onset probability threshold (0.0-1.0)
+        offset: Speech offset probability threshold (0.0-1.0)
+        min_duration_on: Remove speech regions shorter than this (seconds)
+        min_duration_off: Fill non-speech gaps shorter than this (seconds)
 
     Returns:
         Modified segments list with trimmed word timestamps
     """
-    import torch
-    import whisperx
+    from pyannote.audio.pipelines import VoiceActivityDetection as VoiceActivityDetectionPipeline
 
-    # VAD aggressiveness presets
-    VAD_PRESETS = {
-        'low': {'min_speech_duration_ms': 250, 'min_silence_duration_ms': 100, 'threshold': 0.4},
-        'medium': {'min_speech_duration_ms': 200, 'min_silence_duration_ms': 80, 'threshold': 0.5},
-        'high': {'min_speech_duration_ms': 150, 'min_silence_duration_ms': 50, 'threshold': 0.6}
-    }
+    seg_model = VAD_CFG.get("segmentation_model", "pyannote/segmentation-3.0")
+    hf_token = os.environ.get('HF_TOKEN')
 
-    preset = VAD_PRESETS.get(vad_aggressiveness, VAD_PRESETS['medium'])
-    actual_threshold = preset['threshold'] if vad_threshold == 0.5 else vad_threshold
-
-    logger.info(f"Loading Silero VAD model (aggressiveness: {vad_aggressiveness})...")
+    logger.info(f"Loading pyannote VAD model ({seg_model})...")
 
     try:
-        # Load Silero VAD model
-        model, utils = torch.hub.load(
-            repo_or_dir='snakers4/silero-vad',
-            model='silero_vad',
-            force_reload=False,
-            trust_repo=True
+        vad_pipeline = VoiceActivityDetectionPipeline(
+            segmentation=seg_model,
+            token=hf_token,
         )
-        get_speech_timestamps = utils[0]
+        # Set hyper-parameters (no optimization, use directly)
+        vad_pipeline.onset = onset
+        vad_pipeline.offset = offset
+        vad_pipeline.min_duration_on = min_duration_on
+        vad_pipeline.min_duration_off = min_duration_off
+        vad_pipeline.initialize()
 
-        # Load audio
-        logger.info(f"Loading audio for VAD processing: {audio_path}")
-        audio = whisperx.load_audio(str(audio_path))
-        sample_rate = 16000  # WhisperX uses 16kHz
+        # Run VAD on full audio — returns pyannote.core.Annotation
+        logger.info(f"Running VAD on full audio: {audio_path.name}")
+        speech_regions = vad_pipeline(str(audio_path))
+
+        # Convert to sorted list of (start, end) tuples for fast lookup
+        speech_timeline = sorted(
+            [(seg.start, seg.end) for seg in speech_regions.get_timeline()],
+            key=lambda x: x[0]
+        )
+        total_speech_sec = sum(e - s for s, e in speech_timeline)
+        logger.info(
+            f"   ✓ VAD detected {len(speech_timeline)} speech regions "
+            f"({total_speech_sec:.1f}s total speech)"
+        )
 
         total_words = sum(len(seg.get('words', [])) for seg in segments)
         trimmed_count = 0
         total_trim_ms = 0
 
-        logger.info(f"Processing {total_words} words with VAD...")
+        logger.info(f"Trimming {total_words} words against speech timeline...")
 
-        # Process each segment
-        for seg_idx, segment in enumerate(segments):
-            words = segment.get('words', [])
+        # Collect all words across segments and sort by start time so the
+        # running-pointer optimisation works even with overlapping speakers.
+        all_words = [w for seg in segments for w in seg.get('words', [])]
+        all_words.sort(key=lambda w: w['start'])
 
-            if not words:
+        # Maintain a pointer into speech_timeline to avoid re-scanning
+        # regions that end before the current word (O(words + regions) total).
+        region_hint = 0
+        num_regions = len(speech_timeline)
+
+        def find_last_speech_end(word_start: float, word_end: float) -> Optional[float]:
+            """Find the end of the last speech region overlapping [word_start, word_end]."""
+            nonlocal region_hint
+            # Advance hint past regions that end before this word starts
+            while region_hint < num_regions and speech_timeline[region_hint][1] <= word_start:
+                region_hint += 1
+            last_end = None
+            for i in range(region_hint, num_regions):
+                s_start, s_end = speech_timeline[i]
+                if s_start >= word_end:
+                    break  # Past the word, no more overlaps
+                if s_end > word_start:
+                    last_end = min(s_end, word_end)
+            return last_end
+
+        for word in all_words:
+            word_duration = word['end'] - word['start']
+            if word_duration < 0.05:
+                continue  # Skip very short words
+
+            speech_end = find_last_speech_end(word['start'], word['end'])
+
+            if speech_end is None:
+                # Word falls entirely outside speech — leave unchanged
                 continue
 
-            # Process each word in segment
-            for word_idx, word in enumerate(words):
-                # Skip very short words (< 200ms) - already tight
-                word_duration = word['end'] - word['start']
-                if word_duration < 0.2:
-                    continue
+            original_end = word['end']
+            # Add a small buffer (17ms ≈ one pyannote frame)
+            new_end = min(speech_end + 0.017, original_end)
+            # Safety: ensure end > start + 30ms
+            new_end = max(word['start'] + 0.03, new_end)
 
-                # Extract word audio segment
-                word_start_sample = int(word['start'] * sample_rate)
-                word_end_sample = int(word['end'] * sample_rate)
+            if original_end - new_end > 0.01:
+                trim_amount_ms = (original_end - new_end) * 1000
+                word['end'] = new_end
+                trimmed_count += 1
+                total_trim_ms += trim_amount_ms
 
-                # Ensure we don't go out of bounds
-                word_end_sample = min(word_end_sample, len(audio))
-                if word_start_sample >= word_end_sample:
-                    continue
-
-                word_audio = audio[word_start_sample:word_end_sample]
-
-                # Run VAD on word audio
-                try:
-                    word_audio_tensor = torch.from_numpy(word_audio)
-                    speech_timestamps = get_speech_timestamps(
-                        word_audio_tensor,
-                        model,
-                        threshold=actual_threshold,
-                        sampling_rate=sample_rate,
-                        min_speech_duration_ms=preset['min_speech_duration_ms'],
-                        min_silence_duration_ms=preset['min_silence_duration_ms'],
-                        window_size_samples=512  # 32ms @ 16kHz
-                    )
-
-                    # Find last speech frame
-                    if speech_timestamps:
-                        last_speech_end = speech_timestamps[-1]['end']  # Relative to word start
-
-                        # Convert back to absolute time with small buffer (50ms)
-                        buffer_samples = int(0.05 * sample_rate)  # 50ms buffer
-                        trimmed_end_sample = word_start_sample + last_speech_end + buffer_samples
-
-                        # Update word end time
-                        new_end = trimmed_end_sample / sample_rate
-                        original_end = word['end']
-
-                        # Safety: ensure end > start + 50ms and don't extend beyond original
-                        new_end = max(word['start'] + 0.05, min(new_end, original_end))
-
-                        # Only update if we actually trimmed something (> 10ms reduction)
-                        if original_end - new_end > 0.01:
-                            trim_amount_ms = (original_end - new_end) * 1000
-                            word['end'] = new_end
-                            trimmed_count += 1
-                            total_trim_ms += trim_amount_ms
-
-                            logger.debug(
-                                f"Trimmed word '{word.get('word', '?')}' by {trim_amount_ms:.0f}ms "
-                                f"({original_end:.3f}s → {new_end:.3f}s)"
-                            )
-
-                except Exception as e:
-                    logger.warning(f"VAD failed for word '{word.get('word', '?')}': {e}")
-                    continue
+                logger.debug(
+                    f"Trimmed word '{word.get('word', '?')}' by {trim_amount_ms:.0f}ms "
+                    f"({original_end:.3f}s → {new_end:.3f}s)"
+                )
 
         # Update segment boundaries based on trimmed words
         for segment in segments:
@@ -1242,8 +1269,8 @@ def generate_enhanced_json(
     duration_ms: int,
     output_path: Path,
     vad_enabled: bool = False,
-    vad_threshold: float = 0.5,
-    vad_aggressiveness: str = 'medium'
+    vad_onset: float = 0.5,
+    vad_offset: float = 0.5,
 ) -> None:
     """
     Generate enhanced JSON with debugging metadata.
@@ -1256,8 +1283,8 @@ def generate_enhanced_json(
         duration_ms: Video duration in milliseconds
         output_path: Path to write enhanced JSON file
         vad_enabled: Whether VAD trimming was applied
-        vad_threshold: VAD threshold used (if enabled)
-        vad_aggressiveness: VAD aggressiveness preset used (if enabled)
+        vad_onset: VAD onset threshold used (if enabled)
+        vad_offset: VAD offset threshold used (if enabled)
     """
     # Collect all unique speakers
     speakers = sorted(list(set(seg['speaker'] for seg in segments)))
@@ -1304,8 +1331,9 @@ def generate_enhanced_json(
     if vad_enabled:
         output_data['vad_trimming'] = {
             'enabled': True,
-            'threshold': vad_threshold,
-            'aggressiveness': vad_aggressiveness
+            'engine': 'pyannote/segmentation-3.0',
+            'onset': vad_onset,
+            'offset': vad_offset,
         }
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1378,14 +1406,16 @@ def process_video(
     device: str,
     min_speakers: int = None,
     max_speakers: int = None,
-    silence_threshold_sec: float = 0.3,
-    merge_gap_sec: float = 0.1,
-    min_duration_sec: float = 0.2,
-    min_word_confidence: float = 0.3,
+    silence_threshold_sec: float = 0.5,
+    merge_gap_sec: float = 0.05,
+    min_duration_sec: float = 0.1,
+    min_word_confidence: float = 0.15,
     clustering_threshold: float = None,
     enable_vad_trimming: bool = False,
-    vad_threshold: float = 0.5,
-    vad_aggressiveness: str = 'medium',
+    vad_onset: float = 0.4,
+    vad_offset: float = 0.35,
+    vad_min_duration_on: float = 0.0,
+    vad_min_duration_off: float = 0.0,
     model_manager: Optional['ModelManager'] = None
 ) -> bool:
     """
@@ -1404,9 +1434,11 @@ def process_video(
         min_duration_sec: Minimum segment duration in seconds
         min_word_confidence: Minimum confidence for words (0.0-1.0)
         clustering_threshold: Pyannote clustering threshold (0.0-2.0)
-        enable_vad_trimming: Enable VAD-based word timestamp trimming
-        vad_threshold: VAD speech probability threshold (0.0-1.0)
-        vad_aggressiveness: VAD aggressiveness preset ('low', 'medium', 'high')
+        enable_vad_trimming: Enable pyannote VAD-based word timestamp trimming
+        vad_onset: VAD onset threshold (0.0-1.0)
+        vad_offset: VAD offset threshold (0.0-1.0)
+        vad_min_duration_on: Remove speech regions shorter than this (seconds)
+        vad_min_duration_off: Fill non-speech gaps shorter than this (seconds)
         model_manager: Pre-loaded ModelManager for batch processing (optional)
 
     Returns:
@@ -1465,12 +1497,14 @@ def process_video(
 
         # Apply VAD trimming if enabled
         if enable_vad_trimming:
-            logger.info(f"Applying VAD trimming (aggressiveness: {vad_aggressiveness})...")
+            logger.info(f"Applying pyannote VAD trimming...")
             segments = apply_vad_trimming(
                 segments,
                 video_path,
-                vad_threshold=vad_threshold,
-                vad_aggressiveness=vad_aggressiveness
+                onset=vad_onset,
+                offset=vad_offset,
+                min_duration_on=vad_min_duration_on,
+                min_duration_off=vad_min_duration_off,
             )
 
         # Generate CLI format (strict compatibility with CLI audio player)
@@ -1487,8 +1521,8 @@ def process_video(
             duration_ms,
             enhanced_output_path,
             vad_enabled=enable_vad_trimming,
-            vad_threshold=vad_threshold,
-            vad_aggressiveness=vad_aggressiveness
+            vad_onset=vad_onset,
+            vad_offset=vad_offset,
         )
 
         # Generate SRT subtitle file for auditing
@@ -1535,13 +1569,13 @@ def main():
     parser.add_argument(
         '--model',
         choices=['tiny', 'base', 'small', 'medium', 'large', 'large-v2', 'large-v3'],
-        default='large-v3',
-        help='Whisper model size (default: large-v3). large-v3 is most accurate but slowest'
+        default=None,
+        help='Whisper model size (default: from config.toml). large-v3 is most accurate but slowest'
     )
     parser.add_argument(
         '--language',
-        default='auto',
-        help='Language code (default: auto). Examples: en, fr, es'
+        default=None,
+        help='Language code (default: from config.toml). Examples: en, fr, es'
     )
     parser.add_argument(
         '--min-speakers',
@@ -1564,31 +1598,31 @@ def main():
     segment_group.add_argument(
         '--silence-threshold',
         type=float,
-        default=0.3,
-        help='Split segments on word gaps >= this value in seconds (default: 0.3). '
+        default=None,
+        help='Split segments on word gaps >= this value in seconds (default: from config.toml). '
              'Increase to allow longer natural pauses within a segment.'
     )
     segment_group.add_argument(
         '--merge-gap',
         type=float,
-        default=0.1,
-        help='Merge adjacent same-speaker segments with gaps < this value in seconds (default: 0.1). '
+        default=None,
+        help='Merge adjacent same-speaker segments with gaps < this value in seconds (default: from config.toml). '
              'Increase to be more aggressive in consolidating fragmented speech. '
              'Use 0.0 to disable merging entirely.'
     )
     segment_group.add_argument(
         '--min-duration',
         type=float,
-        default=0.2,
-        help='Filter segments shorter than this duration in seconds (default: 0.2). '
+        default=None,
+        help='Filter segments shorter than this duration in seconds (default: from config.toml). '
              'Helps remove filler words and noise. '
              'Use 0.0 to keep all segments.'
     )
     segment_group.add_argument(
         '--min-word-confidence',
         type=float,
-        default=0.3,
-        help='Minimum confidence score for words (range: 0.0-1.0, default: 0.3). '
+        default=None,
+        help='Minimum confidence score for words (range: 0.0-1.0, default: from config.toml). '
              'Lower values keep more words but may include hallucinations. '
              'Higher values filter more aggressively. '
              'If you are missing words, try lowering this to 0.2 or 0.1.'
@@ -1612,32 +1646,43 @@ def main():
     # Voice Activity Detection (VAD) for silence trimming
     vad_group = parser.add_argument_group(
         'Voice Activity Detection (VAD)',
-        'Trim word timestamps to remove trailing silence using Silero VAD'
+        'Trim word timestamps using pyannote segmentation-3.0 (~17ms resolution, overlap-aware)'
     )
     vad_group.add_argument(
         '--enable-vad-trimming',
         action='store_true',
-        default=False,
-        help='Enable VAD-based trimming of word timestamps (removes trailing silence). '
-             'Default: disabled for backward compatibility. '
+        default=None,
+        help='Enable pyannote VAD trimming of word timestamps (removes trailing silence). '
+             'Default: from config.toml. '
              'Recommended for visualization to prevent bars appearing during silence.'
     )
     vad_group.add_argument(
-        '--vad-threshold',
+        '--vad-onset',
         type=float,
-        default=0.5,
-        help='VAD speech probability threshold (range: 0.0-1.0, default: 0.5). '
-             'Higher = more aggressive trimming (may cut off breathy speech ends). '
-             'Lower = more conservative (may keep some trailing silence).'
+        default=None,
+        help='VAD onset threshold (range: 0.0-1.0, default: from config.toml). '
+             'Higher = fewer false positives (stricter speech detection).'
     )
     vad_group.add_argument(
-        '--vad-aggressiveness',
-        choices=['low', 'medium', 'high'],
-        default='medium',
-        help='VAD aggressiveness preset (default: medium). '
-             'low = conservative (250ms min speech, 100ms min silence), '
-             'medium = balanced (200ms min speech, 80ms min silence), '
-             'high = aggressive (150ms min speech, 50ms min silence).'
+        '--vad-offset',
+        type=float,
+        default=None,
+        help='VAD offset threshold (range: 0.0-1.0, default: from config.toml). '
+             'Lower = speech ends detected sooner (more aggressive trimming).'
+    )
+    vad_group.add_argument(
+        '--vad-min-duration-on',
+        type=float,
+        default=None,
+        help='Remove speech regions shorter than this (seconds, default: from config.toml). '
+             '0.0 keeps all detected speech, preserving short interjections.'
+    )
+    vad_group.add_argument(
+        '--vad-min-duration-off',
+        type=float,
+        default=None,
+        help='Fill non-speech gaps shorter than this (seconds, default: from config.toml). '
+             '0.0 preserves all gaps, keeping the natural rhythm of pauses.'
     )
 
     # Skip existing files option
@@ -1655,6 +1700,34 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Resolve CLI args vs config.toml defaults (CLI takes precedence)
+    whisper_cfg = WHISPER_CFG
+    segments_cfg = SEGMENTS_CFG
+    vad_cfg = VAD_CFG
+
+    if args.model is None:
+        args.model = whisper_cfg.get("model", "large-v3")
+    if args.language is None:
+        args.language = whisper_cfg.get("language", "auto")
+    if args.silence_threshold is None:
+        args.silence_threshold = segments_cfg.get("silence_threshold", 0.5)
+    if args.merge_gap is None:
+        args.merge_gap = segments_cfg.get("merge_gap", 0.05)
+    if args.min_duration is None:
+        args.min_duration = segments_cfg.get("min_duration", 0.1)
+    if args.min_word_confidence is None:
+        args.min_word_confidence = segments_cfg.get("min_word_confidence", 0.15)
+    if args.enable_vad_trimming is None:
+        args.enable_vad_trimming = vad_cfg.get("enabled", False)
+    if args.vad_onset is None:
+        args.vad_onset = vad_cfg.get("onset", 0.4)
+    if args.vad_offset is None:
+        args.vad_offset = vad_cfg.get("offset", 0.35)
+    if args.vad_min_duration_on is None:
+        args.vad_min_duration_on = vad_cfg.get("min_duration_on", 0.0)
+    if args.vad_min_duration_off is None:
+        args.vad_min_duration_off = vad_cfg.get("min_duration_off", 0.0)
 
     try:
         # Resolve directories relative to script location
@@ -1764,8 +1837,10 @@ def main():
                     min_word_confidence=args.min_word_confidence,
                     clustering_threshold=args.clustering_threshold,
                     enable_vad_trimming=args.enable_vad_trimming,
-                    vad_threshold=args.vad_threshold,
-                    vad_aggressiveness=args.vad_aggressiveness,
+                    vad_onset=args.vad_onset,
+                    vad_offset=args.vad_offset,
+                    vad_min_duration_on=args.vad_min_duration_on,
+                    vad_min_duration_off=args.vad_min_duration_off,
                     model_manager=model_manager
                 )
                 results.append((video_path.name, success))

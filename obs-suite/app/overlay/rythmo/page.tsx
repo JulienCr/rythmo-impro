@@ -5,7 +5,8 @@ import { useEffect, useRef, useState, Suspense, useCallback } from 'react';
 import RythmoOverlay from '@/components/RythmoOverlay';
 import IntroPanel from '@/components/IntroPanel';
 import Countdown from '@/components/Countdown';
-import { loadTracksFromUrl } from '@/lib/loadFcpxmlTracks';
+import { loadTracksFromUrl, transformToVisualizationData } from '@/lib/loadFcpxmlTracks';
+import { validateCharacterTracksData } from '@/lib/fcpxmlTypes';
 import type { CharacterVisualizationData } from '@/lib/fcpxmlTypes';
 import { extractBasename, deriveTracksUrl } from '@/lib/urlUtils';
 import { useWebSocket } from '@/hooks/useWebSocket';
@@ -166,13 +167,22 @@ function RythmoOverlayContent() {
       const basename = extractBasename(videoSrc);
 
       // Fetch tracks and metadata in parallel
-      const tracksPromise = loadTracksFromUrl(tracksUrl);
+      const tracksPromise = fetch(tracksUrl).then(res => {
+        if (!res.ok) throw new Error(`Failed to load tracks: ${res.status}`);
+        return res.json();
+      });
       const metaPromise = fetch(`/api/out/final-json/${basename}/meta`)
         .then(res => res.ok ? res.json() : null)
         .catch(() => null);
 
       try {
-        const [vizData, metaData] = await Promise.all([tracksPromise, metaPromise]);
+        const [tracksJson, metaData] = await Promise.all([tracksPromise, metaPromise]);
+        validateCharacterTracksData(tracksJson);
+
+        // Apply character name mapping from metadata
+        const characterNames = metaData?.characterNames as Record<string, string> | undefined;
+        const vizData = transformToVisualizationData(tracksJson, characterNames);
+
         setVisualizationData(vizData);
         // Set custom video title if present in metadata
         if (metaData?.videoTitle) {

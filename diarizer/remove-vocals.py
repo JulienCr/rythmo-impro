@@ -12,6 +12,22 @@ import shutil
 from pathlib import Path
 
 try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
+
+
+def _load_config():
+    config_path = Path(__file__).parent / "config.toml"
+    if not config_path.exists():
+        return {}
+    with open(config_path, "rb") as f:
+        return tomllib.load(f)
+
+
+_CONFIG = _load_config()
+
+try:
     from audio_separator.separator import Separator
 except ImportError:
     print("❌ audio-separator not installed!")
@@ -37,7 +53,7 @@ def check_audio_stream(video_path: Path) -> bool:
 def remove_vocals(
     video_path: Path,
     output_path: Path,
-    model: str = "MDX23C-InstVoc HQ",
+    model: str = None,
     force: bool = False
 ) -> bool:
     """
@@ -52,6 +68,10 @@ def remove_vocals(
     Returns:
         True if successful
     """
+    vr_cfg = _CONFIG.get("vocal_removal", {})
+    if model is None:
+        model = vr_cfg.get("model", "MDX23C-InstVoc HQ")
+
     # Skip if exists and not force
     if output_path.exists() and not force:
         print(f"⏭ Skipping {video_path.name} - output exists")
@@ -90,10 +110,11 @@ def remove_vocals(
 
         try:
             # Map user-friendly model names to actual filenames
-            model_map = {
+            default_map = {
                 'MDX23C-InstVoc HQ': 'MDX23C-8KFFT-InstVoc_HQ.ckpt',
                 'MDX23C-InstVoc HQ 2': 'MDX23C-8KFFT-InstVoc_HQ_2.ckpt',
             }
+            model_map = vr_cfg.get("model_map", default_map)
             model_filename = model_map.get(model, model)
 
             # Check CUDA availability
@@ -106,9 +127,9 @@ def remove_vocals(
             # Initialize separator with output configuration
             separator = Separator(
                 output_dir=str(tmpdir),
-                output_format='wav',
-                normalization_threshold=0.9,
-                output_single_stem='Instrumental',  # Only extract instrumental
+                output_format=vr_cfg.get("output_format", "wav"),
+                normalization_threshold=vr_cfg.get("normalization_threshold", 0.9),
+                output_single_stem=vr_cfg.get("output_stem", "Instrumental"),
             )
 
             # Load the model
@@ -144,8 +165,8 @@ def remove_vocals(
                 '-map', '0:v',                   # Take video from input 0
                 '-map', '1:a',                   # Take audio from input 1
                 '-c:v', 'copy',                  # Copy video codec (no re-encode)
-                '-c:a', 'aac',                   # Encode audio as AAC
-                '-b:a', '192k',                  # Audio bitrate
+                '-c:a', vr_cfg.get("audio_codec", "aac"),
+                '-b:a', vr_cfg.get("audio_bitrate", "192k"),
                 str(output_path), '-y'
             ], check=True, capture_output=True)
         except subprocess.CalledProcessError as e:
@@ -162,8 +183,8 @@ def main():
     )
     parser.add_argument('--input', required=True, help='Input video file')
     parser.add_argument('--output', required=True, help='Output video file')
-    parser.add_argument('--model', default='MDX23C-InstVoc HQ',
-                       help='audio-separator model (default: MDX23C-InstVoc HQ)')
+    parser.add_argument('--model', default=None,
+                       help='audio-separator model (default: from config.toml)')
     parser.add_argument('--force', action='store_true',
                        help='Overwrite existing output')
 
